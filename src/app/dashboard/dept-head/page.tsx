@@ -30,11 +30,14 @@ export default async function DeptHeadDashboard() {
     }
 
     // Fetch Requests
-    const { data: requests } = await supabase
+    const { data: requests, error: reqError } = await supabase
         .from('ppe_requests')
         .select('*, ppe_master(name, unit)')
-        .eq('requester_department_id', appUser.department_id)
         .order('created_at', { ascending: false })
+
+    if (reqError) {
+        console.error("Dept Head fetch error:", reqError)
+    }
 
     return (
         <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-4 md:p-8">
@@ -53,6 +56,12 @@ export default async function DeptHeadDashboard() {
 
                 <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6">
                     <h2 className="text-xl font-semibold mb-4">{t.deptHead.pendingTitle}</h2>
+                    {reqError && (
+                        <div className="p-4 mb-4 text-red-800 bg-red-100 rounded-lg">
+                            Fetch Error: {reqError.message}
+                            <pre className="text-xs">{JSON.stringify(reqError, null, 2)}</pre>
+                        </div>
+                    )}
                     <RequestsTable requests={requests || []} />
                 </div>
             </div>
