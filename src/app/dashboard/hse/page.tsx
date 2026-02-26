@@ -29,12 +29,10 @@ export default async function HseDashboard() {
         return <div className="p-8">Unauthorized. Only HSE can access this page.</div>
     }
 
-    // Fetch PENDING_HSE requests + history
-    // Fetch PENDING_HSE requests + history
+    // Fetch All requests + history
     const { data: requests } = await supabase
         .from('ppe_requests')
         .select('*, ppe_master(*), departments(*)')
-        .neq('status', 'PENDING_DEPT') // Do not show requests still waiting for Dept Head
         .order('created_at', { ascending: false })
         .limit(100)
 

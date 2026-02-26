@@ -39,7 +39,7 @@ export async function submitPpeRequest(formData: z.infer<typeof PPE_REQUEST_SCHE
         }
 
         // 2. Insert the request
-        const { data: newRequest, error: insertError } = await supabase
+        const { error: insertError } = await supabase
             .from('ppe_requests')
             .insert({
                 requester_name: formData.requesterName,
@@ -53,8 +53,6 @@ export async function submitPpeRequest(formData: z.infer<typeof PPE_REQUEST_SCHE
                 attachment_url: formData.attachmentUrl || null,
                 status: 'PENDING_DEPT'
             })
-            .select('id')
-            .single()
 
         if (insertError) {
             console.error(insertError)
@@ -83,7 +81,7 @@ export async function submitPpeRequest(formData: z.infer<typeof PPE_REQUEST_SCHE
         revalidatePath('/dashboard/dept-head')
         revalidatePath('/dashboard/hse')
 
-        return { success: true, id: newRequest.id }
+        return { success: true }
     } catch (err: any) {
         console.error(err)
         return { error: 'An unexpected error occurred.' }
