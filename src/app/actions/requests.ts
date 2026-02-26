@@ -45,7 +45,7 @@ export async function submitPpeRequest(formData: z.infer<typeof PPE_REQUEST_SCHE
                 requester_emp_code: formData.requesterEmpCode || null,
                 requester_email: formData.requesterEmail || null,
                 requester_department_id: formData.departmentId,
-                requester_location: formData.location || null,
+                location: formData.location || null,
                 ppe_id: formData.ppeId,
                 quantity: formData.quantity,
                 note: formData.note || null,
