@@ -112,7 +112,11 @@ export function HseRequestsTable({ requests }: { requests: any[] }) {
                                     </TableCell>
                                     <TableCell>
                                         <Badge variant={req.status === 'PENDING_HSE' ? 'default' : 'outline'}>
-                                            {req.status}
+                                            {req.status === 'PENDING_DEPT' ? 'Chờ BP duyệt' :
+                                                req.status === 'PENDING_HSE' ? 'Chờ HSE duyệt' :
+                                                    req.status === 'APPROVED_ISSUED' ? 'Đã cấp phát' :
+                                                        req.status === 'REJECTED_BY_DEPT' ? 'BP từ chối' :
+                                                            req.status === 'REJECTED_BY_HSE' ? 'HSE từ chối' : req.status}
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="text-right">
