@@ -20,13 +20,19 @@ export async function approveRequestByHSE(requestId: string) {
   if (approver?.role !== 'HSE') return { error: 'Only HSE can approve this step.' }
 
   // 2. Fetch Request Data
-  const { data: req } = await supabase
+  const { data: req, error: selError } = await supabase
     .from('ppe_requests')
     .select('*, ppe_master(*), departments(name, dept_head_email)')
     .eq('id', requestId)
     .single()
 
-  if (!req || req.status !== 'PENDING_HSE') return { error: 'Request invalid or not pending HSE.' }
+  if (!req) {
+    return { error: 'Request not found in DB. DB error: ' + (selError?.message || 'unknown') }
+  }
+
+  if (req.status !== 'PENDING_HSE') {
+    return { error: `Request invalid. Expected PENDING_HSE but got: "${req.status}"` }
+  }
 
   const ppe = req.ppe_master
   if (ppe.stock_quantity < req.quantity) {
@@ -125,13 +131,15 @@ export async function rejectRequestByHSE(requestId: string, note: string) {
   const { data: approver } = await supabase.from('app_users').select('id, role').eq('auth_user_id', user.id).single()
   if (approver?.role !== 'HSE') return { error: 'Only HSE can do this.' }
 
-  const { data: req } = await supabase
+  const { data: req, error: selError } = await supabase
     .from('ppe_requests')
     .select('*, ppe_master(name, unit), departments(name, dept_head_email)')
     .eq('id', requestId)
     .single()
 
-  if (!req) return { error: 'Request not found' }
+  if (!req) {
+    return { error: 'Request not found in DB. DB error: ' + (selError?.message || 'unknown') }
+  }
 
   const { error } = await supabase
     .from('ppe_requests')
