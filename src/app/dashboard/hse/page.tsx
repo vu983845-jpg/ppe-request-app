@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { HseRequestsTable } from './client-page'
+import { HseRequestsTable, InventoryTable } from './client-page'
 import { logoutAction } from '@/app/actions/auth'
 import { Button } from '@/components/ui/button'
 
@@ -33,6 +33,12 @@ export default async function HseDashboard() {
         // In a real app we might only fetch PENDING_HSE or recent ones to avoid large payloads
         .limit(100)
 
+    // Fetch PPE Inventory
+    const { data: inventory } = await supabase
+        .from('ppe_master')
+        .select('*')
+        .order('name')
+
     return (
         <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-4 md:p-8">
             <div className="max-w-7xl mx-auto space-y-6">
@@ -51,6 +57,11 @@ export default async function HseDashboard() {
                 <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6">
                     <h2 className="text-xl font-semibold mb-4">Requests Needing Attention</h2>
                     <HseRequestsTable requests={requests || []} />
+                </div>
+
+                <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6 mt-8">
+                    <h2 className="text-xl font-semibold mb-4">Inventory Overview</h2>
+                    <InventoryTable inventory={inventory || []} />
                 </div>
             </div>
         </div>

@@ -156,3 +156,50 @@ export function HseRequestsTable({ requests }: { requests: any[] }) {
         </>
     )
 }
+
+export function InventoryTable({ inventory }: { inventory: any[] }) {
+    return (
+        <div className="rounded-md border">
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>Item Name</TableHead>
+                        <TableHead>Category</TableHead>
+                        <TableHead>Unit</TableHead>
+                        <TableHead className="text-right">Price</TableHead>
+                        <TableHead className="text-right">Min Stock</TableHead>
+                        <TableHead className="text-right">Current Stock</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {inventory.map((item) => {
+                        const isLow = item.stock_quantity <= item.minimum_stock
+                        return (
+                            <TableRow key={item.id}>
+                                <TableCell className="font-medium">{item.name}</TableCell>
+                                <TableCell>
+                                    <Badge variant="outline">{item.category}</Badge>
+                                </TableCell>
+                                <TableCell className="text-zinc-500">{item.unit}</TableCell>
+                                <TableCell className="text-right">${item.unit_price}</TableCell>
+                                <TableCell className="text-right text-zinc-500">{item.minimum_stock}</TableCell>
+                                <TableCell className="text-right">
+                                    <Badge variant={isLow ? "destructive" : "secondary"}>
+                                        {item.stock_quantity}
+                                    </Badge>
+                                </TableCell>
+                            </TableRow>
+                        )
+                    })}
+                    {inventory.length === 0 && (
+                        <TableRow>
+                            <TableCell colSpan={6} className="text-center py-6 text-zinc-500">
+                                No inventory items found.
+                            </TableCell>
+                        </TableRow>
+                    )}
+                </TableBody>
+            </Table>
+        </div>
+    )
+}
