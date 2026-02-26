@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import * as xlsx from 'xlsx'
 import { Badge } from '@/components/ui/badge'
+import { useLanguage } from '@/lib/i18n/context'
 
 export function AdminDashboardClient({
     budget,
@@ -14,6 +15,8 @@ export function AdminDashboardClient({
     requests: any[]
     ppeStats: any[]
 }) {
+    const { t } = useLanguage()
+
     const currentMonthRequests = requests.filter(r => {
         const d = new Date(r.created_at)
         const now = new Date()
@@ -52,7 +55,7 @@ export function AdminDashboardClient({
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-zinc-500">This Month Requests</CardTitle>
+                        <CardTitle className="text-sm font-medium text-zinc-500">{t.admin.metrics.thisMonthRequests}</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{currentMonthRequests.length}</div>
@@ -60,7 +63,7 @@ export function AdminDashboardClient({
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-zinc-500">This Month Cost</CardTitle>
+                        <CardTitle className="text-sm font-medium text-zinc-500">{t.admin.metrics.thisMonthCost}</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">\${currentMonthCost.toFixed(2)}</div>
@@ -68,7 +71,7 @@ export function AdminDashboardClient({
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-zinc-500">Budget Used</CardTitle>
+                        <CardTitle className="text-sm font-medium text-zinc-500">{t.admin.metrics.budgetUsed}</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{budgetPct}%</div>
@@ -77,7 +80,7 @@ export function AdminDashboardClient({
                 </Card>
                 <Card className={lowStockItems.length > 0 ? "border-red-500 bg-red-50/50 dark:bg-red-950/20" : ""}>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-zinc-500">Low Stock Alerts</CardTitle>
+                        <CardTitle className="text-sm font-medium text-zinc-500">{t.admin.metrics.lowStockAlerts}</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-red-600 dark:text-red-400">{lowStockItems.length} items</div>
@@ -87,28 +90,28 @@ export function AdminDashboardClient({
 
             <div className="flex justify-end">
                 <Button onClick={handleExport}>
-                    Export to Excel
+                    {t.admin.exportBtn}
                 </Button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Card>
                     <CardHeader>
-                        <CardTitle>Low Stock Items</CardTitle>
+                        <CardTitle>{t.admin.metrics.lowStockItems}</CardTitle>
                     </CardHeader>
                     <CardContent>
                         {lowStockItems.length === 0 ? (
-                            <p className="text-sm text-zinc-500">All items are sufficiently stocked.</p>
+                            <p className="text-sm text-zinc-500">{t.admin.metrics.allStocked}</p>
                         ) : (
                             <div className="space-y-4">
                                 {lowStockItems.map(item => (
                                     <div key={item.id} className="flex justify-between items-center border-b pb-2 last:border-0">
                                         <div>
                                             <p className="font-medium">{item.name}</p>
-                                            <p className="text-xs text-zinc-500">Min: {item.minimum_stock}</p>
+                                            <p className="text-xs text-zinc-500">{t.admin.metrics.min}: {item.minimum_stock}</p>
                                         </div>
                                         <Badge variant="destructive">
-                                            Stock: {item.stock_quantity}
+                                            {t.admin.metrics.stock}: {item.stock_quantity}
                                         </Badge>
                                     </div>
                                 ))}

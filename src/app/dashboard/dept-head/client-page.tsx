@@ -15,8 +15,10 @@ import { approveRequestByDept, rejectRequestByDept } from '@/app/actions/dept-he
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
+import { useLanguage } from '@/lib/i18n/context'
 
 export function RequestsTable({ requests }: { requests: any[] }) {
+    const { t } = useLanguage()
     const [loadingId, setLoadingId] = useState<string | null>(null)
     const [rejectDialog, setRejectDialog] = useState<{ open: boolean; requestId: string | null }>({
         open: false,
@@ -40,7 +42,7 @@ export function RequestsTable({ requests }: { requests: any[] }) {
         if (res?.error) {
             toast.error(res.error)
         } else {
-            toast.success('Rejected successfully')
+            toast.success(t.common.save) // We can keep a generic success here or reuse
             setRejectDialog({ open: false, requestId: null })
             setRejectNote('')
         }
@@ -52,12 +54,12 @@ export function RequestsTable({ requests }: { requests: any[] }) {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>Date</TableHead>
-                            <TableHead>Requester</TableHead>
-                            <TableHead>Item</TableHead>
-                            <TableHead>Qty</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
+                            <TableHead>{t.deptHead.table.date}</TableHead>
+                            <TableHead>{t.deptHead.table.requester}</TableHead>
+                            <TableHead>{t.deptHead.table.item}</TableHead>
+                            <TableHead>{t.deptHead.table.qty}</TableHead>
+                            <TableHead>{t.deptHead.table.status}</TableHead>
+                            <TableHead className="text-right">{t.deptHead.table.actions}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -87,14 +89,14 @@ export function RequestsTable({ requests }: { requests: any[] }) {
                                                 disabled={loadingId === req.id}
                                                 onClick={() => setRejectDialog({ open: true, requestId: req.id })}
                                             >
-                                                Reject
+                                                {t.common.reject}
                                             </Button>
                                             <Button
                                                 size="sm"
                                                 disabled={loadingId === req.id}
                                                 onClick={() => onApprove(req.id)}
                                             >
-                                                Approve
+                                                {t.common.approve}
                                             </Button>
                                         </div>
                                     )}
@@ -104,7 +106,7 @@ export function RequestsTable({ requests }: { requests: any[] }) {
                         {requests.length === 0 && (
                             <TableRow>
                                 <TableCell colSpan={6} className="text-center py-6 text-zinc-500">
-                                    No requests found for your department.
+                                    {t.deptHead.noRequests}
                                 </TableCell>
                             </TableRow>
                         )}
@@ -115,21 +117,21 @@ export function RequestsTable({ requests }: { requests: any[] }) {
             <Dialog open={rejectDialog.open} onOpenChange={(open) => !open && setRejectDialog({ open: false, requestId: null })}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Reject Request</DialogTitle>
+                        <DialogTitle>{t.deptHead.rejectDialogTitle}</DialogTitle>
                     </DialogHeader>
                     <div className="py-4">
                         <Textarea
-                            placeholder="Provide a reason for rejection (required)..."
+                            placeholder={t.deptHead.rejectDialogPlaceholder}
                             value={rejectNote}
                             onChange={(e) => setRejectNote(e.target.value)}
                         />
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setRejectDialog({ open: false, requestId: null })}>
-                            Cancel
+                            {t.common.cancel}
                         </Button>
                         <Button variant="destructive" onClick={onReject} disabled={!rejectNote.trim() || !!loadingId}>
-                            Confirm Reject
+                            {t.deptHead.rejectConfirmBtn}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

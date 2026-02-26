@@ -3,8 +3,12 @@ import { redirect } from 'next/navigation'
 import { RequestsTable } from './client-page'
 import { logoutAction } from '@/app/actions/auth'
 import { Button } from '@/components/ui/button'
+import { getLocale } from '@/app/actions/locale'
+import { dictionaries } from '@/lib/i18n/dictionaries'
 
 export default async function DeptHeadDashboard() {
+    const locale = await getLocale()
+    const t = dictionaries[locale]
     const supabase = await createClient()
 
     const {
@@ -37,18 +41,18 @@ export default async function DeptHeadDashboard() {
             <div className="max-w-6xl mx-auto space-y-6">
                 <div className="flex justify-between items-center">
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight">Department Dashboard</h1>
+                        <h1 className="text-3xl font-bold tracking-tight">{t.deptHead.title}</h1>
                         <p className="text-zinc-500">
-                            Department: {(appUser.departments as any)?.name}
+                            {t.deptHead.subtitle} - {(appUser.departments as any)?.name}
                         </p>
                     </div>
                     <form action={logoutAction}>
-                        <Button variant="outline" type="submit">Sign Out</Button>
+                        <Button variant="outline" type="submit">{t.common.signOut}</Button>
                     </form>
                 </div>
 
                 <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6">
-                    <h2 className="text-xl font-semibold mb-4">Pending & Recent Requests</h2>
+                    <h2 className="text-xl font-semibold mb-4">{t.deptHead.pendingTitle}</h2>
                     <RequestsTable requests={requests || []} />
                 </div>
             </div>

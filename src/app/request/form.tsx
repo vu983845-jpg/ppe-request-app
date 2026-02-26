@@ -7,6 +7,7 @@ import { z } from 'zod'
 import { toast } from 'sonner'
 import { submitPpeRequest } from '@/app/actions/requests'
 import { Department, PPEMaster } from '@/lib/types'
+import { useLanguage } from '@/lib/i18n/context'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -47,6 +48,7 @@ export function RequestForm({
     departments: Department[]
     ppes: PPEMaster[]
 }) {
+    const { t } = useLanguage()
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -91,9 +93,9 @@ export function RequestForm({
         const result = await submitPpeRequest(payload)
 
         if (result?.error) {
-            toast.error(result.error)
+            toast.error(t.requestForm.error + ' ' + result.error)
         } else {
-            toast.success('PPE Request submitted successfully! A notification was sent to your department head.')
+            toast.success(t.requestForm.success)
             form.reset()
         }
         setIsSubmitting(false)
@@ -108,7 +110,7 @@ export function RequestForm({
                         name="requesterName"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Full Name *</FormLabel>
+                                <FormLabel>{t.requestForm.fullName} *</FormLabel>
                                 <FormControl>
                                     <Input placeholder="John Doe" {...field} />
                                 </FormControl>
@@ -122,7 +124,7 @@ export function RequestForm({
                         name="requesterEmpCode"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Employee Code (Optional)</FormLabel>
+                                <FormLabel>{t.requestForm.empCode} ({t.common.optional})</FormLabel>
                                 <FormControl>
                                     <Input placeholder="EMP123" {...field} />
                                 </FormControl>
@@ -136,7 +138,7 @@ export function RequestForm({
                         name="requesterEmail"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Email (Optional)</FormLabel>
+                                <FormLabel>{t.requestForm.email} ({t.common.optional})</FormLabel>
                                 <FormControl>
                                     <Input type="email" placeholder="john.doe@example.com" {...field} />
                                 </FormControl>
@@ -150,7 +152,7 @@ export function RequestForm({
                         name="location"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Location / Line / Area</FormLabel>
+                                <FormLabel>{t.requestForm.location}</FormLabel>
                                 <FormControl>
                                     <Input placeholder="Line 3, Zone A" {...field} />
                                 </FormControl>
@@ -166,11 +168,11 @@ export function RequestForm({
                         name="departmentId"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Department *</FormLabel>
+                                <FormLabel>{t.requestForm.dept} *</FormLabel>
                                 <Select onValueChange={field.onChange} value={field.value}>
                                     <FormControl>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select a department" />
+                                            <SelectValue placeholder={t.requestForm.selectDept} />
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
@@ -191,11 +193,11 @@ export function RequestForm({
                         name="ppeId"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>PPE Item *</FormLabel>
+                                <FormLabel>{t.requestForm.ppeItem} *</FormLabel>
                                 <Select onValueChange={field.onChange} value={field.value}>
                                     <FormControl>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select an item" />
+                                            <SelectValue placeholder={t.requestForm.selectItem} />
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
@@ -216,7 +218,7 @@ export function RequestForm({
                         name="quantity"
                         render={({ field }) => (
                             <FormItem className="md:col-span-2 max-w-xs">
-                                <FormLabel>Quantity *</FormLabel>
+                                <FormLabel>{t.requestForm.qty} *</FormLabel>
                                 <FormControl>
                                     <Input
                                         type="number"
@@ -237,9 +239,9 @@ export function RequestForm({
                         name="note"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Reason / Note</FormLabel>
+                                <FormLabel>{t.requestForm.reason}</FormLabel>
                                 <FormControl>
-                                    <Textarea placeholder="Please specify why you need this item..." {...field} />
+                                    <Textarea placeholder={t.requestForm.reasonPlaceholder} {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -247,16 +249,16 @@ export function RequestForm({
                     />
 
                     <FormItem>
-                        <FormLabel>Attachment (Optional)</FormLabel>
+                        <FormLabel>{t.requestForm.attachment}</FormLabel>
                         <FormControl>
                             <Input type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} />
                         </FormControl>
-                        <p className="text-xs text-zinc-500">Upload any supporting document</p>
+                        <p className="text-xs text-zinc-500">{t.requestForm.attachmentDesc}</p>
                     </FormItem>
                 </div>
 
                 <Button type="submit" disabled={isSubmitting} className="w-full md:w-auto">
-                    {isSubmitting ? 'Submitting...' : 'Submit Request'}
+                    {isSubmitting ? t.requestForm.submitting : t.common.submit}
                 </Button>
             </form>
         </Form>

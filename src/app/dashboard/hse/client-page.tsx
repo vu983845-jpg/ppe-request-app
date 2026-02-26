@@ -15,8 +15,10 @@ import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
+import { useLanguage } from '@/lib/i18n/context'
 
 export function HseRequestsTable({ requests }: { requests: any[] }) {
+    const { t } = useLanguage()
     const [loadingId, setLoadingId] = useState<string | null>(null)
     const [rejectDialog, setRejectDialog] = useState<{ open: boolean; requestId: string | null }>({
         open: false,
@@ -40,7 +42,7 @@ export function HseRequestsTable({ requests }: { requests: any[] }) {
         if (res?.error) {
             toast.error(res.error)
         } else {
-            toast.success('Rejected successfully')
+            toast.success(t.common.save)
             setRejectDialog({ open: false, requestId: null })
             setRejectNote('')
         }
@@ -52,13 +54,13 @@ export function HseRequestsTable({ requests }: { requests: any[] }) {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>Dept / Date</TableHead>
-                            <TableHead>Requester</TableHead>
-                            <TableHead>Item</TableHead>
-                            <TableHead>Qty</TableHead>
-                            <TableHead>Stock / Warning</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
+                            <TableHead>{t.hse.table.deptDate}</TableHead>
+                            <TableHead>{t.hse.table.requester}</TableHead>
+                            <TableHead>{t.hse.table.item}</TableHead>
+                            <TableHead>{t.hse.table.qty}</TableHead>
+                            <TableHead>{t.hse.table.stockWarning}</TableHead>
+                            <TableHead>{t.hse.table.status}</TableHead>
+                            <TableHead className="text-right">{t.hse.table.actions}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -86,9 +88,9 @@ export function HseRequestsTable({ requests }: { requests: any[] }) {
                                     <TableCell>
                                         <div className="flex flex-col gap-1 items-start">
                                             <Badge variant={isInsufficient ? "destructive" : isLow ? "secondary" : "outline"}>
-                                                Stock: {stock}
+                                                {t.hse.table.stock}: {stock}
                                             </Badge>
-                                            {isInsufficient && <span className="text-xs text-red-500 font-medium">Insufficient</span>}
+                                            {isInsufficient && <span className="text-xs text-red-500 font-medium">{t.hse.table.insufficient}</span>}
                                         </div>
                                     </TableCell>
                                     <TableCell>
@@ -105,14 +107,14 @@ export function HseRequestsTable({ requests }: { requests: any[] }) {
                                                     disabled={loadingId === req.id}
                                                     onClick={() => setRejectDialog({ open: true, requestId: req.id })}
                                                 >
-                                                    Reject
+                                                    {t.common.reject}
                                                 </Button>
                                                 <Button
                                                     size="sm"
                                                     disabled={loadingId === req.id || isInsufficient}
                                                     onClick={() => onApprove(req.id)}
                                                 >
-                                                    Issue
+                                                    {t.hse.issueBtn}
                                                 </Button>
                                             </div>
                                         )}
@@ -123,7 +125,7 @@ export function HseRequestsTable({ requests }: { requests: any[] }) {
                         {requests.length === 0 && (
                             <TableRow>
                                 <TableCell colSpan={7} className="text-center py-6 text-zinc-500">
-                                    No requests pending HSE approval.
+                                    {t.hse.noRequests}
                                 </TableCell>
                             </TableRow>
                         )}
@@ -134,21 +136,21 @@ export function HseRequestsTable({ requests }: { requests: any[] }) {
             <Dialog open={rejectDialog.open} onOpenChange={(open) => !open && setRejectDialog({ open: false, requestId: null })}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Reject HSE Request</DialogTitle>
+                        <DialogTitle>{t.hse.rejectDialogTitle}</DialogTitle>
                     </DialogHeader>
                     <div className="py-4">
                         <Textarea
-                            placeholder="Provide a reason for rejection (required)..."
+                            placeholder={t.deptHead?.rejectDialogPlaceholder || "Provide a reason for rejection (required)..."}
                             value={rejectNote}
                             onChange={(e) => setRejectNote(e.target.value)}
                         />
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setRejectDialog({ open: false, requestId: null })}>
-                            Cancel
+                            {t.common.cancel}
                         </Button>
                         <Button variant="destructive" onClick={onReject} disabled={!rejectNote.trim() || !!loadingId}>
-                            Confirm Reject
+                            {t.deptHead?.rejectConfirmBtn || "Confirm Reject"}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -158,17 +160,18 @@ export function HseRequestsTable({ requests }: { requests: any[] }) {
 }
 
 export function InventoryTable({ inventory }: { inventory: any[] }) {
+    const { t } = useLanguage()
     return (
         <div className="rounded-md border">
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>Item Name</TableHead>
-                        <TableHead>Category</TableHead>
-                        <TableHead>Unit</TableHead>
-                        <TableHead className="text-right">Price</TableHead>
-                        <TableHead className="text-right">Min Stock</TableHead>
-                        <TableHead className="text-right">Current Stock</TableHead>
+                        <TableHead>{t.hse.inventoryTable.itemName}</TableHead>
+                        <TableHead>{t.hse.inventoryTable.category}</TableHead>
+                        <TableHead>{t.hse.inventoryTable.unit}</TableHead>
+                        <TableHead className="text-right">{t.hse.inventoryTable.price}</TableHead>
+                        <TableHead className="text-right">{t.hse.inventoryTable.minStock}</TableHead>
+                        <TableHead className="text-right">{t.hse.inventoryTable.currStock}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -194,7 +197,7 @@ export function InventoryTable({ inventory }: { inventory: any[] }) {
                     {inventory.length === 0 && (
                         <TableRow>
                             <TableCell colSpan={6} className="text-center py-6 text-zinc-500">
-                                No inventory items found.
+                                {t.hse.inventoryTable.noItems}
                             </TableCell>
                         </TableRow>
                     )}

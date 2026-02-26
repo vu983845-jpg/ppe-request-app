@@ -3,8 +3,12 @@ import { redirect } from 'next/navigation'
 import { AdminDashboardClient } from './client-page'
 import { logoutAction } from '@/app/actions/auth'
 import { Button } from '@/components/ui/button'
+import { getLocale } from '@/app/actions/locale'
+import { dictionaries } from '@/lib/i18n/dictionaries'
 
 export default async function AdminDashboard() {
+    const locale = await getLocale()
+    const t = dictionaries[locale]
     const supabase = await createClient()
 
     const {
@@ -51,13 +55,13 @@ export default async function AdminDashboard() {
             <div className="max-w-7xl mx-auto space-y-6">
                 <div className="flex justify-between items-center">
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight">System Admin Dashboard</h1>
+                        <h1 className="text-3xl font-bold tracking-tight">{t.admin.title}</h1>
                         <p className="text-zinc-500">
-                            Overview of costs, requests, and budget.
+                            {t.admin.subtitle}
                         </p>
                     </div>
                     <form action={logoutAction}>
-                        <Button variant="outline" type="submit">Sign Out</Button>
+                        <Button variant="outline" type="submit">{t.common.signOut}</Button>
                     </form>
                 </div>
 

@@ -3,8 +3,12 @@ import { redirect } from 'next/navigation'
 import { HseRequestsTable, InventoryTable } from './client-page'
 import { logoutAction } from '@/app/actions/auth'
 import { Button } from '@/components/ui/button'
+import { getLocale } from '@/app/actions/locale'
+import { dictionaries } from '@/lib/i18n/dictionaries'
 
 export default async function HseDashboard() {
+    const locale = await getLocale()
+    const t = dictionaries[locale]
     const supabase = await createClient()
 
     const {
@@ -44,23 +48,23 @@ export default async function HseDashboard() {
             <div className="max-w-7xl mx-auto space-y-6">
                 <div className="flex justify-between items-center">
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight">HSE Dashboard</h1>
+                        <h1 className="text-3xl font-bold tracking-tight">{t.hse.title}</h1>
                         <p className="text-zinc-500">
-                            Manage PPE Issuance and view safety stock.
+                            {t.hse.subtitle}
                         </p>
                     </div>
                     <form action={logoutAction}>
-                        <Button variant="outline" type="submit">Sign Out</Button>
+                        <Button variant="outline" type="submit">{t.common.signOut}</Button>
                     </form>
                 </div>
 
                 <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6">
-                    <h2 className="text-xl font-semibold mb-4">Requests Needing Attention</h2>
+                    <h2 className="text-xl font-semibold mb-4">{t.hse.pendingTitle}</h2>
                     <HseRequestsTable requests={requests || []} />
                 </div>
 
                 <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6 mt-8">
-                    <h2 className="text-xl font-semibold mb-4">Inventory Overview</h2>
+                    <h2 className="text-xl font-semibold mb-4">{t.hse.inventoryTitle}</h2>
                     <InventoryTable inventory={inventory || []} />
                 </div>
             </div>
