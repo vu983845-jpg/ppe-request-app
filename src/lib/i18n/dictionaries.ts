@@ -18,6 +18,7 @@ export const dictionaries = {
             title: "Manufacturing PPE Management",
             subtitle: "Request Personal Protective Equipment quickly, or log in to manage approvals and inventory.",
             requestBtn: "Request PPE",
+            trackBtn: "Track Requests",
             loginBtn: "Staff Login"
         },
         login: {
@@ -56,7 +57,25 @@ export const dictionaries = {
             removeItem: "Remove Item",
             minOneItem: "You must request at least one item.",
             captchaPrompt: "To prevent spam, please solve:",
-            captchaError: "Incorrect answer."
+            captchaError: "Incorrect answer.",
+            confirmTitle: "Confirm Your Request",
+            confirmSubtitle: "Please review the details below before submitting.",
+            goBackBtn: "Go Back & Edit",
+            confirmBtn: "Confirm & Submit",
+            requestedItems: "Items Requested:"
+        },
+        tracking: {
+            title: "Request Tracking",
+            subtitle: "View the status of recent PPE requests.",
+            table: {
+                date: "Date",
+                requester: "Requester",
+                dept: "Dept",
+                item: "Item",
+                qty: "Qty",
+                status: "Status"
+            },
+            noRequests: "No pending requests found."
         },
         deptHead: {
             title: "Department Dashboard",
@@ -155,6 +174,7 @@ export const dictionaries = {
             title: "Quản Lý Đồ Bảo Hộ Intersnack",
             subtitle: "Đăng ký nhận trang thiết bị bảo hộ lao động (PPE) nhanh chóng, hoặc đăng nhập để quản lý phê duyệt và kho.",
             requestBtn: "Đăng Ký PPE",
+            trackBtn: "Tra Cứu Yêu Cầu",
             loginBtn: "Nhân Viên Đăng Nhập"
         },
         login: {
@@ -193,7 +213,25 @@ export const dictionaries = {
             removeItem: "Xóa",
             minOneItem: "Bạn phải chọn ít nhất một vật dụng.",
             captchaPrompt: "Xác thực chống máy chủ ảo, kết quả là:",
-            captchaError: "Kết quả phép tính không đúng."
+            captchaError: "Kết quả phép tính không đúng.",
+            confirmTitle: "Xác Nhận Yêu Cầu",
+            confirmSubtitle: "Vui lòng kiểm tra lại các thông tin bên dưới trước khi gửi.",
+            goBackBtn: "Quay Lại Sửa",
+            confirmBtn: "Xác Nhận & Gửi Đi",
+            requestedItems: "Vật dụng yêu cầu:"
+        },
+        tracking: {
+            title: "Tra Cứu Yêu Cầu",
+            subtitle: "Xem trạng thái các yêu cầu xin cấp phát BHLĐ gần đây.",
+            table: {
+                date: "Ngày tạo",
+                requester: "Người xin",
+                dept: "Bộ phận",
+                item: "Vật dụng",
+                qty: "S.L",
+                status: "Trạng thái"
+            },
+            noRequests: "Hiện không có yêu cầu nào đang chờ xử lý."
         },
         deptHead: {
             title: "Quản Lý Bộ Phận",

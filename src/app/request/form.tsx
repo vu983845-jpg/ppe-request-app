@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { z } from 'zod'
@@ -52,7 +53,10 @@ export function RequestForm({
     ppes: PPEMaster[]
 }) {
     const { t } = useLanguage()
+    const router = useRouter()
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const [isConfirming, setIsConfirming] = useState(false)
+    const [confirmedValues, setConfirmedValues] = useState<z.infer<typeof formSchema> | null>(null)
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -94,7 +98,7 @@ export function RequestForm({
 
     const [file, setFile] = useState<File | null>(null)
 
-    async function onSubmit(values: z.infer<typeof formSchema>) {
+    async function handleInitialSubmit(values: z.infer<typeof formSchema>) {
         const expectedAnswer = mathCaptcha.num1 + mathCaptcha.num2
         if (parseInt(values.captchaAnswer) !== expectedAnswer) {
             form.setError('captchaAnswer', { message: t.requestForm.captchaError })
@@ -102,8 +106,17 @@ export function RequestForm({
             return
         }
 
+        // Switch to confirmation mode
+        setConfirmedValues(values)
+        setIsConfirming(true)
+    }
+
+    async function handleConfirmSubmit() {
+        if (!confirmedValues) return
+
         setIsSubmitting(true)
         let attachmentUrl = ''
+        const values = confirmedValues
 
         if (file) {
             const supabase = createClient()
@@ -127,17 +140,90 @@ export function RequestForm({
 
         if (result?.error) {
             toast.error(t.requestForm.error + ' ' + result.error)
+            setIsSubmitting(false)
         } else {
             toast.success(t.requestForm.success)
             form.reset()
-            regenerateCaptcha()
+            router.push('/tracking')
         }
-        setIsSubmitting(false)
+    }
+
+    if (isConfirming && confirmedValues) {
+        return (
+            <div className="space-y-6 animate-in fade-in zoom-in-95 duration-200">
+                <div className="bg-zinc-50 dark:bg-zinc-900/40 p-6 border border-zinc-200 dark:border-zinc-800 rounded-xl space-y-4">
+                    <h3 className="text-xl font-semibold mb-2">{t.requestForm.confirmTitle}</h3>
+                    <p className="text-zinc-500 mb-4">{t.requestForm.confirmSubtitle}</p>
+
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <span className="text-zinc-500 block">{t.requestForm.fullName}</span>
+                            <span className="font-medium">{confirmedValues.requesterName}</span>
+                        </div>
+                        <div>
+                            <span className="text-zinc-500 block">{t.requestForm.dept}</span>
+                            <span className="font-medium whitespace-nowrap overflow-hidden text-ellipsis">
+                                {departments.find(d => d.id === confirmedValues.departmentId)?.name}
+                            </span>
+                        </div>
+                        {confirmedValues.requesterEmpCode && (
+                            <div>
+                                <span className="text-zinc-500 block">{t.requestForm.empCode}</span>
+                                <span className="font-medium">{confirmedValues.requesterEmpCode}</span>
+                            </div>
+                        )}
+                        {confirmedValues.location && (
+                            <div>
+                                <span className="text-zinc-500 block">{t.requestForm.location}</span>
+                                <span className="font-medium">{confirmedValues.location}</span>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="mt-6 pt-6 border-t border-zinc-200 dark:border-zinc-700">
+                        <h4 className="font-medium mb-3">{t.requestForm.requestedItems}</h4>
+                        <ul className="space-y-2">
+                            {confirmedValues.items.map((item, idx) => {
+                                const ppe = ppes.find(p => p.id === item.ppeId)
+                                return (
+                                    <li key={idx} className="flex justify-between items-center bg-white dark:bg-zinc-950 p-3 rounded border border-zinc-100 dark:border-zinc-800">
+                                        <span>{ppe?.name}</span>
+                                        <span className="font-medium bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded">
+                                            {item.quantity} {ppe?.unit}
+                                        </span>
+                                    </li>
+                                )
+                            })}
+                        </ul>
+                    </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                    <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setIsConfirming(false)}
+                        disabled={isSubmitting}
+                        className="flex-1"
+                    >
+                        {t.requestForm.goBackBtn}
+                    </Button>
+                    <Button
+                        type="button"
+                        onClick={handleConfirmSubmit}
+                        disabled={isSubmitting}
+                        className="flex-1"
+                    >
+                        {isSubmitting ? t.requestForm.submitting : t.requestForm.confirmBtn}
+                    </Button>
+                </div>
+            </div>
+        )
     }
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(handleInitialSubmit)} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                         control={form.control}

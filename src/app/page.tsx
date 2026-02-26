@@ -26,6 +26,11 @@ export default async function Home() {
               {t.index.requestBtn}
             </Button>
           </Link>
+          <Link href="/tracking">
+            <Button size="lg" variant="secondary" className="w-full sm:w-auto bg-blue-100 hover:bg-blue-200 text-blue-900 border border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800">
+              {t.index.trackBtn}
+            </Button>
+          </Link>
           <Link href="/login">
             <Button variant="outline" size="lg" className="w-full sm:w-auto">
               {t.index.loginBtn}
