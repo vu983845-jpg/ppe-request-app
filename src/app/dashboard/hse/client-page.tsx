@@ -16,9 +16,11 @@ import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
 import { useLanguage } from '@/lib/i18n/context'
+import { useRouter } from 'next/navigation'
 
 export function HseRequestsTable({ requests }: { requests: any[] }) {
     const { t } = useLanguage()
+    const router = useRouter()
     const [loadingId, setLoadingId] = useState<string | null>(null)
     const [rejectDialog, setRejectDialog] = useState<{ open: boolean; requestId: string | null }>({
         open: false,
@@ -28,23 +30,38 @@ export function HseRequestsTable({ requests }: { requests: any[] }) {
 
     async function onApprove(id: string) {
         setLoadingId(id)
-        const res = await approveRequestByHSE(id)
-        setLoadingId(null)
-        if (res?.error) toast.error(res.error)
-        else toast.success('Approved and Issued successfully')
+        try {
+            const res = await approveRequestByHSE(id)
+            if (res?.error) {
+                toast.error(res.error)
+            } else {
+                toast.success(t.common.save)
+                router.refresh()
+            }
+        } catch (err: any) {
+            toast.error(err.message || 'Unknown error occurred')
+        } finally {
+            setLoadingId(null)
+        }
     }
 
     async function onReject() {
         if (!rejectDialog.requestId) return
         setLoadingId(rejectDialog.requestId)
-        const res = await rejectRequestByHSE(rejectDialog.requestId, rejectNote)
-        setLoadingId(null)
-        if (res?.error) {
-            toast.error(res.error)
-        } else {
-            toast.success(t.common.save)
-            setRejectDialog({ open: false, requestId: null })
-            setRejectNote('')
+        try {
+            const res = await rejectRequestByHSE(rejectDialog.requestId, rejectNote)
+            if (res?.error) {
+                toast.error(res.error)
+            } else {
+                toast.success(t.common.save)
+                setRejectDialog({ open: false, requestId: null })
+                setRejectNote('')
+                router.refresh()
+            }
+        } catch (err: any) {
+            toast.error(err.message || 'Unknown error occurred')
+        } finally {
+            setLoadingId(null)
         }
     }
 

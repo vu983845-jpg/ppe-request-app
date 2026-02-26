@@ -36,19 +36,17 @@ export async function approveRequestByHSE(requestId: string) {
   const totalCost = req.quantity * ppe.unit_price
 
   // 3. Perform Updates using RPC (or sequentially if no complex RPC setup)
-  // For robustness, multiple queries from an authenticated server client acts as a pseudo-transaction in Supabase Edge without custom RPC,
-  // but a Postgres function is safer. We'll do sequential updates securely.
 
   // Deduct stock
   const { error: stockError } = await supabase
     .from('ppe_master')
-    .update({ stock_quantity: ppe.stock_quantity - req.quantity })
+    .update({ stock_quantity: Number(ppe.stock_quantity) - Number(req.quantity) })
     .eq('id', ppe.id)
 
-  if (stockError) return { error: 'Failed to deduct stock' }
+  if (stockError) return { error: 'Failed to deduct stock: ' + stockError.message }
 
   // Update request status
-  await supabase
+  const { error: reqError } = await supabase
     .from('ppe_requests')
     .update({
       status: 'APPROVED_ISSUED',
@@ -57,26 +55,32 @@ export async function approveRequestByHSE(requestId: string) {
     })
     .eq('id', req.id)
 
+  if (reqError) return { error: 'Failed to update request: ' + reqError.message }
+
   // Insert to log
-  await supabase
+  const { error: logError } = await supabase
     .from('ppe_issue_log')
     .insert({
       request_id: req.id,
-      issued_quantity: req.quantity,
-      unit_price_at_issue: ppe.unit_price,
-      total_cost: totalCost,
+      issued_quantity: Number(req.quantity),
+      unit_price_at_issue: Number(ppe.unit_price),
+      total_cost: Number(totalCost),
       issued_by: approver.id
     })
+
+  if (logError) return { error: 'Failed to insert log: ' + logError.message }
 
   // Update yearly budget
   const currentYear = new Date().getFullYear()
   const { data: budget } = await supabase.from('yearly_budget').select('*').eq('year', currentYear).single()
 
   if (budget) {
-    await supabase
+    const { error: budgetError } = await supabase
       .from('yearly_budget')
-      .update({ used_budget: Number(budget.used_budget) + totalCost })
+      .update({ used_budget: Number(budget.used_budget) + Number(totalCost) })
       .eq('id', budget.id)
+
+    if (budgetError) return { error: 'Failed to update budget: ' + budgetError.message }
   }
 
   // 4. Send Emails
