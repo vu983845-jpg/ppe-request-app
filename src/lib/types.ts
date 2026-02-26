@@ -40,7 +40,7 @@ export interface PperRequest {
     requester_emp_code: string | null
     requester_email: string | null
     requester_department_id: string
-    requester_location: string | null
+    location: string | null
     ppe_id: string
     quantity: number
     note: string | null
