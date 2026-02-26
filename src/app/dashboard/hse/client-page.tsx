@@ -206,3 +206,49 @@ export function InventoryTable({ inventory }: { inventory: any[] }) {
         </div>
     )
 }
+
+export function HistoryTable({ issueLog }: { issueLog: any[] }) {
+    const { t } = useLanguage()
+
+    return (
+        <div className="rounded-md border">
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>{t.hse.historyTable.month}</TableHead>
+                        <TableHead>{t.hse.historyTable.item}</TableHead>
+                        <TableHead>{t.hse.historyTable.dept}</TableHead>
+                        <TableHead>{t.hse.historyTable.qty}</TableHead>
+                        <TableHead className="text-right">{t.hse.historyTable.cost}</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {issueLog.map((log) => {
+                        const date = new Date(log.issued_at)
+                        const monthStr = date.toLocaleDateString(undefined, { year: 'numeric', month: '2-digit' })
+
+                        return (
+                            <TableRow key={log.id}>
+                                <TableCell className="font-medium whitespace-nowrap">{monthStr}</TableCell>
+                                <TableCell>
+                                    {log.ppe_requests?.ppe_master?.name}
+                                    <span className="text-xs text-zinc-500 ml-2">({log.ppe_requests?.ppe_master?.unit})</span>
+                                </TableCell>
+                                <TableCell>{log.ppe_requests?.departments?.name}</TableCell>
+                                <TableCell>{log.issued_quantity}</TableCell>
+                                <TableCell className="text-right">${log.total_cost}</TableCell>
+                            </TableRow>
+                        )
+                    })}
+                    {issueLog.length === 0 && (
+                        <TableRow>
+                            <TableCell colSpan={5} className="text-center py-6 text-zinc-500">
+                                {t.hse.historyTable.noHistory}
+                            </TableCell>
+                        </TableRow>
+                    )}
+                </TableBody>
+            </Table>
+        </div>
+    )
+}

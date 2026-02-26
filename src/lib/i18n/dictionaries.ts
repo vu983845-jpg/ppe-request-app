@@ -95,6 +95,15 @@ export const dictionaries = {
                 currStock: "Current Stock",
                 noItems: "No inventory items found."
             },
+            historyTitle: "Monthly Issuance History",
+            historyTable: {
+                month: "Month",
+                item: "Item",
+                dept: "Department",
+                qty: "Qty Issued",
+                cost: "Total Cost",
+                noHistory: "No issuance history found."
+            },
             issueBtn: "Issue",
             rejectDialogTitle: "Reject HSE Request",
             noRequests: "No requests pending HSE approval."
@@ -217,6 +226,15 @@ export const dictionaries = {
                 minStock: "Ngưỡng An Toàn",
                 currStock: "Tồn Kho Hiện Tại",
                 noItems: "Không tìm thấy vật phẩm trong kho."
+            },
+            historyTitle: "Lịch Sử Cấp Phát Theo Tháng",
+            historyTable: {
+                month: "Tháng",
+                item: "Vật Phẩm",
+                dept: "Bộ Phận",
+                qty: "S.L Cấp Phát",
+                cost: "Tổng Chi Phí",
+                noHistory: "Chưa có dữ liệu cấp phát."
             },
             issueBtn: "Cấp Phát",
             rejectDialogTitle: "HSE Từ Chối Cấp Phát",
