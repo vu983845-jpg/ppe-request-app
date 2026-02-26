@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { sendEmail, generateStatusEmailHtml } from '@/lib/email'
 import { z } from 'zod'
+import { revalidatePath } from 'next/cache'
 
 const PPE_REQUEST_SCHEMA = z.object({
     requesterName: z.string().min(1, 'Name is required'),
@@ -78,6 +79,9 @@ export async function submitPpeRequest(formData: z.infer<typeof PPE_REQUEST_SCHE
             subject: `[PPE Request] Action Required for ${formData.requesterName}`,
             html: notifyHtml
         })
+
+        revalidatePath('/dashboard/dept-head')
+        revalidatePath('/dashboard/hse')
 
         return { success: true, id: newRequest.id }
     } catch (err: any) {
