@@ -24,19 +24,22 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- 1. departments
 -- Read-only for public (so form can fetch departments)
-CREATE POLICY "Departments are viewable by everyone" ON public.departments FOR SELECT USING (true);
+CREATE POLICY "Departments are viewable by everyone" ON public.departments FOR SELECT 
+USING (true);
 CREATE POLICY "Departments insert/update/delete by ADMIN" ON public.departments 
 USING (get_current_user_role() = 'ADMIN');
 
 -- 2. ppe_master
 -- Read-only for public (so form can fetch PPE items)
-CREATE POLICY "PPE Master viewable by everyone" ON public.ppe_master FOR SELECT USING (true);
+CREATE POLICY "PPE Master viewable by everyone" ON public.ppe_master FOR SELECT 
+USING (true);
 CREATE POLICY "PPE Master managed by ADMIN and HSE" ON public.ppe_master FOR ALL 
 USING (get_current_user_role() IN ('ADMIN', 'HSE'));
 
 -- 3. ppe_requests
 -- Public can INSERT
-CREATE POLICY "Public can create PPE requests" ON public.ppe_requests FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public can create PPE requests" ON public.ppe_requests FOR INSERT 
+WITH CHECK (true);
 
 -- DEPT HEAD can SELECT requests in their department
 CREATE POLICY "DEPT HEAD can view own dept requests" ON public.ppe_requests FOR SELECT 
