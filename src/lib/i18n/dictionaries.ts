@@ -189,10 +189,10 @@ export const dictionaries = {
             error: "Tài khoản hoặc mật khẩu chưa chính xác."
         },
         requestForm: {
-            title: "Biểu Mẫu Yêu Cầu PPE",
-            subtitle: "Điền vào biểu mẫu này để đăng ký nhận đồ bảo hộ. Không cần đăng nhập.",
+            title: "Khởi Tạo Yêu Cầu Cấp Phát BHLĐ",
+            subtitle: "Điền đầy đủ thông tin vào biểu mẫu dưới đây để hệ thống ghi nhận yêu cầu của bạn.",
             detailsTitle: "Chi Tiết Yêu Cầu",
-            detailsSubtitle: "Các trường có dấu * là bắt buộc.",
+            detailsSubtitle: "Các trường có dấu * là bắt buộc bổ sung.",
             fullName: "Họ và Tên",
             empCode: "Mã Nhân Viên",
             email: "Email (Nhận thông báo)",
@@ -221,17 +221,17 @@ export const dictionaries = {
             requestedItems: "Danh mục đồ bảo hộ đã chọn:"
         },
         tracking: {
-            title: "Tra Cứu Yêu Cầu",
-            subtitle: "Xem trạng thái các yêu cầu xin cấp phát BHLĐ gần đây.",
+            title: "Tra Cứu Tiến Độ Cấp Phát",
+            subtitle: "Theo dõi tình trạng phê duyệt và xuất kho của các đơn cấp phát bảo hộ lao động.",
             table: {
                 date: "Ngày tạo",
-                requester: "Người xin",
-                dept: "Bộ phận",
-                item: "Vật dụng",
-                qty: "S.L",
-                status: "Trạng thái"
+                requester: "Người yêu cầu",
+                dept: "Phòng/Ban",
+                item: "Trang thiết bị",
+                qty: "Số lượng",
+                status: "Tình trạng"
             },
-            noRequests: "Hiện không có yêu cầu nào đang chờ xử lý."
+            noRequests: "Hiện tại không có đơn cấp phát nào đang chờ xử lý."
         },
         deptHead: {
             title: "Quản Lý Bộ Phận",
