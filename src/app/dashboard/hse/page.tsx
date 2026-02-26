@@ -30,11 +30,12 @@ export default async function HseDashboard() {
     }
 
     // Fetch PENDING_HSE requests + history
+    // Fetch PENDING_HSE requests + history
     const { data: requests } = await supabase
         .from('ppe_requests')
         .select('*, ppe_master(*), departments(*)')
+        .neq('status', 'PENDING_DEPT') // Do not show requests still waiting for Dept Head
         .order('created_at', { ascending: false })
-        // In a real app we might only fetch PENDING_HSE or recent ones to avoid large payloads
         .limit(100)
 
     // Fetch PPE Inventory
