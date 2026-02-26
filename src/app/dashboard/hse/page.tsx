@@ -45,7 +45,7 @@ export default async function HseDashboard() {
         .order('name')
 
     // Fetch Issuance History
-    const { data: issueLog } = await supabase
+    const { data: issueLog, error: issueLogError } = await supabase
         .from('ppe_issue_log')
         .select(`
             id,
@@ -58,6 +58,10 @@ export default async function HseDashboard() {
             )
         `)
         .order('issued_at', { ascending: false })
+
+    if (issueLogError) {
+        console.error("Failed to fetch History:", issueLogError)
+    }
 
     return (
         <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-4 md:p-8">
@@ -86,6 +90,12 @@ export default async function HseDashboard() {
 
                 <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6 mt-8">
                     <h2 className="text-xl font-semibold mb-4">{t.hse.historyTitle}</h2>
+                    {issueLogError && (
+                        <div className="p-4 mb-4 text-red-800 bg-red-100 rounded-lg">
+                            Fetch Error: {issueLogError.message}
+                            <pre className="text-xs">{JSON.stringify(issueLogError, null, 2)}</pre>
+                        </div>
+                    )}
                     <HistoryTable issueLog={issueLog || []} />
                 </div>
             </div>
