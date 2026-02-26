@@ -54,7 +54,9 @@ export const dictionaries = {
             error: "Failed to submit request.",
             addItem: "+ Add Another Item",
             removeItem: "Remove Item",
-            minOneItem: "You must request at least one item."
+            minOneItem: "You must request at least one item.",
+            captchaPrompt: "To prevent spam, please solve:",
+            captchaError: "Incorrect answer."
         },
         deptHead: {
             title: "Department Dashboard",
@@ -189,7 +191,9 @@ export const dictionaries = {
             error: "Gửi yêu cầu thất bại.",
             addItem: "+ Thêm Vật Dụng Khác",
             removeItem: "Xóa",
-            minOneItem: "Bạn phải chọn ít nhất một vật dụng."
+            minOneItem: "Bạn phải chọn ít nhất một vật dụng.",
+            captchaPrompt: "Xác thực chống máy chủ ảo, kết quả là:",
+            captchaError: "Kết quả phép tính không đúng."
         },
         deptHead: {
             title: "Quản Lý Bộ Phận",

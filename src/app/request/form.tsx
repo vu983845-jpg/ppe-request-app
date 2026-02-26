@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { z } from 'zod'
@@ -40,7 +40,8 @@ const formSchema = z.object({
         quantity: z.number().positive().min(1, 'At least 1 item is required'),
     })).min(1, 'You must request at least one item.'),
     note: z.string().optional(),
-    attachmentUrl: z.string().optional()
+    attachmentUrl: z.string().optional(),
+    captchaAnswer: z.string().min(1, 'Required')
 })
 
 export function RequestForm({
@@ -64,8 +65,27 @@ export function RequestForm({
             items: [{ ppeId: '', quantity: 1 }],
             note: '',
             attachmentUrl: '',
+            captchaAnswer: '',
         },
     })
+
+    const [mathCaptcha, setMathCaptcha] = useState({ num1: 0, num2: 0 })
+
+    // Generate initial math problem
+    useEffect(() => {
+        setMathCaptcha({
+            num1: Math.floor(Math.random() * 20) + 1,
+            num2: Math.floor(Math.random() * 20) + 1
+        })
+    }, [])
+
+    const regenerateCaptcha = () => {
+        setMathCaptcha({
+            num1: Math.floor(Math.random() * 20) + 1,
+            num2: Math.floor(Math.random() * 20) + 1
+        })
+        form.setValue('captchaAnswer', '')
+    }
 
     const { fields, append, remove } = useFieldArray({
         control: form.control,
@@ -75,6 +95,13 @@ export function RequestForm({
     const [file, setFile] = useState<File | null>(null)
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
+        const expectedAnswer = mathCaptcha.num1 + mathCaptcha.num2
+        if (parseInt(values.captchaAnswer) !== expectedAnswer) {
+            form.setError('captchaAnswer', { message: t.requestForm.captchaError })
+            regenerateCaptcha()
+            return
+        }
+
         setIsSubmitting(true)
         let attachmentUrl = ''
 
@@ -103,6 +130,7 @@ export function RequestForm({
         } else {
             toast.success(t.requestForm.success)
             form.reset()
+            regenerateCaptcha()
         }
         setIsSubmitting(false)
     }
@@ -289,6 +317,27 @@ export function RequestForm({
                         </FormControl>
                         <p className="text-xs text-zinc-500">{t.requestForm.attachmentDesc}</p>
                     </FormItem>
+                </div>
+
+                <div className="bg-zinc-50 dark:bg-zinc-900/40 p-4 border border-zinc-200 dark:border-zinc-800 rounded-lg max-w-sm">
+                    <FormField
+                        control={form.control}
+                        name="captchaAnswer"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="flex items-center gap-2">
+                                    <span className="text-zinc-500">🛡️</span> {t.requestForm.captchaPrompt}
+                                    <strong className="text-lg bg-zinc-200 dark:bg-zinc-800 px-2 py-1 rounded">
+                                        {mathCaptcha.num1} + {mathCaptcha.num2} = ?
+                                    </strong>
+                                </FormLabel>
+                                <FormControl>
+                                    <Input type="number" placeholder="Enter result" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
                 </div>
 
                 <Button type="submit" disabled={isSubmitting} className="w-full md:w-auto">
