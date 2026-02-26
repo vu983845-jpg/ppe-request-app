@@ -173,20 +173,20 @@ export const dictionaries = {
         index: {
             title: "Quản Lý Đồ Bảo Hộ Intersnack",
             subtitle: "Đăng ký nhận trang thiết bị bảo hộ lao động (PPE) nhanh chóng, hoặc đăng nhập để quản lý phê duyệt và kho.",
-            requestBtn: "Đăng Ký PPE",
-            trackBtn: "Tra Cứu Yêu Cầu",
-            loginBtn: "Nhân Viên Đăng Nhập"
+            requestBtn: "Tạo Đơn Cấp Phát BHLĐ",
+            trackBtn: "Tra Cứu Tình Trạng Đơn",
+            loginBtn: "Cổng Đăng Nhập Quản Lý"
         },
         login: {
-            title: "Đăng Nhập Lãnh Đạo",
-            subtitle: "Nhập email của bạn để truy cập hệ thống.",
+            title: "Đăng Nhập Hệ Thống",
+            subtitle: "Nhập email của bạn để truy cập hệ thống quản lý.",
             emailLabel: "Địa chỉ Email",
             emailPlaceholder: "name@intersnack.com.vn",
             passwordLabel: "Mật khẩu",
             loginBtn: "Đăng Nhập",
-            loggingIn: "Đang xử lý...",
-            success: "Đăng nhập thành công! Đang chuyển hướng...",
-            error: "Đăng nhập thất bại."
+            loggingIn: "Hệ thống đang xử lý...",
+            success: "Đăng nhập thành công! Đang chuyển trang...",
+            error: "Tài khoản hoặc mật khẩu chưa chính xác."
         },
         requestForm: {
             title: "Biểu Mẫu Yêu Cầu PPE",
@@ -206,19 +206,19 @@ export const dictionaries = {
             reasonPlaceholder: "Vui lòng ghi rõ lý do bạn cần vật dụng này...",
             attachment: "Đính Kèm Dẫn Chứng",
             attachmentDesc: "Tải lên tài liệu chứng minh nếu có",
-            submitting: "Đang Gửi...",
-            success: "Bạn đã gửi yêu cầu thành công!",
-            error: "Gửi yêu cầu thất bại.",
-            addItem: "+ Thêm Vật Dụng Khác",
-            removeItem: "Xóa",
-            minOneItem: "Bạn phải chọn ít nhất một vật dụng.",
-            captchaPrompt: "Xác thực chống máy chủ ảo, kết quả là:",
-            captchaError: "Kết quả phép tính không đúng.",
-            confirmTitle: "Xác Nhận Yêu Cầu",
-            confirmSubtitle: "Vui lòng kiểm tra lại các thông tin bên dưới trước khi gửi.",
-            goBackBtn: "Quay Lại Sửa",
-            confirmBtn: "Xác Nhận & Gửi Đi",
-            requestedItems: "Vật dụng yêu cầu:"
+            submitting: "Hệ Thống Đang Xử Lý...",
+            success: "Tuyệt vời, đơn cấp phát của bạn đã được ghi nhận thành công!",
+            error: "Không thể xử lý yêu cầu lúc này.",
+            addItem: "+ Thêm Loại Đồ Bảo Hộ Khác",
+            removeItem: "Loại Bỏ",
+            minOneItem: "Bạn cần cung cấp ít nhất một vật dụng để tạo đơn.",
+            captchaPrompt: "Kiểm tra bảo mật, vui lòng giải phép tính:",
+            captchaError: "Kết quả phép tính không chính xác.",
+            confirmTitle: "Xác Nhận Thông Tin Đơn Cấp Phát",
+            confirmSubtitle: "Vui lòng xem lại danh mục các vật dụng trước khi gửi lên hệ thống.",
+            goBackBtn: "Chỉnh Sửa Lại Thông Tin",
+            confirmBtn: "Gửi Đơn Xin Cấp Phát",
+            requestedItems: "Danh mục đồ bảo hộ đã chọn:"
         },
         tracking: {
             title: "Tra Cứu Yêu Cầu",
