@@ -24,7 +24,7 @@ export function LoginForm() {
     return (
         <Card className="w-full max-w-sm mx-auto mt-12">
             <CardHeader className="flex flex-col items-center">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Intersnack_logo.svg/1024px-Intersnack_logo.svg.png" alt="Intersnack Logo" className="h-12 object-contain mb-4" />
+                <img src="/intersnack-logo.png" alt="Intersnack Logo" className="h-12 object-contain mb-4" />
                 <CardTitle className="text-2xl">Staff Login</CardTitle>
                 <CardDescription>Enter your email below to login.</CardDescription>
             </CardHeader>
