@@ -51,7 +51,10 @@ export const dictionaries = {
             attachmentDesc: "Upload any supporting document",
             submitting: "Submitting...",
             success: "Your request has been submitted successfully!",
-            error: "Failed to submit request."
+            error: "Failed to submit request.",
+            addItem: "+ Add Another Item",
+            removeItem: "Remove Item",
+            minOneItem: "You must request at least one item."
         },
         deptHead: {
             title: "Department Dashboard",
@@ -183,7 +186,10 @@ export const dictionaries = {
             attachmentDesc: "Tải lên tài liệu chứng minh nếu có",
             submitting: "Đang Gửi...",
             success: "Bạn đã gửi yêu cầu thành công!",
-            error: "Gửi yêu cầu thất bại."
+            error: "Gửi yêu cầu thất bại.",
+            addItem: "+ Thêm Vật Dụng Khác",
+            removeItem: "Xóa",
+            minOneItem: "Bạn phải chọn ít nhất một vật dụng."
         },
         deptHead: {
             title: "Quản Lý Bộ Phận",

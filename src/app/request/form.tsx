@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
+import { useForm, useFieldArray } from 'react-hook-form'
 import { z } from 'zod'
 import { toast } from 'sonner'
 import { submitPpeRequest } from '@/app/actions/requests'
@@ -35,8 +35,10 @@ const formSchema = z.object({
     requesterEmail: z.string().email('Invalid email').optional().or(z.literal('')),
     departmentId: z.string().uuid('Please select a department'),
     location: z.string().optional(),
-    ppeId: z.string().uuid('Please select an item'),
-    quantity: z.number().positive().min(1, 'At least 1 item is required'),
+    items: z.array(z.object({
+        ppeId: z.string().uuid('Please select an item'),
+        quantity: z.number().positive().min(1, 'At least 1 item is required'),
+    })).min(1, 'You must request at least one item.'),
     note: z.string().optional(),
     attachmentUrl: z.string().optional()
 })
@@ -59,11 +61,15 @@ export function RequestForm({
             requesterEmail: '',
             departmentId: '',
             location: '',
-            ppeId: '',
-            quantity: 1,
+            items: [{ ppeId: '', quantity: 1 }],
             note: '',
             attachmentUrl: '',
         },
+    })
+
+    const { fields, append, remove } = useFieldArray({
+        control: form.control,
+        name: "items"
     })
 
     const [file, setFile] = useState<File | null>(null)
@@ -188,49 +194,77 @@ export function RequestForm({
                         )}
                     />
 
-                    <FormField
-                        control={form.control}
-                        name="ppeId"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>{t.requestForm.ppeItem} *</FormLabel>
-                                <Select onValueChange={field.onChange} value={field.value}>
-                                    <FormControl>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder={t.requestForm.selectItem} />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        {ppes.map((ppe) => (
-                                            <SelectItem key={ppe.id} value={ppe.id}>
-                                                {ppe.name} ({ppe.unit})
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                    {/* Dynamic Items Array */}
+                    {fields.map((field, index) => (
+                        <div key={field.id} className="col-span-1 md:col-span-2 p-4 border border-zinc-200 dark:border-zinc-800 rounded-lg space-y-4 relative bg-zinc-50/50 dark:bg-zinc-900/50">
+                            <div className="flex justify-between items-center mb-2">
+                                <h4 className="font-medium text-sm text-zinc-700 dark:text-zinc-300">
+                                    Item {index + 1}
+                                </h4>
+                                {fields.length > 1 && (
+                                    <Button type="button" variant="destructive" size="sm" onClick={() => remove(index)}>
+                                        {t.requestForm.removeItem}
+                                    </Button>
+                                )}
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <FormField
+                                    control={form.control}
+                                    name={`items.${index}.ppeId`}
+                                    render={({ field: itemField }) => (
+                                        <FormItem>
+                                            <FormLabel>{t.requestForm.ppeItem} *</FormLabel>
+                                            <Select onValueChange={itemField.onChange} value={itemField.value}>
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder={t.requestForm.selectItem} />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {ppes.map((ppe) => (
+                                                        <SelectItem key={ppe.id} value={ppe.id}>
+                                                            {ppe.name} ({ppe.unit})
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-                    <FormField
-                        control={form.control}
-                        name="quantity"
-                        render={({ field }) => (
-                            <FormItem className="md:col-span-2 max-w-xs">
-                                <FormLabel>{t.requestForm.qty} *</FormLabel>
-                                <FormControl>
-                                    <Input
-                                        type="number"
-                                        min="1"
-                                        {...field}
-                                        onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : '')}
-                                    />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                                <FormField
+                                    control={form.control}
+                                    name={`items.${index}.quantity`}
+                                    render={({ field: itemField }) => (
+                                        <FormItem className="max-w-xs">
+                                            <FormLabel>{t.requestForm.qty} *</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type="number"
+                                                    min="1"
+                                                    {...itemField}
+                                                    onChange={(e) => itemField.onChange(e.target.value ? Number(e.target.value) : '')}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                        </div>
+                    ))}
+
+                    <div className="col-span-1 md:col-span-2 flex justify-start">
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            className="bg-zinc-100 hover:bg-zinc-200 text-zinc-800 dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-zinc-100"
+                            onClick={() => append({ ppeId: '', quantity: 1 })}
+                        >
+                            {t.requestForm.addItem}
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
