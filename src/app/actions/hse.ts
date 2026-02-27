@@ -44,12 +44,14 @@ export async function approveRequestByHSE(requestId: string) {
   // 3. Perform Updates using RPC (or sequentially if no complex RPC setup)
 
   // Deduct stock
-  const { error: stockError } = await supabase
+  const { data: stockData, error: stockError } = await supabase
     .from('ppe_master')
     .update({ stock_quantity: Number(ppe.stock_quantity) - Number(req.quantity) })
-    .eq('id', ppe.id)
+    .eq('id', req.ppe_id)
+    .select()
+    .single()
 
-  if (stockError) return { error: 'Failed to deduct stock: ' + stockError.message }
+  if (stockError || !stockData) return { error: 'Failed to deduct stock: ' + (stockError?.message || 'Row not found') }
 
   // Update request status
   const { error: reqError } = await supabase
