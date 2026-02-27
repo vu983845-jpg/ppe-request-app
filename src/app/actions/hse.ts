@@ -234,6 +234,32 @@ export async function addPpeStock(ppeId: string, quantity: number, unitPrice: nu
 export async function getInventoryAnalytics(year: number, month?: number) {
   const supabase = await createClient()
 
+  // --- Auto-Repair Orhpaned Logs (Self-Healing) ---
+  const { data: orhpRequests } = await supabase
+    .from('ppe_requests')
+    .select('id, quantity, created_at, ppe_id, hse_approved_by, hse_approved_at, ppe_master (unit_price)')
+    .eq('status', 'APPROVED_ISSUED')
+
+  if (orhpRequests && orhpRequests.length > 0) {
+    const { data: existingLogs } = await supabase.from('ppe_issue_log').select('request_id')
+    const loggedIds = new Set((existingLogs || []).map((l: any) => l.request_id))
+    const missing = orhpRequests.filter((r: any) => !loggedIds.has(r.id))
+
+    if (missing.length > 0) {
+      const inserts = missing.map((req: any) => ({
+        request_id: req.id,
+        ppe_id: req.ppe_id,
+        issued_quantity: Number(req.quantity),
+        unit_price_at_issue: Number(req.ppe_master?.unit_price || 0),
+        total_cost: Number(req.quantity) * Number(req.ppe_master?.unit_price || 0),
+        issued_by: req.hse_approved_by || '00000000-0000-0000-0000-000000000000',
+        issued_at: req.hse_approved_at || req.created_at
+      }))
+      await supabase.from('ppe_issue_log').insert(inserts)
+    }
+  }
+  // --- End Auto-Repair ---
+
   // Build the time ranges
   // If month is provided, we calculate the balance for that specific month, and opening balance is prior to that month.
   // If month is NOT provided, we get the overview for the entire year, opening balance is prior to Jan 1st of that year.
