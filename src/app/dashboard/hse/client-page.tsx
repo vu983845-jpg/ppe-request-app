@@ -121,7 +121,7 @@ export function HseRequestsTable({ requests }: { requests: any[] }) {
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="text-right">
-                                        {req.status === 'PENDING_HSE' && (
+                                        {(req.status === 'PENDING_HSE' || req.status === 'PENDING_DEPT') && (
                                             <div className="flex justify-end gap-2">
                                                 <Button
                                                     size="sm"

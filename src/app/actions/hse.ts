@@ -30,8 +30,8 @@ export async function approveRequestByHSE(requestId: string) {
     return { error: 'Request not found in DB. DB error: ' + (selError?.message || 'unknown') }
   }
 
-  if (req.status !== 'PENDING_HSE') {
-    return { error: `Request invalid. Expected PENDING_HSE but got: "${req.status}"` }
+  if (req.status !== 'PENDING_HSE' && req.status !== 'PENDING_DEPT') {
+    return { error: `Request invalid. Expected PENDING_HSE or PENDING_DEPT but got: "${req.status}"` }
   }
 
   const ppe = req.ppe_master
@@ -139,6 +139,10 @@ export async function rejectRequestByHSE(requestId: string, note: string) {
 
   if (!req) {
     return { error: 'Request not found in DB. DB error: ' + (selError?.message || 'unknown') }
+  }
+
+  if (req.status !== 'PENDING_HSE' && req.status !== 'PENDING_DEPT') {
+    return { error: `Request invalid. Expected PENDING_HSE or PENDING_DEPT but got: "${req.status}"` }
   }
 
   const { error } = await supabase
