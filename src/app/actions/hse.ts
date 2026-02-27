@@ -79,7 +79,7 @@ export async function approveRequestByHSE(requestId: string) {
 
   if (logError) return { error: 'Failed to insert log: ' + logError.message }
 
-  // Update yearly budget
+  // Update yearly factory budget
   const currentYear = new Date().getFullYear()
   const { data: budget } = await supabase.from('yearly_budget').select('*').eq('year', currentYear).single()
 
@@ -89,7 +89,24 @@ export async function approveRequestByHSE(requestId: string) {
       .update({ used_budget: Number(budget.used_budget) + Number(totalCost) })
       .eq('id', budget.id)
 
-    if (budgetError) return { error: 'Failed to update budget: ' + budgetError.message }
+    if (budgetError) console.error('Failed to update factory budget: ', budgetError.message)
+  }
+
+  // Update department budget
+  const { data: deptBudget } = await supabase
+    .from('department_budgets')
+    .select('*')
+    .eq('year', currentYear)
+    .eq('department_id', req.requester_department_id)
+    .single()
+
+  if (deptBudget) {
+    const { error: deptBudgetError } = await supabase
+      .from('department_budgets')
+      .update({ used_budget: Number(deptBudget.used_budget) + Number(totalCost) })
+      .eq('id', deptBudget.id)
+
+    if (deptBudgetError) console.error('Failed to update department budget: ', deptBudgetError.message)
   }
 
   // 4. Send Emails

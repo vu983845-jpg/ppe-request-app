@@ -185,7 +185,7 @@ export function HseRequestsTable({ requests }: { requests: any[] }) {
     )
 }
 
-export function InventoryTable({ inventory }: { inventory: any[] }) {
+export function InventoryTable({ inventory, purchases }: { inventory: any[], purchases: any[] }) {
     const { t } = useLanguage()
     const router = useRouter()
 
@@ -296,6 +296,51 @@ export function InventoryTable({ inventory }: { inventory: any[] }) {
                             <TableRow>
                                 <TableCell colSpan={6} className="text-center py-6 text-zinc-500">
                                     {t.hse.inventoryTable.noItems}
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            </div>
+
+            <h3 className="font-semibold text-lg mt-12 mb-4">Lịch Sử Nhập Hàng (Purchase History)</h3>
+            <div className="rounded-md border bg-white dark:bg-zinc-950">
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Ngày Nhập</TableHead>
+                            <TableHead>Vật Phẩm</TableHead>
+                            <TableHead>Số Lượng</TableHead>
+                            <TableHead>Đơn Giá</TableHead>
+                            <TableHead>Tổng Tiền</TableHead>
+                            <TableHead>Người Nhập</TableHead>
+                            <TableHead>Ghi chú (Remark)</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {purchases.map((p) => (
+                            <TableRow key={p.id}>
+                                <TableCell className="text-sm">
+                                    {new Date(p.purchased_at).toLocaleDateString()}
+                                    <div className="text-xs text-zinc-500">{new Date(p.purchased_at).toLocaleTimeString()}</div>
+                                </TableCell>
+                                <TableCell>
+                                    <div className="font-medium">{p.ppe_master?.name}</div>
+                                    <div className="text-xs text-zinc-500">{p.ppe_master?.unit}</div>
+                                </TableCell>
+                                <TableCell className="font-medium text-green-600 dark:text-green-400">+{p.quantity}</TableCell>
+                                <TableCell>{Number(p.unit_price).toLocaleString()}</TableCell>
+                                <TableCell>{Number(p.total_cost).toLocaleString()}</TableCell>
+                                <TableCell>{p.app_users?.name || 'Unknown'}</TableCell>
+                                <TableCell className="max-w-[200px] truncate" title={p.note || ''}>
+                                    {p.note || '-'}
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                        {purchases.length === 0 && (
+                            <TableRow>
+                                <TableCell colSpan={7} className="text-center py-6 text-zinc-500">
+                                    Chưa có lịch sử nhập kho.
                                 </TableCell>
                             </TableRow>
                         )}
@@ -511,6 +556,81 @@ export function AnalyticsTable({ triggerRefetch }: { triggerRefetch?: number }) 
                         )}
                     </TableBody>
                 </Table>
+            </div>
+        </div>
+    )
+}
+
+export function BudgetCostsTable({ factory, departments }: { factory: any, departments: any[] }) {
+    const factoryUsed = Number(factory?.used_budget || 0)
+    const factoryTotal = Number(factory?.total_budget || 0)
+    const factoryPercent = factoryTotal > 0 ? (factoryUsed / factoryTotal) * 100 : 0
+
+    return (
+        <div className="space-y-8">
+            <div className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 rounded-lg">
+                <h3 className="font-semibold text-lg mb-4">Tổng Khoản Nhà Máy (Factory Level)</h3>
+                <div className="flex flex-col md:flex-row gap-8 items-center">
+                    <div className="flex-1 space-y-2 w-full">
+                        <div className="flex justify-between text-sm">
+                            <span className="text-zinc-500">Đã sử dụng (Used)</span>
+                            <span className="font-medium text-red-600 dark:text-red-400">{factoryUsed.toLocaleString()} VND</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                            <span className="text-zinc-500">Tổng ngân sách (Total)</span>
+                            <span className="font-medium">{factoryTotal.toLocaleString()} VND</span>
+                        </div>
+                        <div className="w-full bg-zinc-200 dark:bg-zinc-800 rounded-full h-4 mt-4 overflow-hidden">
+                            <div
+                                className={`h-4 rounded-full ${factoryPercent > 90 ? 'bg-red-500' : factoryPercent > 70 ? 'bg-amber-500' : 'bg-blue-500'}`}
+                                style={{ width: `${Math.min(factoryPercent, 100)}%` }}
+                            ></div>
+                        </div>
+                        <div className="text-xs text-right text-zinc-500 mt-1">{factoryPercent.toFixed(1)}%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h3 className="font-semibold text-lg mb-4">Định Biên Theo Bộ Phận (Department Quotas)</h3>
+                <div className="rounded-md border bg-white dark:bg-zinc-950">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Phòng Ban</TableHead>
+                                <TableHead className="text-right">Đã Sử Dụng (Cost)</TableHead>
+                                <TableHead className="text-right">Ngân Sách (Quota)</TableHead>
+                                <TableHead className="text-right">Tỷ Lệ (%)</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {departments.map(d => {
+                                const used = Number(d.used_budget || 0)
+                                const total = Number(d.total_budget || 0)
+                                const pct = total > 0 ? (used / total) * 100 : 0
+                                return (
+                                    <TableRow key={d.id}>
+                                        <TableCell className="font-medium">{d.departments?.name}</TableCell>
+                                        <TableCell className="text-right text-red-600 dark:text-red-400 font-medium">{used.toLocaleString()}</TableCell>
+                                        <TableCell className="text-right">{total.toLocaleString()}</TableCell>
+                                        <TableCell className="text-right">
+                                            <span className={`px-2 py-1 rounded text-xs font-semibold ${pct > 90 ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : pct > 70 ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'}`}>
+                                                {pct.toFixed(1)}%
+                                            </span>
+                                        </TableCell>
+                                    </TableRow>
+                                )
+                            })}
+                            {departments.length === 0 && (
+                                <TableRow>
+                                    <TableCell colSpan={4} className="text-center py-6 text-zinc-500">
+                                        Chưa có chi tiết định biên bộ phận. (Vui lòng thiết lập trong CSDL)
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </div>
             </div>
         </div>
     )

@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { HseRequestsTable, InventoryTable, AnalyticsTable } from './client-page'
+import { HseRequestsTable, InventoryTable, AnalyticsTable, BudgetCostsTable } from './client-page'
 import { logoutAction } from '@/app/actions/auth'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -43,6 +43,17 @@ export default async function HseDashboard() {
         .select('*')
         .order('name')
 
+    // Fetch Purchase History
+    const { data: purchases } = await supabase
+        .from('ppe_purchases')
+        .select('*, ppe_master(name, unit), app_users(name)')
+        .order('purchased_at', { ascending: false })
+        .limit(100)
+
+    // Fetch Budgets
+    const currentYear = new Date().getFullYear()
+    const { data: factoryBudget } = await supabase.from('yearly_budget').select('*').eq('year', currentYear).single()
+    const { data: deptBudgets } = await supabase.from('department_budgets').select('*, departments(name)').eq('year', currentYear)
 
 
     return (
@@ -61,10 +72,11 @@ export default async function HseDashboard() {
                 </div>
 
                 <Tabs defaultValue="approvals" className="w-full">
-                    <TabsList className="grid w-full grid-cols-3 mb-8">
+                    <TabsList className="grid w-full grid-cols-4 mb-8">
                         <TabsTrigger value="approvals">{t.hse.tabs?.approvals || "Phê Duyệt"}</TabsTrigger>
                         <TabsTrigger value="inventory">{t.hse.tabs?.inventory || "Kho Chứa"}</TabsTrigger>
                         <TabsTrigger value="analytics">{t.hse.tabs?.analytics || "Phân Tích & Lịch Sử"}</TabsTrigger>
+                        <TabsTrigger value="budgets">{t.hse.tabs?.budgets || "Ngân sách & Chi phí"}</TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="approvals">
@@ -77,7 +89,7 @@ export default async function HseDashboard() {
                     <TabsContent value="inventory">
                         <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6">
                             <h2 className="text-xl font-semibold mb-4">{t.hse.inventoryTitle}</h2>
-                            <InventoryTable inventory={inventory || []} />
+                            <InventoryTable inventory={inventory || []} purchases={purchases || []} />
                         </div>
                     </TabsContent>
 
@@ -85,6 +97,13 @@ export default async function HseDashboard() {
                         <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6">
                             <h2 className="text-xl font-semibold mb-4">{t.hse.historyTitle}</h2>
                             <AnalyticsTable triggerRefetch={(inventory || []).reduce((acc: number, curr: any) => acc + curr.stock_quantity, 0)} />
+                        </div>
+                    </TabsContent>
+
+                    <TabsContent value="budgets">
+                        <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6">
+                            <h2 className="text-xl font-semibold mb-4">Quản Lý Ngân Sách (Năm {currentYear})</h2>
+                            <BudgetCostsTable factory={factoryBudget} departments={deptBudgets || []} />
                         </div>
                     </TabsContent>
                 </Tabs>

@@ -136,14 +136,15 @@ export const dictionaries = {
                 addStockTitle: "Add Stock (Inward)",
                 addStockQty: "Quantity to Add",
                 addStockPrice: "Unit Price (Total recalculates automatically)",
-                addStockNote: "Note / Supplier",
+                addStockNote: "Remark / Note (Quality, Delivery, Supplier, ...)",
                 addStockConfirm: "Confirm Purchase",
                 addStockSuccess: "Stock added successfully!"
             },
             tabs: {
                 approvals: "Approvals",
                 inventory: "Inventory",
-                analytics: "Analytics & History"
+                analytics: "Analytics & History",
+                budgets: "Budgets & Costs"
             },
             historyTitle: "Monthly & Yearly Analytics",
             chartTitle: "Yearly Overview (In vs Out)",
@@ -322,14 +323,15 @@ export const dictionaries = {
                 addStockTitle: "Nhập Thêm Hàng (Stock In)",
                 addStockQty: "Số lượng nhập thêm",
                 addStockPrice: "Đơn giá nhập",
-                addStockNote: "Ghi chú / Đơn vị cung cấp",
+                addStockNote: "Ghi chú / Remark (Chất lượng, Giao hàng, NCC,...)",
                 addStockConfirm: "Xác Nhận Nhập",
                 addStockSuccess: "Nhập kho thành công!"
             },
             tabs: {
                 approvals: "Phê Duyệt",
                 inventory: "Kho Chứa",
-                analytics: "Phân Tích & Lịch Sử"
+                analytics: "Phân Tích & Lịch Sử",
+                budgets: "Ngân Sách & Chi Phí"
             },
             historyTitle: "Nhập Xuất Tồn & Lịch Sự",
             chartTitle: "Biểu Đồ Tổng Quan Năm",
