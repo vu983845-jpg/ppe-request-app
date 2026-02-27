@@ -32,7 +32,7 @@ import {
 
 const formSchema = z.object({
     requesterName: z.string().min(1, 'Name is required'),
-    requesterEmpCode: z.string().optional(),
+    requesterEmpCode: z.string().min(1, 'Employee Code is required for tracking'),
     requesterEmail: z.string().email('Invalid email').optional().or(z.literal('')),
     departmentId: z.string().uuid('Please select a department'),
     location: z.string().optional(),
@@ -244,7 +244,7 @@ export function RequestForm({
                         name="requesterEmpCode"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>{t.requestForm.empCode} ({t.common.optional})</FormLabel>
+                                <FormLabel>{t.requestForm.empCode} *</FormLabel>
                                 <FormControl>
                                     <Input placeholder="EMP123" {...field} />
                                 </FormControl>

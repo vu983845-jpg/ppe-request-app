@@ -66,7 +66,15 @@ export const dictionaries = {
         },
         tracking: {
             title: "Request Tracking",
-            subtitle: "View the status of recent PPE requests.",
+            subtitle: "Enter your Employee Code to view your request status and history.",
+            searchBtn: "Search",
+            searching: "Searching...",
+            empCode: "Employee Code",
+            empCodePlaceholder: "e.g. EMP123",
+            captchaPrompt: "To prevent spam, please solve:",
+            captchaError: "Incorrect answer.",
+            myRequests: "My Recent Requests",
+            history: "Issuance History",
             table: {
                 date: "Date",
                 requester: "Requester",
@@ -75,7 +83,13 @@ export const dictionaries = {
                 qty: "Qty",
                 status: "Status"
             },
-            noRequests: "No pending requests found."
+            historyTable: {
+                date: "Issued Date",
+                item: "Item",
+                qty: "Qty",
+                cost: "Total Cost"
+            },
+            noRequests: "No requests found for this code."
         },
         deptHead: {
             title: "Department Dashboard",
@@ -221,8 +235,16 @@ export const dictionaries = {
             requestedItems: "Danh mục đồ bảo hộ đã chọn:"
         },
         tracking: {
-            title: "Tra Cứu Tiến Độ Cấp Phát",
-            subtitle: "Theo dõi tình trạng phê duyệt và xuất kho của các đơn cấp phát bảo hộ lao động.",
+            title: "Tra Cứu Tình Trạng Nhận Đồ",
+            subtitle: "Vui lòng nhập Mã Nhân Viên của bạn để xem tình trạng đơn và lịch sử đã nhận.",
+            searchBtn: "Tra Cứu",
+            searching: "Đang tìm...",
+            empCode: "Mã Nhân Viên",
+            empCodePlaceholder: "Ví dụ: EMP123",
+            captchaPrompt: "Kiểm tra bảo mật, vui lòng giải:",
+            captchaError: "Kết quả sai.",
+            myRequests: "Đơn Đang Chờ Xử Lý",
+            history: "Lịch Sử Đã Nhận",
             table: {
                 date: "Ngày tạo",
                 requester: "Người yêu cầu",
@@ -231,7 +253,13 @@ export const dictionaries = {
                 qty: "Số lượng",
                 status: "Tình trạng"
             },
-            noRequests: "Hiện tại không có đơn cấp phát nào đang chờ xử lý."
+            historyTable: {
+                date: "Ngày Cấp",
+                item: "Vật Phẩm",
+                qty: "S.L",
+                cost: "Tổng Chi Phí"
+            },
+            noRequests: "Không tìm thấy dữ liệu nào khớp với mã nhân viên này."
         },
         deptHead: {
             title: "Quản Lý Bộ Phận",

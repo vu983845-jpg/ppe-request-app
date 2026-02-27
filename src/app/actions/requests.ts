@@ -103,3 +103,37 @@ export async function submitPpeRequest(formData: z.infer<typeof PPE_REQUEST_SCHE
         return { error: 'An unexpected error occurred.' }
     }
 }
+
+export async function searchRequestsByEmpCode(empCode: string) {
+    const supabase = await createClient()
+
+    // 1. Fetch pending/recent requests
+    const { data: requests, error: reqError } = await supabase
+        .from('ppe_requests')
+        .select('*, ppe_master(name, unit), departments(name)')
+        .eq('requester_emp_code', empCode)
+        .order('created_at', { ascending: false })
+        .limit(20)
+
+    if (reqError) {
+        return { error: 'Failed to fetch requests: ' + reqError.message }
+    }
+
+    // 2. We can also fetch issuance history (ppe_issue_log) linked to these requests
+    const requestIds = requests?.map(r => r.id) || []
+    let history: any[] = []
+
+    if (requestIds.length > 0) {
+        const { data: issueLog, error: logError } = await supabase
+            .from('ppe_issue_log')
+            .select('*, ppe_requests!inner(ppe_master(name, unit))')
+            .in('request_id', requestIds)
+            .order('issued_at', { ascending: false })
+
+        if (!logError && issueLog) {
+            history = issueLog
+        }
+    }
+
+    return { requests, history }
+}
