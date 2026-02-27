@@ -43,15 +43,15 @@ export default async function DeptHeadDashboard() {
     return (
         <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-4 md:p-8">
             <div className="max-w-6xl mx-auto space-y-6">
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight">{t.deptHead.title}</h1>
-                        <p className="text-zinc-500">
+                        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{t.deptHead.title}</h1>
+                        <p className="text-sm sm:text-base text-zinc-500">
                             {t.deptHead.subtitle} - {(appUser.departments as any)?.name}
                         </p>
                     </div>
-                    <form action={logoutAction}>
-                        <Button variant="outline" type="submit">{t.common.signOut}</Button>
+                    <form action={logoutAction} className="w-full sm:w-auto">
+                        <Button variant="outline" type="submit" className="w-full sm:w-auto">{t.common.signOut}</Button>
                     </form>
                 </div>
 

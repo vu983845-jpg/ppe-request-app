@@ -72,8 +72,8 @@ export function HseRequestsTable({ requests }: { requests: any[] }) {
 
     return (
         <>
-            <div className="rounded-md border">
-                <Table>
+            <div className="rounded-md border bg-white dark:bg-zinc-950">
+                <Table className="whitespace-nowrap">
                     <TableHeader>
                         <TableRow>
                             <TableHead>{t.hse.table.deptDate}</TableHead>
@@ -254,8 +254,8 @@ export function InventoryTable({ inventory, purchases }: { inventory: any[], pur
                     {t.admin?.exportBtn || "Export to Excel"}
                 </Button>
             </div>
-            <div className="rounded-md border">
-                <Table>
+            <div className="rounded-md border bg-white dark:bg-zinc-950">
+                <Table className="whitespace-nowrap">
                     <TableHeader>
                         <TableRow>
                             <TableHead>{t.hse.inventoryTable.itemName}</TableHead>
@@ -305,7 +305,7 @@ export function InventoryTable({ inventory, purchases }: { inventory: any[], pur
 
             <h3 className="font-semibold text-lg mt-12 mb-4">Lịch Sử Nhập Hàng (Purchase History)</h3>
             <div className="rounded-md border bg-white dark:bg-zinc-950">
-                <Table>
+                <Table className="whitespace-nowrap">
                     <TableHeader>
                         <TableRow>
                             <TableHead>Ngày Nhập</TableHead>
@@ -517,8 +517,8 @@ export function AnalyticsTable({ triggerRefetch }: { triggerRefetch?: number }) 
                 </div>
             )}
 
-            <div className="rounded-md border relative">
-                <Table>
+            <div className="rounded-md border relative bg-white dark:bg-zinc-950">
+                <Table className="whitespace-nowrap">
                     <TableHeader>
                         <TableRow className="bg-zinc-50 dark:bg-zinc-900/50">
                             <TableHead className="font-semibold">{t.hse.historyTable.item}</TableHead>
@@ -594,7 +594,7 @@ export function BudgetCostsTable({ factory, departments }: { factory: any, depar
             <div>
                 <h3 className="font-semibold text-lg mb-4">Định Biên Theo Bộ Phận (Department Quotas)</h3>
                 <div className="rounded-md border bg-white dark:bg-zinc-950">
-                    <Table>
+                    <Table className="whitespace-nowrap">
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Phòng Ban</TableHead>

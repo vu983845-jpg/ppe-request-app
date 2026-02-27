@@ -50,8 +50,8 @@ export function RequestsTable({ requests }: { requests: any[] }) {
 
     return (
         <>
-            <div className="rounded-md border">
-                <Table>
+            <div className="rounded-md border bg-white dark:bg-zinc-950">
+                <Table className="whitespace-nowrap">
                     <TableHeader>
                         <TableRow>
                             <TableHead>{t.deptHead.table.date}</TableHead>

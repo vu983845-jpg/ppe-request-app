@@ -59,25 +59,27 @@ export default async function HseDashboard() {
     return (
         <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-4 md:p-8">
             <div className="max-w-7xl mx-auto space-y-6">
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight">{t.hse.title}</h1>
-                        <p className="text-zinc-500">
+                        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{t.hse.title}</h1>
+                        <p className="text-sm sm:text-base text-zinc-500">
                             {t.hse.subtitle}
                         </p>
                     </div>
-                    <form action={logoutAction}>
-                        <Button variant="outline" type="submit">{t.common.signOut}</Button>
+                    <form action={logoutAction} className="w-full sm:w-auto">
+                        <Button variant="outline" type="submit" className="w-full sm:w-auto">{t.common.signOut}</Button>
                     </form>
                 </div>
 
                 <Tabs defaultValue="approvals" className="w-full">
-                    <TabsList className="grid w-full grid-cols-4 mb-8">
-                        <TabsTrigger value="approvals">{t.hse.tabs?.approvals || "Phê Duyệt"}</TabsTrigger>
-                        <TabsTrigger value="inventory">{t.hse.tabs?.inventory || "Kho Chứa"}</TabsTrigger>
-                        <TabsTrigger value="analytics">{t.hse.tabs?.analytics || "Phân Tích & Lịch Sử"}</TabsTrigger>
-                        <TabsTrigger value="budgets">{t.hse.tabs?.budgets || "Ngân sách & Chi phí"}</TabsTrigger>
-                    </TabsList>
+                    <div className="w-full overflow-x-auto pb-2 mb-6">
+                        <TabsList className="inline-flex min-w-max sm:grid sm:w-full sm:grid-cols-4 h-auto p-1">
+                            <TabsTrigger value="approvals" className="whitespace-nowrap px-4 py-2">{t.hse.tabs?.approvals || "Phê Duyệt"}</TabsTrigger>
+                            <TabsTrigger value="inventory" className="whitespace-nowrap px-4 py-2">{t.hse.tabs?.inventory || "Kho Chứa"}</TabsTrigger>
+                            <TabsTrigger value="analytics" className="whitespace-nowrap px-4 py-2">{t.hse.tabs?.analytics || "Phân Tích & Lịch Sử"}</TabsTrigger>
+                            <TabsTrigger value="budgets" className="whitespace-nowrap px-4 py-2">{t.hse.tabs?.budgets || "Ngân sách & Chi phí"}</TabsTrigger>
+                        </TabsList>
+                    </div>
 
                     <TabsContent value="approvals">
                         <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6">
