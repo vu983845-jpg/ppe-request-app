@@ -1,9 +1,18 @@
 -- Insert Initial Departments (Without dept_head mapping at first)
 INSERT INTO public.departments (name, dept_head_email) VALUES
-('Production', 'prod_head@example.com'),
-('Quality Assurance', 'qa_head@example.com'),
-('Maintenance', 'maint_head@example.com'),
-('Logistics', 'logistics_head@example.com');
+('Boiler', 'boiler_head@example.com'),
+('Borma', 'borma_head@example.com'),
+('Shelling', 'shelling_head@example.com'),
+('Office', 'office_head@example.com'),
+('HSE', 'hse_head@example.com'),
+('Technical', 'technical_head@example.com'),
+('Machine Grading', 'ml_grading_head@example.com'),
+('Machine Peeling', 'ml_peeling_head@example.com'),
+('Maint', 'maint_head@example.com'),
+('Manual Grading + Manual Peeling', 'manual_head@example.com'),
+('Packing', 'packing_head@example.com'),
+('Warehouse', 'warehouse_head@example.com'),
+('Steaming', 'steaming_head@example.com');
 
 -- Insert Initial Master Data for PPE
 INSERT INTO public.ppe_master (name, category, unit, unit_price, stock_quantity, minimum_stock, active) VALUES
