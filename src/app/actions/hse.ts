@@ -291,3 +291,50 @@ export async function getInventoryAnalytics(year: number, month?: number) {
 
   return analytics
 }
+
+export async function getYearlyChartData(year: number) {
+  const supabase = await createClient()
+
+  // We want to return an array of 12 months for the given year:
+  // [{ month: "1", in: 100, out: 50 }, { month: "2", in: 0, out: 20 }, ...]
+
+  const startDate = new Date(year, 0, 1).toISOString()
+  const endDate = new Date(year + 1, 0, 1).toISOString()
+
+  // Fetch all transactions for the year
+  const { data: allPurchases } = await supabase
+    .from('ppe_purchases')
+    .select('quantity, purchased_at')
+    .gte('purchased_at', startDate)
+    .lt('purchased_at', endDate)
+
+  const { data: allIssues } = await supabase
+    .from('ppe_issue_log')
+    .select('issued_quantity, issued_at')
+    .gte('issued_at', startDate)
+    .lt('issued_at', endDate)
+
+  const chartData = Array.from({ length: 12 }, (_, i) => {
+    const monthIndex = i // 0 to 11
+
+    // Filter purchases for this month
+    const monthPurchases = (allPurchases || []).filter(p => {
+      return new Date(p.purchased_at).getMonth() === monthIndex
+    })
+    const totalIn = monthPurchases.reduce((acc, p) => acc + Number(p.quantity), 0)
+
+    // Filter issues for this month
+    const monthIssues = (allIssues || []).filter(i => {
+      return new Date(i.issued_at).getMonth() === monthIndex
+    })
+    const totalOut = monthIssues.reduce((acc, i) => acc + Number(i.issued_quantity), 0)
+
+    return {
+      month: (monthIndex + 1).toString(),
+      in: totalIn,
+      out: totalOut
+    }
+  })
+
+  return chartData
+}

@@ -141,6 +141,7 @@ export const dictionaries = {
                 addStockSuccess: "Stock added successfully!"
             },
             historyTitle: "Monthly & Yearly Analytics",
+            chartTitle: "Yearly Overview (In vs Out)",
             historyTable: {
                 selectMonth: "Select Month",
                 entireYear: "Entire Year Overview",
@@ -321,6 +322,7 @@ export const dictionaries = {
                 addStockSuccess: "Nhập kho thành công!"
             },
             historyTitle: "Nhập Xuất Tồn & Lịch Sự",
+            chartTitle: "Biểu Đồ Tổng Quan Năm",
             historyTable: {
                 selectMonth: "Chọn Tháng",
                 entireYear: "Tổng Quan Cả Năm",

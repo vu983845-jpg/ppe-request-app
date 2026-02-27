@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { approveRequestByHSE, rejectRequestByHSE, addPpeStock, getInventoryAnalytics } from '@/app/actions/hse'
+import { approveRequestByHSE, rejectRequestByHSE, addPpeStock, getInventoryAnalytics, getYearlyChartData } from '@/app/actions/hse'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -21,6 +21,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { useLanguage } from '@/lib/i18n/context'
 import { useRouter } from 'next/navigation'
 import * as xlsx from 'xlsx'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts'
 
 export function HseRequestsTable({ requests }: { requests: any[] }) {
     const { t } = useLanguage()
@@ -363,14 +364,19 @@ export function AnalyticsTable() {
     const [year, setYear] = useState<number>(new Date().getFullYear())
     const [month, setMonth] = useState<string>("all") // "all" string for Entire Year, or "1"-"12"
     const [data, setData] = useState<any[]>([])
+    const [chartData, setChartData] = useState<any[]>([])
     const [loading, setLoading] = useState(false)
 
     useEffect(() => {
         async function load() {
             setLoading(true)
             const m = month === "all" ? undefined : parseInt(month)
-            const res = await getInventoryAnalytics(year, m)
-            setData(res || [])
+            const [resData, resChart] = await Promise.all([
+                getInventoryAnalytics(year, m),
+                month === "all" ? getYearlyChartData(year) : Promise.resolve([])
+            ])
+            setData(resData || [])
+            setChartData(resChart || [])
             setLoading(false)
         }
         load()
@@ -428,6 +434,43 @@ export function AnalyticsTable() {
                     {t.admin?.exportBtn || "Export to Excel"}
                 </Button>
             </div>
+
+            {month === "all" && chartData.length > 0 && (
+                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-6 mb-8 mt-4">
+                    <h3 className="text-lg font-semibold mb-6 text-zinc-800 dark:text-zinc-200">
+                        {t.hse.chartTitle || "Yearly Overview (In vs Out)"} - {year}
+                    </h3>
+                    <div className="h-[300px] w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart
+                                data={chartData}
+                                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                            >
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" className="dark:stroke-zinc-800" />
+                                <XAxis
+                                    dataKey="month"
+                                    tickLine={false}
+                                    axisLine={false}
+                                    tickFormatter={(value) => `T${value}`}
+                                    className="text-xs text-zinc-500"
+                                />
+                                <YAxis
+                                    tickLine={false}
+                                    axisLine={false}
+                                    className="text-xs text-zinc-500"
+                                />
+                                <RechartsTooltip
+                                    cursor={{ fill: 'transparent' }}
+                                    contentStyle={{ borderRadius: '8px', border: '1px solid #e4e4e7', backgroundColor: 'var(--tooltip-bg, #fff)' }}
+                                />
+                                <Legend wrapperStyle={{ paddingTop: '20px' }} />
+                                <Bar dataKey="in" name={t.hse.historyTable.in || "IN"} fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={30} />
+                                <Bar dataKey="out" name={t.hse.historyTable.out || "OUT"} fill="#f97316" radius={[4, 4, 0, 0]} barSize={30} />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+            )}
 
             <div className="rounded-md border relative">
                 <Table>
