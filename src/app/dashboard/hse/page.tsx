@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { HseRequestsTable, InventoryTable, HistoryTable } from './client-page'
+import { HseRequestsTable, InventoryTable, AnalyticsTable } from './client-page'
 import { logoutAction } from '@/app/actions/auth'
 import { Button } from '@/components/ui/button'
 import { getLocale } from '@/app/actions/locale'
@@ -42,24 +42,7 @@ export default async function HseDashboard() {
         .select('*')
         .order('name')
 
-    // Fetch Issuance History
-    const { data: issueLog, error: issueLogError } = await supabase
-        .from('ppe_issue_log')
-        .select(`
-            id,
-            issued_quantity,
-            total_cost,
-            issued_at,
-            ppe_requests (
-                ppe_master (name, unit),
-                departments (name)
-            )
-        `)
-        .order('issued_at', { ascending: false })
 
-    if (issueLogError) {
-        console.error("Failed to fetch History:", issueLogError)
-    }
 
     return (
         <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-4 md:p-8">
@@ -88,13 +71,7 @@ export default async function HseDashboard() {
 
                 <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6 mt-8">
                     <h2 className="text-xl font-semibold mb-4">{t.hse.historyTitle}</h2>
-                    {issueLogError && (
-                        <div className="p-4 mb-4 text-red-800 bg-red-100 rounded-lg">
-                            Fetch Error: {issueLogError.message}
-                            <pre className="text-xs">{JSON.stringify(issueLogError, null, 2)}</pre>
-                        </div>
-                    )}
-                    <HistoryTable issueLog={issueLog || []} />
+                    <AnalyticsTable />
                 </div>
             </div>
         </div>

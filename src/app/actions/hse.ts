@@ -187,3 +187,107 @@ export async function rejectRequestByHSE(requestId: string, note: string) {
   revalidatePath('/dashboard/hse')
   return { success: true }
 }
+
+export async function addPpeStock(ppeId: string, quantity: number, unitPrice: number, note?: string) {
+  const supabase = await createClient()
+
+  // 1. Auth check
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Unauthorized' }
+
+  const { data: approver } = await supabase.from('app_users').select('id, role').eq('auth_user_id', user.id).single()
+  if (approver?.role !== 'HSE') return { error: 'Only HSE can do this.' }
+
+  // 2. Fetch current PPE stock
+  const { data: ppe, error: selError } = await supabase.from('ppe_master').select('*').eq('id', ppeId).single()
+  if (!ppe) return { error: 'PPE not found. ' + (selError?.message || '') }
+
+  // 3. Insert Purchase Log and Update Master
+  const totalCost = quantity * unitPrice
+
+  const { error: purError } = await supabase
+    .from('ppe_purchases')
+    .insert({
+      ppe_id: ppeId,
+      quantity,
+      unit_price: unitPrice,
+      total_cost: totalCost,
+      purchased_by: approver.id,
+      note
+    })
+
+  if (purError) return { error: 'Failed to log purchase: ' + purError.message }
+
+  const { error: updError } = await supabase
+    .from('ppe_master')
+    .update({ stock_quantity: Number(ppe.stock_quantity) + quantity })
+    .eq('id', ppeId)
+
+  if (updError) return { error: 'Failed to update stock quantity: ' + updError.message }
+
+  revalidatePath('/dashboard/hse')
+  return { success: true }
+}
+
+export async function getInventoryAnalytics(year: number, month?: number) {
+  const supabase = await createClient()
+
+  // Build the time ranges
+  // If month is provided, we calculate the balance for that specific month, and opening balance is prior to that month.
+  // If month is NOT provided, we get the overview for the entire year, opening balance is prior to Jan 1st of that year.
+
+  const startDate = month
+    ? new Date(year, month - 1, 1).toISOString()
+    : new Date(year, 0, 1).toISOString()
+
+  const endDate = month
+    ? new Date(year, month, 1).toISOString()
+    : new Date(year + 1, 0, 1).toISOString()
+
+  // Fetch all items
+  const { data: items } = await supabase.from('ppe_master').select('id, name, unit, stock_quantity')
+  if (!items) return []
+
+  // Note: RLS allows us to fetch all, but we only really need aggregations
+  const { data: allPurchases } = await supabase.from('ppe_purchases').select('ppe_id, quantity, purchased_at')
+  const { data: allIssues } = await supabase.from('ppe_issue_log').select('ppe_id, issued_quantity, issued_at')
+
+  const analytics = items.map(item => {
+    // Purchases
+    const itemPurchases = (allPurchases || []).filter(p => p.ppe_id === item.id)
+    const inPeriodPurchases = itemPurchases.filter(p => p.purchased_at >= startDate && p.purchased_at < endDate)
+    const totalInPeriod = inPeriodPurchases.reduce((acc, p) => acc + Number(p.quantity), 0)
+
+    // Issues
+    const itemIssues = (allIssues || []).filter(i => i.ppe_id === item.id)
+    const inPeriodIssues = itemIssues.filter(i => i.issued_at >= startDate && i.issued_at < endDate)
+    const totalOutPeriod = inPeriodIssues.reduce((acc, i) => acc + Number(i.issued_quantity), 0)
+
+    // Calculate Opening Balance
+    // Current Stock = Opening Balance + Total In (from start of time) - Total Out (from start of time)
+    // Actually, it's easier: 
+    // Opening Balance = Current Stock - Total In (from StartDate to Now) + Total Out (from StartDate to Now)
+
+    const postPeriodPurchases = itemPurchases.filter(p => p.purchased_at >= startDate)
+    const postPeriodTotalIn = postPeriodPurchases.reduce((acc, p) => acc + Number(p.quantity), 0)
+
+    const postPeriodIssues = itemIssues.filter(i => i.issued_at >= startDate)
+    const postPeriodTotalOut = postPeriodIssues.reduce((acc, i) => acc + Number(i.issued_quantity), 0)
+
+    const openingBalance = Number(item.stock_quantity) - postPeriodTotalIn + postPeriodTotalOut
+    const closingBalance = openingBalance + totalInPeriod - totalOutPeriod
+
+    return {
+      id: item.id,
+      name: item.name,
+      unit: item.unit,
+      openingBalance,
+      in: totalInPeriod,
+      out: totalOutPeriod,
+      closingBalance,
+      currentRealStock: Number(item.stock_quantity) // for debugging/reference
+    }
+  })
+
+  return analytics
+}

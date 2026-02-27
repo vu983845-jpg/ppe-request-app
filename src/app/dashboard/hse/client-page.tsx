@@ -1,7 +1,9 @@
 'use client'
 
-import { useState } from 'react'
-import { approveRequestByHSE, rejectRequestByHSE } from '@/app/actions/hse'
+import { useState, useEffect } from 'react'
+import { approveRequestByHSE, rejectRequestByHSE, addPpeStock, getInventoryAnalytics } from '@/app/actions/hse'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
     Table,
     TableBody,
@@ -12,6 +14,7 @@ import {
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
@@ -183,6 +186,43 @@ export function HseRequestsTable({ requests }: { requests: any[] }) {
 
 export function InventoryTable({ inventory }: { inventory: any[] }) {
     const { t } = useLanguage()
+    const router = useRouter()
+
+    // Add Stock States
+    const [isAddMenuOpen, setIsAddMenuOpen] = useState(false)
+    const [selectedPpeId, setSelectedPpeId] = useState<string | null>(null)
+    const [addQty, setAddQty] = useState<number>(0)
+    const [addPrice, setAddPrice] = useState<number>(0)
+    const [addNote, setAddNote] = useState('')
+    const [isAdding, setIsAdding] = useState(false)
+
+    function openAddMenu(ppe: any) {
+        setSelectedPpeId(ppe.id)
+        setAddPrice(ppe.unit_price) // Default to current price
+        setAddQty(0)
+        setAddNote('')
+        setIsAddMenuOpen(true)
+    }
+
+    async function handleAddStock() {
+        if (!selectedPpeId || addQty <= 0 || addPrice < 0) return
+
+        setIsAdding(true)
+        try {
+            const res = await addPpeStock(selectedPpeId, addQty, addPrice, addNote)
+            if (res?.error) {
+                toast.error(res.error)
+            } else {
+                toast.success(t.hse.inventoryTable.addStockSuccess || "Stock added successfully!")
+                setIsAddMenuOpen(false)
+                router.refresh()
+            }
+        } catch (err: any) {
+            toast.error(err.message || 'Error occurred')
+        } finally {
+            setIsAdding(false)
+        }
+    }
 
     function handleExport() {
         const exportData = inventory.map(item => ({
@@ -202,8 +242,14 @@ export function InventoryTable({ inventory }: { inventory: any[] }) {
 
     return (
         <div className="space-y-4">
-            <div className="flex justify-end">
-                <Button onClick={handleExport} variant="outline" size="sm">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 rounded-lg">
+                <div className="space-y-1">
+                    <h3 className="font-medium text-sm">Add Stock (Nhập Kho)</h3>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                        To add stock, click the "+ Add Stock" button next to any item in the table below.
+                    </p>
+                </div>
+                <Button onClick={handleExport} variant="outline" size="sm" className="w-full sm:w-auto">
                     {t.admin?.exportBtn || "Export to Excel"}
                 </Button>
             </div>
@@ -217,6 +263,7 @@ export function InventoryTable({ inventory }: { inventory: any[] }) {
                             <TableHead className="text-right">{t.hse.inventoryTable.price}</TableHead>
                             <TableHead className="text-right">{t.hse.inventoryTable.minStock}</TableHead>
                             <TableHead className="text-right">{t.hse.inventoryTable.currStock}</TableHead>
+                            <TableHead className="text-right"></TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -236,6 +283,11 @@ export function InventoryTable({ inventory }: { inventory: any[] }) {
                                             {item.stock_quantity}
                                         </Badge>
                                     </TableCell>
+                                    <TableCell className="text-right">
+                                        <Button size="sm" variant="secondary" onClick={() => openAddMenu(item)}>
+                                            {t.hse.inventoryTable.addStockBtn || "+ Add Stock"}
+                                        </Button>
+                                    </TableCell>
                                 </TableRow>
                             )
                         })}
@@ -249,71 +301,167 @@ export function InventoryTable({ inventory }: { inventory: any[] }) {
                     </TableBody>
                 </Table>
             </div>
+
+            <Dialog open={isAddMenuOpen} onOpenChange={setIsAddMenuOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>{t.hse.inventoryTable.addStockTitle || "Add Stock"}</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <Label>{t.hse.inventoryTable.addStockQty || "Quantity to Add"}</Label>
+                            <Input
+                                type="number"
+                                min="1"
+                                value={addQty || ''}
+                                onChange={(e) => setAddQty(Number(e.target.value))}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>{t.hse.inventoryTable.addStockPrice || "Unit Price"}</Label>
+                            <Input
+                                type="number"
+                                min="0"
+                                value={addPrice || ''}
+                                onChange={(e) => setAddPrice(Number(e.target.value))}
+                            />
+                            {addQty > 0 && addPrice > 0 && (
+                                <p className="text-xs text-zinc-500 mt-1">
+                                    Total: ${(addQty * addPrice).toLocaleString()}
+                                </p>
+                            )}
+                        </div>
+                        <div className="space-y-2">
+                            <Label>{t.hse.inventoryTable.addStockNote || "Note / Supplier"}</Label>
+                            <Textarea
+                                placeholder="Supplier name or invoice id..."
+                                value={addNote}
+                                onChange={(e) => setAddNote(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsAddMenuOpen(false)} disabled={isAdding}>
+                            {t.common.cancel}
+                        </Button>
+                        <Button
+                            onClick={handleAddStock}
+                            disabled={isAdding || addQty <= 0 || addPrice < 0}
+                        >
+                            {isAdding ? t.common.loading : (t.hse.inventoryTable.addStockConfirm || "Confirm Purchase")}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }
 
-export function HistoryTable({ issueLog }: { issueLog: any[] }) {
+export function AnalyticsTable() {
     const { t } = useLanguage()
 
+    const [year, setYear] = useState<number>(new Date().getFullYear())
+    const [month, setMonth] = useState<string>("all") // "all" string for Entire Year, or "1"-"12"
+    const [data, setData] = useState<any[]>([])
+    const [loading, setLoading] = useState(false)
+
+    useEffect(() => {
+        async function load() {
+            setLoading(true)
+            const m = month === "all" ? undefined : parseInt(month)
+            const res = await getInventoryAnalytics(year, m)
+            setData(res || [])
+            setLoading(false)
+        }
+        load()
+    }, [year, month])
+
     function handleExport() {
-        const exportData = issueLog.map(log => {
-            const date = new Date(log.issued_at)
-            const monthStr = date.toLocaleDateString(undefined, { year: 'numeric', month: '2-digit' })
+        const exportData = data.map(item => {
             return {
-                [t.hse.historyTable.month]: monthStr,
-                [t.hse.historyTable.item]: log.ppe_requests?.ppe_master?.name,
-                [t.hse.historyTable.dept]: log.ppe_requests?.departments?.name,
-                [t.hse.historyTable.qty]: log.issued_quantity,
-                [t.hse.historyTable.cost]: log.total_cost,
+                [t.hse.historyTable.item]: item.name,
+                [t.hse.historyTable.unit]: item.unit,
+                [t.hse.historyTable.openBal]: item.openingBalance,
+                [t.hse.historyTable.in]: item.in,
+                [t.hse.historyTable.out]: item.out,
+                [t.hse.historyTable.closeBal]: item.closingBalance,
             }
         })
 
         const ws = xlsx.utils.json_to_sheet(exportData)
         const wb = xlsx.utils.book_new()
-        xlsx.utils.book_append_sheet(wb, ws, 'History')
-        xlsx.writeFile(wb, `issuance_history_export_${new Date().getTime()}.xlsx`)
+        xlsx.utils.book_append_sheet(wb, ws, 'Analytics')
+        xlsx.writeFile(wb, `inventory_analytics_${year}_${month}.xlsx`)
     }
+
+    const availableYears = Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i)
 
     return (
         <div className="space-y-4">
-            <div className="flex justify-end">
-                <Button onClick={handleExport} variant="outline" size="sm">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 rounded-lg">
+                <div className="flex gap-2 items-center w-full sm:w-auto">
+                    <Select value={month} onValueChange={setMonth}>
+                        <SelectTrigger className="w-[180px] bg-white dark:bg-zinc-950">
+                            <SelectValue placeholder="Month" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">{t.hse.historyTable.entireYear || "Entire Year"}</SelectItem>
+                            {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
+                                <SelectItem key={m} value={m.toString()}>Tháng {m}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+
+                    <Select value={year.toString()} onValueChange={(v) => setYear(parseInt(v))}>
+                        <SelectTrigger className="w-[120px] bg-white dark:bg-zinc-950">
+                            <SelectValue placeholder="Year" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {availableYears.map(y => (
+                                <SelectItem key={y} value={y.toString()}>Năm {y}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                <Button onClick={handleExport} variant="outline" size="sm" className="w-full sm:w-auto whitespace-nowrap" disabled={loading}>
                     {t.admin?.exportBtn || "Export to Excel"}
                 </Button>
             </div>
-            <div className="rounded-md border">
+
+            <div className="rounded-md border relative">
                 <Table>
                     <TableHeader>
-                        <TableRow>
-                            <TableHead>{t.hse.historyTable.month}</TableHead>
-                            <TableHead>{t.hse.historyTable.item}</TableHead>
-                            <TableHead>{t.hse.historyTable.dept}</TableHead>
-                            <TableHead>{t.hse.historyTable.qty}</TableHead>
-                            <TableHead className="text-right">{t.hse.historyTable.cost}</TableHead>
+                        <TableRow className="bg-zinc-50 dark:bg-zinc-900/50">
+                            <TableHead className="font-semibold">{t.hse.historyTable.item}</TableHead>
+                            <TableHead className="font-semibold">{t.hse.historyTable.unit}</TableHead>
+                            <TableHead className="text-right font-semibold">{t.hse.historyTable.openBal}</TableHead>
+                            <TableHead className="text-right font-semibold text-blue-600 dark:text-blue-400">{t.hse.historyTable.in}</TableHead>
+                            <TableHead className="text-right font-semibold text-orange-600 dark:text-orange-400">{t.hse.historyTable.out}</TableHead>
+                            <TableHead className="text-right font-semibold">{t.hse.historyTable.closeBal}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {issueLog.map((log) => {
-                            const date = new Date(log.issued_at)
-                            const monthStr = date.toLocaleDateString(undefined, { year: 'numeric', month: '2-digit' })
-
-                            return (
-                                <TableRow key={log.id}>
-                                    <TableCell className="font-medium whitespace-nowrap">{monthStr}</TableCell>
-                                    <TableCell>
-                                        {log.ppe_requests?.ppe_master?.name}
-                                        <span className="text-xs text-zinc-500 ml-2">({log.ppe_requests?.ppe_master?.unit})</span>
-                                    </TableCell>
-                                    <TableCell>{log.ppe_requests?.departments?.name}</TableCell>
-                                    <TableCell>{log.issued_quantity}</TableCell>
-                                    <TableCell className="text-right">${log.total_cost}</TableCell>
-                                </TableRow>
-                            )
-                        })}
-                        {issueLog.length === 0 && (
+                        {loading && (
                             <TableRow>
-                                <TableCell colSpan={5} className="text-center py-6 text-zinc-500">
+                                <TableCell colSpan={6} className="text-center py-8 text-zinc-500">
+                                    {t.common.loading}
+                                </TableCell>
+                            </TableRow>
+                        )}
+                        {!loading && data.map((item) => (
+                            <TableRow key={item.id}>
+                                <TableCell className="font-medium text-zinc-900 dark:text-zinc-100">{item.name}</TableCell>
+                                <TableCell className="text-zinc-500">{item.unit}</TableCell>
+                                <TableCell className="text-right font-medium">{item.openingBalance}</TableCell>
+                                <TableCell className="text-right text-blue-600 dark:text-blue-400 font-medium">+{item.in}</TableCell>
+                                <TableCell className="text-right text-orange-600 dark:text-orange-400 font-medium">-{item.out}</TableCell>
+                                <TableCell className="text-right font-bold text-zinc-900 dark:text-zinc-100">{item.closingBalance}</TableCell>
+                            </TableRow>
+                        ))}
+                        {!loading && data.length === 0 && (
+                            <TableRow>
+                                <TableCell colSpan={6} className="text-center py-8 text-zinc-500">
                                     {t.hse.historyTable.noHistory}
                                 </TableCell>
                             </TableRow>
