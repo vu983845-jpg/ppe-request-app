@@ -140,6 +140,11 @@ export const dictionaries = {
                 addStockConfirm: "Confirm Purchase",
                 addStockSuccess: "Stock added successfully!"
             },
+            tabs: {
+                approvals: "Approvals",
+                inventory: "Inventory",
+                analytics: "Analytics & History"
+            },
             historyTitle: "Monthly & Yearly Analytics",
             chartTitle: "Yearly Overview (In vs Out)",
             historyTable: {
@@ -320,6 +325,11 @@ export const dictionaries = {
                 addStockNote: "Ghi chú / Đơn vị cung cấp",
                 addStockConfirm: "Xác Nhận Nhập",
                 addStockSuccess: "Nhập kho thành công!"
+            },
+            tabs: {
+                approvals: "Phê Duyệt",
+                inventory: "Kho Chứa",
+                analytics: "Phân Tích & Lịch Sử"
             },
             historyTitle: "Nhập Xuất Tồn & Lịch Sự",
             chartTitle: "Biểu Đồ Tổng Quan Năm",

@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { HseRequestsTable, InventoryTable, AnalyticsTable } from './client-page'
 import { logoutAction } from '@/app/actions/auth'
 import { Button } from '@/components/ui/button'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { getLocale } from '@/app/actions/locale'
 import { dictionaries } from '@/lib/i18n/dictionaries'
 
@@ -59,20 +60,34 @@ export default async function HseDashboard() {
                     </form>
                 </div>
 
-                <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6">
-                    <h2 className="text-xl font-semibold mb-4">{t.hse.pendingTitle}</h2>
-                    <HseRequestsTable requests={requests || []} />
-                </div>
+                <Tabs defaultValue="approvals" className="w-full">
+                    <TabsList className="grid w-full grid-cols-3 mb-8">
+                        <TabsTrigger value="approvals">{t.hse.tabs?.approvals || "Phê Duyệt"}</TabsTrigger>
+                        <TabsTrigger value="inventory">{t.hse.tabs?.inventory || "Kho Chứa"}</TabsTrigger>
+                        <TabsTrigger value="analytics">{t.hse.tabs?.analytics || "Phân Tích & Lịch Sử"}</TabsTrigger>
+                    </TabsList>
 
-                <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6 mt-8">
-                    <h2 className="text-xl font-semibold mb-4">{t.hse.inventoryTitle}</h2>
-                    <InventoryTable inventory={inventory || []} />
-                </div>
+                    <TabsContent value="approvals">
+                        <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6">
+                            <h2 className="text-xl font-semibold mb-4">{t.hse.pendingTitle}</h2>
+                            <HseRequestsTable requests={requests || []} />
+                        </div>
+                    </TabsContent>
 
-                <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6 mt-8">
-                    <h2 className="text-xl font-semibold mb-4">{t.hse.historyTitle}</h2>
-                    <AnalyticsTable triggerRefetch={(inventory || []).reduce((acc: number, curr: any) => acc + curr.stock_quantity, 0)} />
-                </div>
+                    <TabsContent value="inventory">
+                        <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6">
+                            <h2 className="text-xl font-semibold mb-4">{t.hse.inventoryTitle}</h2>
+                            <InventoryTable inventory={inventory || []} />
+                        </div>
+                    </TabsContent>
+
+                    <TabsContent value="analytics">
+                        <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6">
+                            <h2 className="text-xl font-semibold mb-4">{t.hse.historyTitle}</h2>
+                            <AnalyticsTable triggerRefetch={(inventory || []).reduce((acc: number, curr: any) => acc + curr.stock_quantity, 0)} />
+                        </div>
+                    </TabsContent>
+                </Tabs>
             </div>
         </div>
     )
