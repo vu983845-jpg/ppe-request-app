@@ -68,6 +68,7 @@ export async function approveRequestByHSE(requestId: string) {
     .from('ppe_issue_log')
     .insert({
       request_id: req.id,
+      ppe_id: ppe.id,
       issued_quantity: Number(req.quantity),
       unit_price_at_issue: Number(ppe.unit_price),
       total_cost: Number(totalCost),
