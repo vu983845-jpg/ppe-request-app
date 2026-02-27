@@ -17,6 +17,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Textarea } from '@/components/ui/textarea'
 import { useLanguage } from '@/lib/i18n/context'
 import { useRouter } from 'next/navigation'
+import * as xlsx from 'xlsx'
 
 export function HseRequestsTable({ requests }: { requests: any[] }) {
     const { t } = useLanguage()
@@ -182,48 +183,72 @@ export function HseRequestsTable({ requests }: { requests: any[] }) {
 
 export function InventoryTable({ inventory }: { inventory: any[] }) {
     const { t } = useLanguage()
+
+    function handleExport() {
+        const exportData = inventory.map(item => ({
+            [t.hse.inventoryTable.itemName]: item.name,
+            [t.hse.inventoryTable.category]: item.category,
+            [t.hse.inventoryTable.unit]: item.unit,
+            [t.hse.inventoryTable.price]: item.unit_price,
+            [t.hse.inventoryTable.minStock]: item.minimum_stock,
+            [t.hse.inventoryTable.currStock]: item.stock_quantity,
+        }))
+
+        const ws = xlsx.utils.json_to_sheet(exportData)
+        const wb = xlsx.utils.book_new()
+        xlsx.utils.book_append_sheet(wb, ws, 'Inventory')
+        xlsx.writeFile(wb, `inventory_export_${new Date().getTime()}.xlsx`)
+    }
+
     return (
-        <div className="rounded-md border">
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>{t.hse.inventoryTable.itemName}</TableHead>
-                        <TableHead>{t.hse.inventoryTable.category}</TableHead>
-                        <TableHead>{t.hse.inventoryTable.unit}</TableHead>
-                        <TableHead className="text-right">{t.hse.inventoryTable.price}</TableHead>
-                        <TableHead className="text-right">{t.hse.inventoryTable.minStock}</TableHead>
-                        <TableHead className="text-right">{t.hse.inventoryTable.currStock}</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {inventory.map((item) => {
-                        const isLow = item.stock_quantity <= item.minimum_stock
-                        return (
-                            <TableRow key={item.id}>
-                                <TableCell className="font-medium">{item.name}</TableCell>
-                                <TableCell>
-                                    <Badge variant="outline">{item.category}</Badge>
-                                </TableCell>
-                                <TableCell className="text-zinc-500">{item.unit}</TableCell>
-                                <TableCell className="text-right">${item.unit_price}</TableCell>
-                                <TableCell className="text-right text-zinc-500">{item.minimum_stock}</TableCell>
-                                <TableCell className="text-right">
-                                    <Badge variant={isLow ? "destructive" : "secondary"}>
-                                        {item.stock_quantity}
-                                    </Badge>
+        <div className="space-y-4">
+            <div className="flex justify-end">
+                <Button onClick={handleExport} variant="outline" size="sm">
+                    {t.admin?.exportBtn || "Export to Excel"}
+                </Button>
+            </div>
+            <div className="rounded-md border">
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>{t.hse.inventoryTable.itemName}</TableHead>
+                            <TableHead>{t.hse.inventoryTable.category}</TableHead>
+                            <TableHead>{t.hse.inventoryTable.unit}</TableHead>
+                            <TableHead className="text-right">{t.hse.inventoryTable.price}</TableHead>
+                            <TableHead className="text-right">{t.hse.inventoryTable.minStock}</TableHead>
+                            <TableHead className="text-right">{t.hse.inventoryTable.currStock}</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {inventory.map((item) => {
+                            const isLow = item.stock_quantity <= item.minimum_stock
+                            return (
+                                <TableRow key={item.id}>
+                                    <TableCell className="font-medium">{item.name}</TableCell>
+                                    <TableCell>
+                                        <Badge variant="outline">{item.category}</Badge>
+                                    </TableCell>
+                                    <TableCell className="text-zinc-500">{item.unit}</TableCell>
+                                    <TableCell className="text-right">${item.unit_price}</TableCell>
+                                    <TableCell className="text-right text-zinc-500">{item.minimum_stock}</TableCell>
+                                    <TableCell className="text-right">
+                                        <Badge variant={isLow ? "destructive" : "secondary"}>
+                                            {item.stock_quantity}
+                                        </Badge>
+                                    </TableCell>
+                                </TableRow>
+                            )
+                        })}
+                        {inventory.length === 0 && (
+                            <TableRow>
+                                <TableCell colSpan={6} className="text-center py-6 text-zinc-500">
+                                    {t.hse.inventoryTable.noItems}
                                 </TableCell>
                             </TableRow>
-                        )
-                    })}
-                    {inventory.length === 0 && (
-                        <TableRow>
-                            <TableCell colSpan={6} className="text-center py-6 text-zinc-500">
-                                {t.hse.inventoryTable.noItems}
-                            </TableCell>
-                        </TableRow>
-                    )}
-                </TableBody>
-            </Table>
+                        )}
+                    </TableBody>
+                </Table>
+            </div>
         </div>
     )
 }
@@ -231,45 +256,71 @@ export function InventoryTable({ inventory }: { inventory: any[] }) {
 export function HistoryTable({ issueLog }: { issueLog: any[] }) {
     const { t } = useLanguage()
 
-    return (
-        <div className="rounded-md border">
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>{t.hse.historyTable.month}</TableHead>
-                        <TableHead>{t.hse.historyTable.item}</TableHead>
-                        <TableHead>{t.hse.historyTable.dept}</TableHead>
-                        <TableHead>{t.hse.historyTable.qty}</TableHead>
-                        <TableHead className="text-right">{t.hse.historyTable.cost}</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {issueLog.map((log) => {
-                        const date = new Date(log.issued_at)
-                        const monthStr = date.toLocaleDateString(undefined, { year: 'numeric', month: '2-digit' })
+    function handleExport() {
+        const exportData = issueLog.map(log => {
+            const date = new Date(log.issued_at)
+            const monthStr = date.toLocaleDateString(undefined, { year: 'numeric', month: '2-digit' })
+            return {
+                [t.hse.historyTable.month]: monthStr,
+                [t.hse.historyTable.item]: log.ppe_requests?.ppe_master?.name,
+                [t.hse.historyTable.dept]: log.ppe_requests?.departments?.name,
+                [t.hse.historyTable.qty]: log.issued_quantity,
+                [t.hse.historyTable.cost]: log.total_cost,
+            }
+        })
 
-                        return (
-                            <TableRow key={log.id}>
-                                <TableCell className="font-medium whitespace-nowrap">{monthStr}</TableCell>
-                                <TableCell>
-                                    {log.ppe_requests?.ppe_master?.name}
-                                    <span className="text-xs text-zinc-500 ml-2">({log.ppe_requests?.ppe_master?.unit})</span>
-                                </TableCell>
-                                <TableCell>{log.ppe_requests?.departments?.name}</TableCell>
-                                <TableCell>{log.issued_quantity}</TableCell>
-                                <TableCell className="text-right">${log.total_cost}</TableCell>
-                            </TableRow>
-                        )
-                    })}
-                    {issueLog.length === 0 && (
+        const ws = xlsx.utils.json_to_sheet(exportData)
+        const wb = xlsx.utils.book_new()
+        xlsx.utils.book_append_sheet(wb, ws, 'History')
+        xlsx.writeFile(wb, `issuance_history_export_${new Date().getTime()}.xlsx`)
+    }
+
+    return (
+        <div className="space-y-4">
+            <div className="flex justify-end">
+                <Button onClick={handleExport} variant="outline" size="sm">
+                    {t.admin?.exportBtn || "Export to Excel"}
+                </Button>
+            </div>
+            <div className="rounded-md border">
+                <Table>
+                    <TableHeader>
                         <TableRow>
-                            <TableCell colSpan={5} className="text-center py-6 text-zinc-500">
-                                {t.hse.historyTable.noHistory}
-                            </TableCell>
+                            <TableHead>{t.hse.historyTable.month}</TableHead>
+                            <TableHead>{t.hse.historyTable.item}</TableHead>
+                            <TableHead>{t.hse.historyTable.dept}</TableHead>
+                            <TableHead>{t.hse.historyTable.qty}</TableHead>
+                            <TableHead className="text-right">{t.hse.historyTable.cost}</TableHead>
                         </TableRow>
-                    )}
-                </TableBody>
-            </Table>
+                    </TableHeader>
+                    <TableBody>
+                        {issueLog.map((log) => {
+                            const date = new Date(log.issued_at)
+                            const monthStr = date.toLocaleDateString(undefined, { year: 'numeric', month: '2-digit' })
+
+                            return (
+                                <TableRow key={log.id}>
+                                    <TableCell className="font-medium whitespace-nowrap">{monthStr}</TableCell>
+                                    <TableCell>
+                                        {log.ppe_requests?.ppe_master?.name}
+                                        <span className="text-xs text-zinc-500 ml-2">({log.ppe_requests?.ppe_master?.unit})</span>
+                                    </TableCell>
+                                    <TableCell>{log.ppe_requests?.departments?.name}</TableCell>
+                                    <TableCell>{log.issued_quantity}</TableCell>
+                                    <TableCell className="text-right">${log.total_cost}</TableCell>
+                                </TableRow>
+                            )
+                        })}
+                        {issueLog.length === 0 && (
+                            <TableRow>
+                                <TableCell colSpan={5} className="text-center py-6 text-zinc-500">
+                                    {t.hse.historyTable.noHistory}
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            </div>
         </div>
     )
 }
