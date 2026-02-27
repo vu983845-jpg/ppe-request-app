@@ -71,7 +71,7 @@ export default async function HseDashboard() {
 
                 <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6 mt-8">
                     <h2 className="text-xl font-semibold mb-4">{t.hse.historyTitle}</h2>
-                    <AnalyticsTable />
+                    <AnalyticsTable triggerRefetch={(inventory || []).reduce((acc: number, curr: any) => acc + curr.stock_quantity, 0)} />
                 </div>
             </div>
         </div>

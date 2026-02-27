@@ -358,7 +358,7 @@ export function InventoryTable({ inventory }: { inventory: any[] }) {
     )
 }
 
-export function AnalyticsTable() {
+export function AnalyticsTable({ triggerRefetch }: { triggerRefetch?: number }) {
     const { t } = useLanguage()
 
     const [year, setYear] = useState<number>(new Date().getFullYear())
@@ -380,7 +380,7 @@ export function AnalyticsTable() {
             setLoading(false)
         }
         load()
-    }, [year, month])
+    }, [year, month, triggerRefetch])
 
     function handleExport() {
         const exportData = data.map(item => {
