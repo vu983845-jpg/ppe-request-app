@@ -19,14 +19,23 @@ export default async function DeptHeadDashboard() {
         redirect('/login')
     }
 
-    const { data: appUser } = await supabase
+    const { data: appUser, error: auError } = await supabase
         .from('app_users')
         .select('role, department_id, departments(name)')
         .eq('auth_user_id', user.id)
         .single()
 
     if (appUser?.role !== 'DEPT_HEAD') {
-        return <div className="p-8">Unauthorized. Only Department Heads can access this page. Debug Data: {JSON.stringify(appUser || 'null')}</div>
+        return (
+            <div className="p-8 space-y-4">
+                <h1 className="text-xl font-bold text-red-600">Unauthorized. Only Department Heads can access this page.</h1>
+                <div className="bg-zinc-100 p-4 rounded text-sm text-zinc-800 break-all">
+                    <strong>Auth ID:</strong> {user.id} <br />
+                    <strong>AppUser Data:</strong> {JSON.stringify(appUser || 'null')} <br />
+                    <strong>Supabase Fetch Error:</strong> {JSON.stringify(auError || 'No error, the row might be empty.')}
+                </div>
+            </div>
+        )
     }
 
     // Fetch Requests
