@@ -46,7 +46,7 @@ export default async function DeptHeadDashboard() {
                     <div>
                         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{t.deptHead.title}</h1>
                         <p className="text-sm sm:text-base text-zinc-500">
-                            {t.deptHead.subtitle} - {(appUser.departments as any)?.name}
+                            {t.deptHead.subtitle} - {appUser.departments ? (appUser.departments as any).name : 'Tổng / Toàn Nhà Máy'}
                         </p>
                     </div>
                     <form action={logoutAction} className="w-full sm:w-auto">
