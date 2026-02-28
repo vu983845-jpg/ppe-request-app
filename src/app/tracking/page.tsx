@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { useLanguage } from '@/lib/i18n/context'
-import { searchRequestsByEmpCode } from '@/app/actions/requests'
+import { searchRequestsByEmpCode, confirmReceipt } from '@/app/actions/requests'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
@@ -18,6 +18,7 @@ export default function TrackingPage() {
     const [history, setHistory] = useState<any[]>([])
     const [loading, setLoading] = useState(false)
     const [hasSearched, setHasSearched] = useState(false)
+    const [confirmingId, setConfirmingId] = useState<string | null>(null)
 
     useEffect(() => {
         regenerateCaptcha()
@@ -55,6 +56,19 @@ export default function TrackingPage() {
         }
 
         setLoading(false)
+    }
+
+    async function handleConfirmReceipt(requestId: string) {
+        setConfirmingId(requestId)
+        const res = await confirmReceipt(requestId, empCode.trim())
+        setConfirmingId(null)
+
+        if (res.error) {
+            toast.error(res.error)
+        } else {
+            toast.success(t.tracking.confirmSuccess || 'Receipt confirmed successfully!')
+            setRequests(prev => prev.map(req => req.id === requestId ? { ...req, status: 'COMPLETED' } : req))
+        }
     }
 
     return (
@@ -133,11 +147,24 @@ export default function TrackingPage() {
                                                     {req.quantity} <span className="text-xs text-zinc-500">{req.ppe_master?.unit}</span>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                    {req.status === 'PENDING_DEPT' && <Badge variant="secondary" className="bg-yellow-100/50 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-500 hover:bg-yellow-100/50">Dept Pending</Badge>}
-                                                    {req.status === 'PENDING_HSE' && <Badge variant="secondary" className="bg-orange-100/50 text-orange-800 dark:bg-orange-900/20 dark:text-orange-500 hover:bg-orange-100/50">HSE Pending</Badge>}
-                                                    {req.status === 'REJECTED_BY_DEPT' && <Badge variant="destructive">Dept Rejected</Badge>}
-                                                    {req.status === 'REJECTED_BY_HSE' && <Badge variant="destructive">HSE Rejected</Badge>}
-                                                    {req.status === 'APPROVED_ISSUED' && <Badge className="bg-green-100 text-green-800 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400">Issued</Badge>}
+                                                    {(req.status === 'READY_FOR_PICKUP') ? (
+                                                        <Button
+                                                            size="sm"
+                                                            onClick={() => handleConfirmReceipt(req.id)}
+                                                            disabled={confirmingId === req.id}
+                                                            className="bg-green-600 hover:bg-green-700 text-white"
+                                                        >
+                                                            {confirmingId === req.id ? t.common.loading : (t.tracking.confirmReceiptBtn || 'Confirm Receipt')}
+                                                        </Button>
+                                                    ) : (
+                                                        <Badge variant={req.status.includes('REJECTED') ? "destructive" : "secondary"} className={
+                                                            req.status === 'APPROVED_ISSUED' || req.status === 'COMPLETED' ? "bg-green-100 text-green-800 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400" :
+                                                                req.status === 'PENDING_DEPT' ? "bg-yellow-100/50 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-500 hover:bg-yellow-100/50" :
+                                                                    req.status.includes('PENDING') ? "bg-orange-100/50 text-orange-800 dark:bg-orange-900/20 dark:text-orange-500 hover:bg-orange-100/50" : ""
+                                                        }>
+                                                            {(t.tracking.statusMap as any)?.[req.status] || req.status}
+                                                        </Badge>
+                                                    )}
                                                 </td>
                                             </tr>
                                         ))}

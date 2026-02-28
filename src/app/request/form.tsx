@@ -29,11 +29,14 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Checkbox } from '@/components/ui/checkbox'
 
 const formSchema = z.object({
+    requestType: z.enum(['NORMAL', 'LOST_BROKEN']),
     requesterName: z.string().min(1, 'Name is required'),
     requesterEmpCode: z.string().min(1, 'Employee Code is required for tracking'),
-    requesterEmail: z.string().email('Invalid email').optional().or(z.literal('')),
+    requesterEmail: z.string().optional().or(z.literal('')),
     departmentId: z.string().uuid('Please select a department'),
     location: z.string().optional(),
     items: z.array(z.object({
@@ -42,7 +45,34 @@ const formSchema = z.object({
     })).min(1, 'You must request at least one item.'),
     note: z.string().optional(),
     attachmentUrl: z.string().optional(),
-    captchaAnswer: z.string().min(1, 'Required')
+    captchaAnswer: z.string().min(1, 'Required'),
+    incidentDescription: z.string().optional(),
+    incidentDate: z.string().optional(),
+    employeeAcceptsCompensation: z.boolean(),
+}).superRefine((data, ctx) => {
+    if (data.requestType === 'LOST_BROKEN') {
+        if (!data.incidentDescription || data.incidentDescription.trim() === '') {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Required for Lost/Broken reports',
+                path: ['incidentDescription']
+            });
+        }
+        if (!data.incidentDate) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Required',
+                path: ['incidentDate']
+            });
+        }
+        if (!data.employeeAcceptsCompensation) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'You must accept compensation to proceed',
+                path: ['employeeAcceptsCompensation']
+            });
+        }
+    }
 })
 
 export function RequestForm({
@@ -61,6 +91,7 @@ export function RequestForm({
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
+            requestType: 'NORMAL',
             requesterName: '',
             requesterEmpCode: '',
             requesterEmail: '',
@@ -70,6 +101,9 @@ export function RequestForm({
             note: '',
             attachmentUrl: '',
             captchaAnswer: '',
+            incidentDescription: '',
+            incidentDate: '',
+            employeeAcceptsCompensation: false,
         },
     })
 
@@ -95,6 +129,8 @@ export function RequestForm({
         control: form.control,
         name: "items"
     })
+
+    const currentRequestType = form.watch('requestType')
 
     const [file, setFile] = useState<File | null>(null)
 
@@ -224,6 +260,41 @@ export function RequestForm({
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(handleInitialSubmit)} className="space-y-6">
+
+                <FormField
+                    control={form.control}
+                    name="requestType"
+                    render={({ field }) => (
+                        <FormItem className="space-y-3 p-4 bg-zinc-100 dark:bg-zinc-900 rounded-lg">
+                            <FormControl>
+                                <RadioGroup
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                    className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-8"
+                                >
+                                    <FormItem className="flex items-center space-x-3 space-y-0">
+                                        <FormControl>
+                                            <RadioGroupItem value="NORMAL" />
+                                        </FormControl>
+                                        <FormLabel className="font-medium cursor-pointer text-base">
+                                            {t.requestForm.typeNormal || "Normal Request"}
+                                        </FormLabel>
+                                    </FormItem>
+                                    <FormItem className="flex items-center space-x-3 space-y-0">
+                                        <FormControl>
+                                            <RadioGroupItem value="LOST_BROKEN" />
+                                        </FormControl>
+                                        <FormLabel className="font-medium cursor-pointer text-base">
+                                            {t.requestForm.typeLostBroken || "Lost / Broken Report"}
+                                        </FormLabel>
+                                    </FormItem>
+                                </RadioGroup>
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                         control={form.control}
@@ -232,7 +303,7 @@ export function RequestForm({
                             <FormItem>
                                 <FormLabel>{t.requestForm.fullName} *</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="John Doe" {...field} />
+                                    <Input placeholder="Nguyễn Văn A" {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -260,7 +331,7 @@ export function RequestForm({
                             <FormItem>
                                 <FormLabel>{t.requestForm.email} ({t.common.optional})</FormLabel>
                                 <FormControl>
-                                    <Input type="email" placeholder="john.doe@example.com" {...field} />
+                                    <Input type="text" placeholder="0912345678" {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -380,6 +451,59 @@ export function RequestForm({
                         </Button>
                     </div>
                 </div>
+
+                {currentRequestType === 'LOST_BROKEN' && (
+                    <div className="space-y-4 p-4 border border-red-200 dark:border-red-900/50 bg-red-50/50 dark:bg-red-950/20 rounded-lg">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="incidentDate"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-red-800 dark:text-red-200">{t.requestForm.incidentDate || "Date of Incident"} *</FormLabel>
+                                        <FormControl>
+                                            <Input type="date" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                        <FormField
+                            control={form.control}
+                            name="incidentDescription"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="text-red-800 dark:text-red-200">{t.requestForm.incidentDesc || "Incident Description"} *</FormLabel>
+                                    <FormControl>
+                                        <Textarea placeholder={t.requestForm.incidentDescPlaceholder} {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="employeeAcceptsCompensation"
+                            render={({ field }) => (
+                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 p-4 border border-red-100 dark:border-red-900 bg-white dark:bg-zinc-950 rounded-md">
+                                    <FormControl>
+                                        <Checkbox
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                        />
+                                    </FormControl>
+                                    <div className="space-y-1 leading-none">
+                                        <FormLabel className="font-medium cursor-pointer">
+                                            {t.requestForm.acceptCompensation || "I confirm the above information is accurate and accept responsibility for compensation."}
+                                        </FormLabel>
+                                        <FormMessage />
+                                    </div>
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField

@@ -49,11 +49,11 @@ export default async function RootLayout({
             </main>
             <footer className="border-t bg-white dark:bg-zinc-950/50 py-4">
               <div className="container mx-auto px-4 flex flex-col items-center justify-between gap-2 md:h-12 md:flex-row">
-                <p className="text-center text-sm text-zinc-500 dark:text-zinc-400">
-                  &copy; {new Date().getFullYear()} Intersnack Vietnam.
+                <p className="text-zinc-500 mb-2 md:mb-0 text-center text-sm">
+                  &copy; {new Date().getFullYear()} Intersnack Vietnam. All rights reserved.
                 </p>
-                <p className="text-center text-sm text-zinc-500 dark:text-zinc-400 font-medium whitespace-nowrap">
-                  Designed & Built by Vu.Huynh
+                <p className="text-zinc-500 dark:text-zinc-400 font-medium tracking-wide text-sm whitespace-nowrap">
+                  Designed & Built by V.H
                 </p>
                 <div className="ml-0 md:ml-auto">
                   <LanguageSwitcher />

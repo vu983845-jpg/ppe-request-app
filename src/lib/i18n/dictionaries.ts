@@ -15,11 +15,11 @@ export const dictionaries = {
             optional: "Optional"
         },
         index: {
-            title: "Manufacturing PPE Management",
-            subtitle: "Request Personal Protective Equipment quickly, or log in to manage approvals and inventory.",
+            title: "PPE Management System",
+            subtitle: "A centralized portal to request, approve, and manage Personal Protective Equipment inventory.",
             requestBtn: "Request PPE",
-            trackBtn: "Track Requests",
-            loginBtn: "Staff Login"
+            trackBtn: "Track Request",
+            loginBtn: "System Login"
         },
         login: {
             title: "Staff Login",
@@ -39,7 +39,7 @@ export const dictionaries = {
             detailsSubtitle: "All fields with * are required.",
             fullName: "Full Name",
             empCode: "Employee Code",
-            email: "Email",
+            email: "Zalo Phone Number",
             location: "Location / Line / Area",
             dept: "Department",
             selectDept: "Select a department",
@@ -62,7 +62,14 @@ export const dictionaries = {
             confirmSubtitle: "Please review the details below before submitting.",
             goBackBtn: "Go Back & Edit",
             confirmBtn: "Confirm & Submit",
-            requestedItems: "Items Requested:"
+            requestedItems: "Items Requested:",
+            typeNormal: "Normal Request",
+            typeLostBroken: "Lost / Broken Report",
+            incidentDesc: "Incident Description",
+            incidentDescPlaceholder: "Explain how it was lost or broken...",
+            incidentDate: "Date of Incident",
+            acceptCompensation: "I confirm the above information is accurate and accept responsibility for compensation or payroll deduction for the replacement cost.",
+            mustAcceptCompensation: "You must accept responsibility to proceed with a replacement request."
         },
         tracking: {
             title: "Request Tracking",
@@ -89,7 +96,22 @@ export const dictionaries = {
                 qty: "Qty",
                 cost: "Total Cost"
             },
-            noRequests: "No requests found for this code."
+            noRequests: "No requests found for this code.",
+            confirmReceiptBtn: "Confirm Receipt",
+            confirmSuccess: "Receipt confirmed successfully!",
+            statusMap: {
+                PENDING_DEPT: "Dept Pending",
+                PENDING_HSE: "HSE Pending",
+                PENDING_PLANT_MANAGER: "PM Pending",
+                PENDING_HR: "HR Pending",
+                READY_FOR_PICKUP: "Ready for Pickup",
+                COMPLETED: "Completed",
+                APPROVED_ISSUED: "Issued",
+                REJECTED_BY_DEPT: "Dept Rejected",
+                REJECTED_BY_HSE: "HSE Rejected",
+                REJECTED_BY_PLANT_MANAGER: "PM Rejected",
+                REJECTED_BY_HR: "HR Rejected"
+            }
         },
         deptHead: {
             title: "Department Dashboard",
@@ -184,6 +206,18 @@ export const dictionaries = {
                 stock: "Stock"
             },
             exportBtn: "Export to Excel"
+        },
+        plantManager: {
+            title: "Plant Manager Dashboard",
+            subtitle: "Review incidents and approve lost/broken PPE replacements.",
+            pendingTitle: "Lost/Broken PPE Requests Pending Your Approval",
+            noRequests: "No requests pending your approval."
+        },
+        hr: {
+            title: "HR Dashboard",
+            subtitle: "Review and approve payroll deductions for lost/broken PPE.",
+            pendingTitle: "Lost/Broken PPE Requests Pending Deduction Approval",
+            noRequests: "No requests pending HR approval."
         }
     },
     vi: {
@@ -202,11 +236,11 @@ export const dictionaries = {
             optional: "Tùy chọn"
         },
         index: {
-            title: "Quản Lý Đồ Bảo Hộ Intersnack",
-            subtitle: "Đăng ký nhận trang thiết bị bảo hộ lao động (PPE) nhanh chóng, hoặc đăng nhập để quản lý phê duyệt và kho.",
-            requestBtn: "Tạo Đơn Cấp Phát BHLĐ",
-            trackBtn: "Tra Cứu Tình Trạng Đơn",
-            loginBtn: "Cổng Đăng Nhập Quản Lý"
+            title: "Hệ Thống Quản Lý BHLĐ Intersnack",
+            subtitle: "Cổng thông tin điện tử hỗ trợ yêu cầu, phê duyệt và quản trị tồn kho Thiết bị Bảo hộ Cá nhân (PPE).",
+            requestBtn: "Tạo Yêu Cầu Cấp Phát",
+            trackBtn: "Tra Cứu Tình Trạng",
+            loginBtn: "Đăng Nhập Hệ Thống"
         },
         login: {
             title: "Đăng Nhập Hệ Thống",
@@ -220,13 +254,13 @@ export const dictionaries = {
             error: "Tài khoản hoặc mật khẩu chưa chính xác."
         },
         requestForm: {
-            title: "Khởi Tạo Yêu Cầu Cấp Phát BHLĐ",
-            subtitle: "Điền đầy đủ thông tin vào biểu mẫu dưới đây để hệ thống ghi nhận yêu cầu của bạn.",
+            title: "Yêu Cầu Cấp Phát Thiết Bị Bảo Hộ",
+            subtitle: "Điền đầy đủ các thông tin chuyên môn vào biểu mẫu dưới đây để hệ thống ghi nhận.",
             detailsTitle: "Chi Tiết Yêu Cầu",
-            detailsSubtitle: "Các trường có dấu * là bắt buộc bổ sung.",
+            detailsSubtitle: "Vui lòng cung cấp đầy đủ thông tin vào các trường đánh dấu (*).",
             fullName: "Họ và Tên",
             empCode: "Mã Nhân Viên",
-            email: "Email (Nhận thông báo)",
+            email: "SĐT Zalo (Để nhận thông báo)",
             location: "Vị Trí / Chuyền / Khu Vực",
             dept: "Phòng Ban",
             selectDept: "Chọn phòng ban",
@@ -243,25 +277,32 @@ export const dictionaries = {
             addItem: "+ Thêm Loại Đồ Bảo Hộ Khác",
             removeItem: "Loại Bỏ",
             minOneItem: "Bạn cần cung cấp ít nhất một vật dụng để tạo đơn.",
-            captchaPrompt: "Kiểm tra bảo mật, vui lòng giải phép tính:",
-            captchaError: "Kết quả phép tính không chính xác.",
-            confirmTitle: "Xác Nhận Thông Tin Đơn Cấp Phát",
-            confirmSubtitle: "Vui lòng xem lại danh mục các vật dụng trước khi gửi lên hệ thống.",
+            captchaPrompt: "Xác thực chống tự động, vui lòng nhập kết quả phép tính:",
+            captchaError: "Kết quả toán học không chính xác, vui lòng thử lại.",
+            confirmTitle: "Xác Nhận Yêu Cầu Cấp Phát",
+            confirmSubtitle: "Vui lòng rà soát lại thông tin chi tiết trước khi xác nhận gửi lên hệ thống.",
             goBackBtn: "Chỉnh Sửa Lại Thông Tin",
             confirmBtn: "Gửi Đơn Xin Cấp Phát",
-            requestedItems: "Danh mục đồ bảo hộ đã chọn:"
+            requestedItems: "Danh mục đồ bảo hộ đã chọn:",
+            typeNormal: "Yêu cầu cấp phát mới",
+            typeLostBroken: "Báo cáo Mất / Hỏng (Cấp lại)",
+            incidentDesc: "Mô tả sự cố",
+            incidentDescPlaceholder: "Trình bày rõ lý do làm mất hoặc làm hỏng thiết bị...",
+            incidentDate: "Thời điểm xảy ra sự cố",
+            acceptCompensation: "Tôi xác nhận thông tin trên là chính xác và chấp nhận trách nhiệm bồi thường/trừ lương đối với chi phí cấp lại trang thiết bị này.",
+            mustAcceptCompensation: "Bạn buộc phải đánh dấu đồng ý bồi thường để tiếp tục yêu cầu cấp lại."
         },
         tracking: {
-            title: "Tra Cứu Tình Trạng Nhận Đồ",
-            subtitle: "Vui lòng nhập Mã Nhân Viên của bạn để xem tình trạng đơn và lịch sử đã nhận.",
+            title: "Hệ Thống Tra Cứu Yêu Cầu",
+            subtitle: "Vui lòng cung cấp Mã Nhân Viên để theo dõi tiến độ xử lý và lịch sử nhận thiết bị.",
             searchBtn: "Tra Cứu",
-            searching: "Đang tìm...",
+            searching: "Đang tra cứu dữ liệu...",
             empCode: "Mã Nhân Viên",
             empCodePlaceholder: "Ví dụ: EMP123",
-            captchaPrompt: "Kiểm tra bảo mật, vui lòng giải:",
-            captchaError: "Kết quả sai.",
-            myRequests: "Đơn Đang Chờ Xử Lý",
-            history: "Lịch Sử Đã Nhận",
+            captchaPrompt: "Xác thực chống tự động, vui lòng nhập kết quả phép tính:",
+            captchaError: "Kết quả toán học không chính xác, vui lòng thử lại.",
+            myRequests: "Danh Sách Yêu Cầu Đang Xử Lý",
+            history: "Lịch Sử Cấp Phát Thiết Bị",
             table: {
                 date: "Ngày tạo",
                 requester: "Người yêu cầu",
@@ -276,12 +317,27 @@ export const dictionaries = {
                 qty: "S.L",
                 cost: "Tổng Chi Phí"
             },
-            noRequests: "Không tìm thấy dữ liệu nào khớp với mã nhân viên này."
+            noRequests: "Hệ thống không tìm thấy dữ liệu khớp với Mã Nhân Viên cung cấp.",
+            confirmReceiptBtn: "Xác nhận đã nhận",
+            confirmSuccess: "Đã xác nhận nhận hàng thành công!",
+            statusMap: {
+                PENDING_DEPT: "Chờ BP Duyệt",
+                PENDING_HSE: "Chờ HSE Duyệt",
+                PENDING_PLANT_MANAGER: "Chờ GĐ Nhà Máy",
+                PENDING_HR: "Chờ HR Duyệt",
+                READY_FOR_PICKUP: "Chờ Bạn Xác Nhận",
+                COMPLETED: "Hoàn Tất",
+                APPROVED_ISSUED: "Đã Cấp Phát",
+                REJECTED_BY_DEPT: "BP Từ Chối",
+                REJECTED_BY_HSE: "HSE Từ Chối",
+                REJECTED_BY_PLANT_MANAGER: "GĐ Từ Chối",
+                REJECTED_BY_HR: "HR Từ Chối"
+            }
         },
         deptHead: {
-            title: "Quản Lý Bộ Phận",
-            subtitle: "Xét duyệt các yêu cầu PPE từ nhân viên trong bộ phận/chuyền của bạn.",
-            pendingTitle: "Yêu Cầu Chờ Duyệt",
+            title: "Quản Trị Kênh Bộ Phận",
+            subtitle: "Phê duyệt các yêu cầu cấp phát thiết bị từ nhân sự trực thuộc bộ phận/chuyền sản xuất.",
+            pendingTitle: "Danh Sách Yêu Cầu Chờ Phê Duyệt",
             table: {
                 date: "Ngày tạo",
                 requester: "Người xin",
@@ -333,8 +389,8 @@ export const dictionaries = {
                 analytics: "Phân Tích & Lịch Sử",
                 budgets: "Ngân Sách & Chi Phí"
             },
-            historyTitle: "Nhập Xuất Tồn & Lịch Sự",
-            chartTitle: "Biểu Đồ Tổng Quan Năm",
+            historyTitle: "Báo Cáo Nhập Xuất Tồn & Lịch Sử",
+            chartTitle: "Biểu Đồ Tổng Quan Cả Năm",
             historyTable: {
                 selectMonth: "Chọn Tháng",
                 entireYear: "Tổng Quan Cả Năm",
@@ -352,7 +408,7 @@ export const dictionaries = {
         },
         admin: {
             title: "Bảng Điều Khiển Quản Trị Hệ Thống",
-            subtitle: "Tổng quan về chi phí, yêu cầu và ngân sách.",
+            subtitle: "Báo cáo tổng quan về chi phí vận hành, tình trạng yêu cầu và ngân sách toàn nhà máy.",
             metrics: {
                 yearlyBudget: "Ngân Sách Năm",
                 spent: "Đã Chi Tiêu",
@@ -371,6 +427,18 @@ export const dictionaries = {
                 stock: "Tồn"
             },
             exportBtn: "Xuất file Excel"
+        },
+        plantManager: {
+            title: "Bảng điều khiển Giám đốc Nhà máy",
+            subtitle: "Xem xét báo cáo sự cố và phê duyệt cấp lại PPE mất/hỏng.",
+            pendingTitle: "Yêu cầu cấp lại PPE Mất/Hỏng chờ phê duyệt",
+            noRequests: "Không có yêu cầu nào chờ phê duyệt."
+        },
+        hr: {
+            title: "Bảng điều khiển Hành chính Nhân sự",
+            subtitle: "Xem xét và phê duyệt trừ lương đối với PPE mất/hỏng.",
+            pendingTitle: "Yêu cầu cấp lại PPE Mất/Hỏng chờ phê duyệt trừ lương",
+            noRequests: "Không có yêu cầu nào chờ HR phê duyệt."
         }
     }
 }

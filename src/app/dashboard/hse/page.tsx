@@ -44,7 +44,7 @@ export default async function HseDashboard() {
         .order('name')
 
     // Fetch Purchase History
-    const { data: purchases } = await supabase
+    const { data: purchases, error: purError } = await supabase
         .from('ppe_purchases')
         .select('*, ppe_master(name, unit), app_users(name)')
         .order('purchased_at', { ascending: false })
@@ -91,6 +91,7 @@ export default async function HseDashboard() {
                     <TabsContent value="inventory">
                         <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6">
                             <h2 className="text-xl font-semibold mb-4">{t.hse.inventoryTitle}</h2>
+                            {purError && <div className="text-red-500 mb-4">Error loading purchases: {purError.message}</div>}
                             <InventoryTable inventory={inventory || []} purchases={purchases || []} />
                         </div>
                     </TabsContent>

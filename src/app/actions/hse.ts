@@ -53,11 +53,13 @@ export async function approveRequestByHSE(requestId: string) {
 
   if (stockError || !stockData) return { error: 'Failed to deduct stock: ' + (stockError?.message || 'Row not found') }
 
-  // Update request status
+  // Update request status based on workflow
+  const nextStatus = req.request_type === 'LOST_BROKEN' ? 'PENDING_PLANT_MANAGER' : 'APPROVED_ISSUED'
+
   const { error: reqError } = await supabase
     .from('ppe_requests')
     .update({
-      status: 'APPROVED_ISSUED',
+      status: nextStatus,
       hse_approved_at: new Date().toISOString(),
       hse_approved_by: approver.id
     })
@@ -114,7 +116,7 @@ export async function approveRequestByHSE(requestId: string) {
 
   const emailHtml = generateStatusEmailHtml({
     requestName: req.requester_name,
-    status: 'APPROVED & ISSUED',
+    status: req.request_type === 'LOST_BROKEN' ? 'HSE VERIFIED (Pending PM)' : 'APPROVED & ISSUED',
     department: req.departments.name,
     ppeName: ppe.name,
     quantity: req.quantity,

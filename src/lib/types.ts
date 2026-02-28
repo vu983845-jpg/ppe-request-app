@@ -1,11 +1,17 @@
-export type Role = 'HSE' | 'DEPT_HEAD' | 'ADMIN'
+export type Role = 'HSE' | 'DEPT_HEAD' | 'ADMIN' | 'HR' | 'PLANT_MANAGER'
+
+export type RequestType = 'NORMAL' | 'LOST_BROKEN'
 
 export type RequestStatus =
     | 'PENDING_DEPT'
     | 'REJECTED_BY_DEPT'
     | 'PENDING_HSE'
     | 'REJECTED_BY_HSE'
-    | 'APPROVED_ISSUED'
+    | 'PENDING_PLANT_MANAGER'
+    | 'PENDING_HR'
+    | 'READY_FOR_PICKUP'
+    | 'APPROVED_ISSUED' // Used historically and for normal requests skipping pickup
+    | 'COMPLETED'
 
 export interface Department {
     id: string
@@ -52,6 +58,20 @@ export interface PperRequest {
     dept_approved_by: string | null
     hse_approved_at: string | null
     hse_approved_by: string | null
+
+    // Lost & Broken additions
+    request_type: RequestType
+    incident_description: string | null
+    incident_date: string | null
+    employee_accepts_compensation: boolean
+    plant_manager_decision_note: string | null
+    plant_manager_approved_at: string | null
+    plant_manager_approved_by: string | null
+    hr_decision_note: string | null
+    hr_approved_at: string | null
+    hr_approved_by: string | null
+    completed_at: string | null
+
     created_at: string
 
     // Joins (optional for typed responses)

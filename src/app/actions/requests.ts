@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { sendEmail, generateStatusEmailHtml } from '@/lib/email'
 import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
+import { sendTeamsNotification } from '@/lib/teams'
 
 const PPE_REQUEST_SCHEMA = z.object({
     requesterName: z.string().min(1, 'Name is required'),
@@ -16,7 +17,11 @@ const PPE_REQUEST_SCHEMA = z.object({
         quantity: z.number().positive().min(1, 'At least 1 item is required'),
     })).min(1, 'You must request at least one item.'),
     note: z.string().optional(),
-    attachmentUrl: z.string().optional()
+    attachmentUrl: z.string().optional(),
+    requestType: z.enum(['NORMAL', 'LOST_BROKEN']),
+    incidentDescription: z.string().optional(),
+    incidentDate: z.string().optional(),
+    employeeAcceptsCompensation: z.boolean().default(false),
 })
 
 export async function submitPpeRequest(formData: z.infer<typeof PPE_REQUEST_SCHEMA>) {
@@ -49,7 +54,11 @@ export async function submitPpeRequest(formData: z.infer<typeof PPE_REQUEST_SCHE
             quantity: item.quantity,
             note: formData.note || null,
             attachment_url: formData.attachmentUrl || null,
-            status: 'PENDING_DEPT'
+            status: 'PENDING_DEPT',
+            request_type: formData.requestType,
+            incident_description: formData.incidentDescription || null,
+            incident_date: formData.incidentDate || null,
+            employee_accepts_compensation: formData.employeeAcceptsCompensation
         }))
 
         const { error: insertError } = await supabase
@@ -94,6 +103,21 @@ export async function submitPpeRequest(formData: z.infer<typeof PPE_REQUEST_SCHE
             html: notifyHtml
         })
 
+        // 4. Send Teams Notification
+        let teamsItemsText = '';
+        for (const item of formData.items) {
+            const ppeDetails = ppeList?.find(p => p.id === item.ppeId)
+            teamsItemsText += `- **${ppeDetails?.name || 'Unknown Item'}**: ${item.quantity} ${ppeDetails?.unit || ''}\n`
+        }
+
+        await sendTeamsNotification({
+            requesterName: formData.requesterName,
+            department: dept.name,
+            items: teamsItemsText,
+            requestType: formData.requestType,
+            incidentDescription: formData.incidentDescription
+        });
+
         revalidatePath('/dashboard/dept-head')
         revalidatePath('/dashboard/hse')
 
@@ -136,4 +160,29 @@ export async function searchRequestsByEmpCode(empCode: string) {
     }
 
     return { requests, history }
+}
+
+export async function confirmReceipt(requestId: string, empCode: string) {
+    const supabase = await createClient()
+
+    // Verify ownership
+    const { data: request, error: fetchErr } = await supabase
+        .from('ppe_requests')
+        .select('id, requester_emp_code, status')
+        .eq('id', requestId)
+        .single()
+
+    if (fetchErr || !request) return { error: 'Request not found' }
+    if (request.requester_emp_code !== empCode) return { error: 'Unauthorized to confirm this request' }
+    if (request.status !== 'READY_FOR_PICKUP') return { error: 'Request is not ready for pickup' }
+
+    const { error: updateErr } = await supabase
+        .from('ppe_requests')
+        .update({ status: 'COMPLETED' })
+        .eq('id', requestId)
+
+    if (updateErr) return { error: updateErr.message }
+
+    revalidatePath('/tracking')
+    return { success: true }
 }
