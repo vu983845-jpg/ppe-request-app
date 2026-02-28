@@ -128,12 +128,13 @@ export const dictionaries = {
             }
         },
         deptHead: {
-            title: "Department Dashboard",
-            subtitle: "Review PPE requests from your department.",
-            pendingTitle: "Pending Approvals",
+            title: "Department Channel Admin",
+            subtitle: "Approve equipment issuance requests from personnel in your department/production line.",
+            pendingTitle: "Requests Pending Approval",
             table: {
                 date: "Date",
                 requester: "Requester",
+                dept: "Department",
                 item: "Item",
                 qty: "Qty",
                 status: "Status",
@@ -143,11 +144,11 @@ export const dictionaries = {
                 approvals: "Pending Approvals",
                 history: "Issuance History"
             },
-            historyTitle: "Department Issuance History",
+            historyTitle: "Issuance History Managed by This Channel",
             rejectDialogTitle: "Reject Request",
             rejectDialogPlaceholder: "Provide a reason for rejection (required)...",
             rejectConfirmBtn: "Confirm Reject",
-            noRequests: "No pending requests."
+            noRequests: "There are currently no requests pending approval."
         },
         hse: {
             title: "HSE Dashboard",
@@ -377,6 +378,7 @@ export const dictionaries = {
             table: {
                 date: "Ngày tạo",
                 requester: "Người xin",
+                dept: "Phòng ban",
                 item: "Vật dụng",
                 qty: "S.L",
                 status: "Trạng thái",
@@ -386,7 +388,7 @@ export const dictionaries = {
                 approvals: "Chờ Phê Duyệt",
                 history: "Lịch Sử Cấp Phát"
             },
-            historyTitle: "Lịch Sử Cấp Phát Của Bộ Phận",
+            historyTitle: "Lịch Sử Cấp Phát Quản Lý Bằng Kênh Này",
             rejectDialogTitle: "Từ Chối Yêu Cầu",
             rejectDialogPlaceholder: "Nhập lý do từ chối để báo cho nhân viên (Bắt buộc)...",
             rejectConfirmBtn: "Xác Nhận Từ Chối",

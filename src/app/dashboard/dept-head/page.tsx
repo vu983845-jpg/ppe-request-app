@@ -32,8 +32,7 @@ export default async function DeptHeadDashboard() {
     // Fetch Requests
     const { data: requests, error: reqError } = await supabase
         .from('ppe_requests')
-        .select('*, ppe_master(name, unit)')
-        .eq('requester_department_id', appUser.department_id)
+        .select('*, ppe_master(name, unit), departments(name)')
         .order('created_at', { ascending: false })
 
     if (reqError) {

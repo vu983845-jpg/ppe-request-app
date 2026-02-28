@@ -59,6 +59,7 @@ export function RequestsTable({ requests }: { requests: any[] }) {
                     <TableRow>
                         <TableHead>{t.deptHead.table.date}</TableHead>
                         <TableHead>{t.deptHead.table.requester}</TableHead>
+                        <TableHead>{t.deptHead.table.dept}</TableHead>
                         <TableHead>{t.deptHead.table.item}</TableHead>
                         <TableHead>{t.deptHead.table.qty}</TableHead>
                         <TableHead>{t.deptHead.table.status}</TableHead>
@@ -72,6 +73,9 @@ export function RequestsTable({ requests }: { requests: any[] }) {
                             <TableCell className="font-medium">
                                 {req.requester_name}
                                 {req.note && <div className="text-sm text-zinc-500">Note: {req.note}</div>}
+                            </TableCell>
+                            <TableCell className="text-zinc-600 dark:text-zinc-400">
+                                {req.departments?.name || '-'}
                             </TableCell>
                             <TableCell>
                                 {req.ppe_master?.name}
