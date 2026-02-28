@@ -46,7 +46,7 @@ export default async function HseDashboard() {
     // Fetch Purchase History
     const { data: purchases, error: purError } = await supabase
         .from('ppe_purchases')
-        .select('*, ppe_master(name, unit), app_users(name)')
+        .select('*, ppe_master(name, unit)')
         .order('purchased_at', { ascending: false })
         .limit(100)
 
