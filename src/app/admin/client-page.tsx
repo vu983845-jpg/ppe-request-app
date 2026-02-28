@@ -42,6 +42,10 @@ export function AdminDashboardClient({
             'Unit Price': r.ppe_master?.unit_price,
             'Total Cost': r.quantity * (r.ppe_master?.unit_price || 0),
             'Status': r.status,
+            'Dept Approver': r.dept_approver?.name || '',
+            'HSE Approver': r.hse_approver?.name || '',
+            'PM Approver': r.pm_approver?.name || '',
+            'HR Approver': r.hr_approver?.name || '',
         }))
 
         const ws = xlsx.utils.json_to_sheet(exportData)

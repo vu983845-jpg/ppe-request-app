@@ -67,6 +67,7 @@ export function RequestsTable({ requests }: { requests: any[] }) {
                             <TableHead>{t.deptHead.table.item}</TableHead>
                             <TableHead>{t.deptHead.table.qty}</TableHead>
                             <TableHead>Incident / Plant Manager Note</TableHead>
+                            <TableHead>Approvers History</TableHead>
                             <TableHead className="text-right">{t.deptHead.table.actions}</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -84,14 +85,21 @@ export function RequestsTable({ requests }: { requests: any[] }) {
                                 </TableCell>
                                 <TableCell>{req.quantity}</TableCell>
                                 <TableCell className="max-w-[250px] truncate">
-                                    <div className="text-xs text-zinc-500 truncate" title={req.incident_description}>
+                                    <div className="text-xs text-zinc-500" title={req.incident_description}>
                                         <span className="font-semibold">User:</span> {req.incident_date} - {req.incident_description}
                                     </div>
                                     {req.plant_manager_decision_note && (
-                                        <div className="text-xs mt-1 text-blue-600 dark:text-blue-400 truncate" title={req.plant_manager_decision_note}>
+                                        <div className="text-xs mt-1 text-blue-600 dark:text-blue-400" title={req.plant_manager_decision_note}>
                                             <span className="font-semibold">PM Note:</span> {req.plant_manager_decision_note}
                                         </div>
                                     )}
+                                </TableCell>
+                                <TableCell>
+                                    <div className="text-[11px] text-zinc-500 font-medium leading-tight space-y-1">
+                                        {req.dept_approver?.name && <div>BP: {req.dept_approver.name}</div>}
+                                        {req.hse_approver?.name && <div>HSE: {req.hse_approver.name}</div>}
+                                        {req.pm_approver?.name && <div>GĐ: {req.pm_approver.name}</div>}
+                                    </div>
                                 </TableCell>
                                 <TableCell className="text-right">
                                     <div className="flex justify-end gap-2">

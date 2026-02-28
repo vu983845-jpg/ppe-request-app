@@ -33,7 +33,15 @@ export default async function HRDashboard() {
     // Fetch Requests for HR Review (Lost/Broken flow after Plant Manager)
     const { data: requests, error: reqError } = await supabase
         .from('ppe_requests')
-        .select('*, ppe_master(name, unit, unit_price), departments(name)')
+        .select(`
+            *, 
+            ppe_master(name, unit, unit_price), 
+            departments(name),
+            dept_approver:app_users!dept_approved_by(name),
+            hse_approver:app_users!hse_approved_by(name),
+            pm_approver:app_users!plant_manager_approved_by(name),
+            hr_approver:app_users!hr_approved_by(name)
+        `)
         .eq('status', 'PENDING_HR')
         .order('created_at', { ascending: false })
 

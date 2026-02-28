@@ -134,7 +134,15 @@ export async function searchRequestsByEmpCode(empCode: string) {
     // 1. Fetch pending/recent requests
     const { data: requests, error: reqError } = await supabase
         .from('ppe_requests')
-        .select('*, ppe_master(name, unit), departments(name)')
+        .select(`
+            *, 
+            ppe_master(name, unit), 
+            departments(name),
+            dept_approver:app_users!dept_approved_by(name),
+            hse_approver:app_users!hse_approved_by(name),
+            pm_approver:app_users!plant_manager_approved_by(name),
+            hr_approver:app_users!hr_approved_by(name)
+        `)
         .eq('requester_emp_code', empCode)
         .order('created_at', { ascending: false })
         .limit(20)

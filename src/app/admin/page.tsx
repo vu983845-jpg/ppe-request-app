@@ -41,7 +41,15 @@ export default async function AdminDashboard() {
     // Fetch all requests
     const { data: requests } = await supabase
         .from('ppe_requests')
-        .select('*, ppe_master(*), departments(*)')
+        .select(`
+            *, 
+            ppe_master(*), 
+            departments(*),
+            dept_approver:app_users!dept_approved_by(name),
+            hse_approver:app_users!hse_approved_by(name),
+            pm_approver:app_users!plant_manager_approved_by(name),
+            hr_approver:app_users!hr_approved_by(name)
+        `)
         .order('created_at', { ascending: false })
 
     // Fetch PPE stock

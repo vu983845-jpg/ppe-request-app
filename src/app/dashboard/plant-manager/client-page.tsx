@@ -67,6 +67,7 @@ export function RequestsTable({ requests }: { requests: any[] }) {
                             <TableHead>{t.deptHead.table.item}</TableHead>
                             <TableHead>{t.deptHead.table.qty}</TableHead>
                             <TableHead>Incident Info</TableHead>
+                            <TableHead>Approvers History</TableHead>
                             <TableHead className="text-right">{t.deptHead.table.actions}</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -87,6 +88,12 @@ export function RequestsTable({ requests }: { requests: any[] }) {
                                     <Badge variant="destructive" className="mb-1">Lost/Broken</Badge>
                                     <div className="text-xs text-zinc-500 truncate" title={req.incident_description}>
                                         {req.incident_date} - {req.incident_description}
+                                    </div>
+                                </TableCell>
+                                <TableCell>
+                                    <div className="text-[11px] text-zinc-500 font-medium leading-tight space-y-1">
+                                        {req.dept_approver?.name && <div>BP: {req.dept_approver.name}</div>}
+                                        {req.hse_approver?.name && <div>HSE: {req.hse_approver.name}</div>}
                                     </div>
                                 </TableCell>
                                 <TableCell className="text-right">

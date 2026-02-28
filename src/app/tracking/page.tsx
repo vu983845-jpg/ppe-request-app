@@ -167,13 +167,21 @@ export default function TrackingPage() {
                                                             {confirmingId === req.id ? t.common.loading : (t.tracking.confirmReceiptBtn || 'Confirm Receipt')}
                                                         </Button>
                                                     ) : (
-                                                        <Badge variant={req.status.includes('REJECTED') ? "destructive" : "secondary"} className={
-                                                            req.status === 'APPROVED_ISSUED' || req.status === 'COMPLETED' ? "bg-green-100 text-green-800 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400" :
-                                                                req.status === 'PENDING_DEPT' ? "bg-yellow-100/50 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-500 hover:bg-yellow-100/50" :
-                                                                    req.status.includes('PENDING') ? "bg-orange-100/50 text-orange-800 dark:bg-orange-900/20 dark:text-orange-500 hover:bg-orange-100/50" : ""
-                                                        }>
-                                                            {(t.tracking.statusMap as any)?.[req.status] || req.status}
-                                                        </Badge>
+                                                        <>
+                                                            <Badge variant={req.status.includes('REJECTED') ? "destructive" : "secondary"} className={
+                                                                req.status === 'APPROVED_ISSUED' || req.status === 'COMPLETED' ? "bg-green-100 text-green-800 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400" :
+                                                                    req.status === 'PENDING_DEPT' ? "bg-yellow-100/50 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-500 hover:bg-yellow-100/50" :
+                                                                        req.status.includes('PENDING') ? "bg-orange-100/50 text-orange-800 dark:bg-orange-900/20 dark:text-orange-500 hover:bg-orange-100/50" : ""
+                                                            }>
+                                                                {(t.tracking.statusMap as any)?.[req.status] || req.status}
+                                                            </Badge>
+                                                            <div className="text-[11px] text-zinc-500 font-medium mt-1 leading-tight space-y-1">
+                                                                {req.dept_approver?.name && <div>BP: {req.dept_approver.name}</div>}
+                                                                {req.hse_approver?.name && <div>HSE: {req.hse_approver.name}</div>}
+                                                                {req.pm_approver?.name && <div>GĐ: {req.pm_approver.name}</div>}
+                                                                {req.hr_approver?.name && <div>HR: {req.hr_approver.name}</div>}
+                                                            </div>
+                                                        </>
                                                     )}
                                                 </td>
                                             </tr>
@@ -212,11 +220,19 @@ export default function TrackingPage() {
                                                         {req.quantity} <span className="text-xs text-zinc-500">{req.ppe_master?.unit}</span>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        <Badge variant={req.status.includes('REJECTED') ? "destructive" : "secondary"} className={
-                                                            req.status === 'APPROVED_ISSUED' || req.status === 'COMPLETED' ? "bg-green-100 text-green-800 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400" : ""
-                                                        }>
-                                                            {(t.tracking.statusMap as any)?.[req.status] || req.status}
-                                                        </Badge>
+                                                        <>
+                                                            <Badge variant={req.status.includes('REJECTED') ? "destructive" : "secondary"} className={
+                                                                req.status === 'APPROVED_ISSUED' || req.status === 'COMPLETED' ? "bg-green-100 text-green-800 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400" : ""
+                                                            }>
+                                                                {(t.tracking.statusMap as any)?.[req.status] || req.status}
+                                                            </Badge>
+                                                            <div className="text-[11px] text-zinc-500 font-medium mt-1 leading-tight space-y-1">
+                                                                {req.dept_approver?.name && <div>BP: {req.dept_approver.name}</div>}
+                                                                {req.hse_approver?.name && <div>HSE: {req.hse_approver.name}</div>}
+                                                                {req.pm_approver?.name && <div>GĐ: {req.pm_approver.name}</div>}
+                                                                {req.hr_approver?.name && <div>HR: {req.hr_approver.name}</div>}
+                                                            </div>
+                                                        </>
                                                     </td>
                                                 </tr>
                                             ))}

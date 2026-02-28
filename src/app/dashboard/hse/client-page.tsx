@@ -135,13 +135,24 @@ export function HseRequestsTable({ requests }: { requests: any[] }) {
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        <Badge variant={req.status === 'PENDING_HSE' ? 'default' : 'outline'}>
-                                            {req.status === 'PENDING_DEPT' ? 'Chờ BP duyệt' :
-                                                req.status === 'PENDING_HSE' ? 'Chờ HSE duyệt' :
-                                                    req.status === 'APPROVED_ISSUED' ? 'Đã cấp phát' :
-                                                        req.status === 'REJECTED_BY_DEPT' ? 'BP từ chối' :
-                                                            req.status === 'REJECTED_BY_HSE' ? 'HSE từ chối' : req.status}
-                                        </Badge>
+                                        <div className="flex flex-col gap-1 items-start">
+                                            <Badge variant={req.status === 'PENDING_HSE' || req.status === 'PENDING_DEPT' ? 'default' : 'outline'}>
+                                                {req.status === 'PENDING_DEPT' ? 'Chờ BP duyệt' :
+                                                    req.status === 'PENDING_HSE' ? 'Chờ HSE duyệt' :
+                                                        req.status === 'PENDING_PLANT_MANAGER' ? 'Chờ GĐ duyệt' :
+                                                            req.status === 'PENDING_HR' ? 'Chờ NS duyệt' :
+                                                                req.status === 'READY_FOR_PICKUP' ? 'Chờ Nhận' :
+                                                                    req.status === 'APPROVED_ISSUED' || req.status === 'COMPLETED' ? 'Đã hoàn tất' :
+                                                                        req.status === 'REJECTED_BY_DEPT' ? 'BP từ chối' :
+                                                                            req.status === 'REJECTED_BY_HSE' ? 'HSE từ chối' : req.status}
+                                            </Badge>
+                                            <div className="text-[11px] text-zinc-500 font-medium mt-1 leading-tight">
+                                                {req.dept_approver?.name && <div>BP: {req.dept_approver.name}</div>}
+                                                {req.hse_approver?.name && <div>HSE: {req.hse_approver.name}</div>}
+                                                {req.pm_approver?.name && <div>GĐ: {req.pm_approver.name}</div>}
+                                                {req.hr_approver?.name && <div>HR: {req.hr_approver.name}</div>}
+                                            </div>
+                                        </div>
                                     </TableCell>
                                     <TableCell className="text-right">
                                         {(req.status === 'PENDING_HSE' || req.status === 'PENDING_DEPT') && (
