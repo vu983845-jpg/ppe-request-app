@@ -55,8 +55,8 @@ BEGIN
 
     -- Insert or Update app_users
     IF new_user_id IS NOT NULL THEN
-      INSERT INTO public.app_users (auth_user_id, email, name, role, department_id, active)
-      VALUES (new_user_id, dept.dept_head_email, 'Trưởng BP ' || dept.name, 'DEPT_HEAD', dept.id, true)
+      INSERT INTO public.app_users (auth_user_id, name, role, department_id)
+      VALUES (new_user_id, 'Trưởng BP ' || dept.name, 'DEPT_HEAD', dept.id)
       ON CONFLICT (auth_user_id) DO UPDATE 
       SET role = 'DEPT_HEAD', department_id = dept.id;
     END IF;
