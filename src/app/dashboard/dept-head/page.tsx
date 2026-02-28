@@ -21,7 +21,7 @@ export default async function DeptHeadDashboard() {
 
     const { data: appUser, error: auError } = await supabase
         .from('app_users')
-        .select('role, department_id, departments(name)')
+        .select('role, department_id, departments!fk_department(name)')
         .eq('auth_user_id', user.id)
         .single()
 
