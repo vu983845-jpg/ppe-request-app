@@ -73,7 +73,8 @@ export const dictionaries = {
         },
         tracking: {
             title: "Request Tracking",
-            subtitle: "Enter your Employee Code to view your request status and history.",
+            subtitle: "Enter your Employee Code to track your PPE requests and history.",
+            welcome: "Welcome, {name}",
             searchBtn: "Search",
             searching: "Searching...",
             empCode: "Employee Code",
@@ -295,6 +296,7 @@ export const dictionaries = {
         tracking: {
             title: "Hệ Thống Tra Cứu Yêu Cầu",
             subtitle: "Vui lòng cung cấp Mã Nhân Viên để theo dõi tiến độ xử lý và lịch sử nhận thiết bị.",
+            welcome: "Xin chào, {name}",
             searchBtn: "Tra Cứu",
             searching: "Đang tra cứu dữ liệu...",
             empCode: "Mã Nhân Viên",

@@ -113,13 +113,23 @@ export default function TrackingPage() {
             {hasSearched && (
                 <div className="space-y-8 animate-in fade-in duration-300">
 
+                    {/* Welcome Message */}
+                    {(() => {
+                        const employeeName = requests[0]?.requester_name || history[0]?.ppe_requests?.requester_name || empCode.trim().toUpperCase()
+                        return (
+                            <h2 className="text-2xl font-bold text-green-700 dark:text-green-500 flex items-center gap-2">
+                                👋 {t.tracking.welcome ? t.tracking.welcome.replace('{name}', employeeName) : `Xin chào, ${employeeName}`}!
+                            </h2>
+                        )
+                    })()}
+
                     {/* Active/Recent Requests */}
                     <div>
-                        <h2 className="text-xl font-semibold mb-4">{t.tracking.myRequests || 'My Requests'}</h2>
+                        <h3 className="text-xl font-semibold mb-4 text-amber-600 dark:text-amber-500">{t.tracking.myRequests || 'My Requests'}</h3>
                         <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden shadow-sm">
                             <div className="overflow-x-auto">
                                 <table className="w-full text-sm text-left">
-                                    <thead className="bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
+                                    <thead className="bg-amber-50 dark:bg-amber-900/10 border-b border-amber-100 dark:border-amber-900/20">
                                         <tr>
                                             <th className="px-6 py-4 font-medium">{t.tracking.table.date}</th>
                                             <th className="px-6 py-4 font-medium">{t.tracking.table.dept}</th>
@@ -129,14 +139,14 @@ export default function TrackingPage() {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
-                                        {requests.length === 0 && (
+                                        {requests.filter(r => r.status.includes('PENDING') || r.status === 'READY_FOR_PICKUP').length === 0 && (
                                             <tr>
                                                 <td colSpan={5} className="px-6 py-8 text-center text-zinc-500">
                                                     {t.tracking.noRequests}
                                                 </td>
                                             </tr>
                                         )}
-                                        {requests.map((req) => (
+                                        {requests.filter(r => r.status.includes('PENDING') || r.status === 'READY_FOR_PICKUP').map((req) => (
                                             <tr key={req.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors">
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     {new Date(req.created_at).toLocaleDateString()}
@@ -174,35 +184,39 @@ export default function TrackingPage() {
                         </div>
                     </div>
 
-                    {/* Issuance History */}
-                    {history.length > 0 && (
+                    {/* Completed Requests */}
+                    {requests.filter(r => !r.status.includes('PENDING') && r.status !== 'READY_FOR_PICKUP').length > 0 && (
                         <div>
-                            <h2 className="text-xl font-semibold mb-4">{t.tracking.history || 'Issuance History'}</h2>
+                            <h3 className="text-xl font-semibold mb-4 text-green-700 dark:text-green-500">{t.tracking.history || 'Issuance History'}</h3>
                             <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden shadow-sm">
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-sm text-left">
-                                        <thead className="bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
+                                        <thead className="bg-green-50 dark:bg-green-900/10 border-b border-green-100 dark:border-green-900/20">
                                             <tr>
-                                                <th className="px-6 py-4 font-medium">{t.tracking.historyTable?.date || 'Issued Date'}</th>
-                                                <th className="px-6 py-4 font-medium">{t.tracking.historyTable?.item || 'Item'}</th>
-                                                <th className="px-6 py-4 font-medium">{t.tracking.historyTable?.qty || 'Qty'}</th>
-                                                <th className="px-6 py-4 font-medium">{t.tracking.historyTable?.cost || 'Cost'}</th>
+                                                <th className="px-6 py-4 font-medium">{t.tracking.table.date}</th>
+                                                <th className="px-6 py-4 font-medium">{t.tracking.table.dept}</th>
+                                                <th className="px-6 py-4 font-medium">{t.tracking.table.item}</th>
+                                                <th className="px-6 py-4 font-medium">{t.tracking.table.qty}</th>
+                                                <th className="px-6 py-4 font-medium">{t.tracking.table.status}</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
-                                            {history.map((log) => (
-                                                <tr key={log.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors">
+                                            {requests.filter(r => !r.status.includes('PENDING') && r.status !== 'READY_FOR_PICKUP').map((req) => (
+                                                <tr key={req.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors">
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        {new Date(log.issued_at).toLocaleDateString()}
+                                                        {new Date(req.created_at).toLocaleDateString()}
                                                     </td>
-                                                    <td className="px-6 py-4">
-                                                        {log.ppe_requests?.ppe_master?.name}
+                                                    <td className="px-6 py-4">{req.departments?.name}</td>
+                                                    <td className="px-6 py-4 max-w-[200px] truncate">{req.ppe_master?.name}</td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        {req.quantity} <span className="text-xs text-zinc-500">{req.ppe_master?.unit}</span>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        {log.issued_quantity} <span className="text-xs text-zinc-500">{log.ppe_requests?.ppe_master?.unit}</span>
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
-                                                        ${log.total_cost}
+                                                        <Badge variant={req.status.includes('REJECTED') ? "destructive" : "secondary"} className={
+                                                            req.status === 'APPROVED_ISSUED' || req.status === 'COMPLETED' ? "bg-green-100 text-green-800 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400" : ""
+                                                        }>
+                                                            {(t.tracking.statusMap as any)?.[req.status] || req.status}
+                                                        </Badge>
                                                     </td>
                                                 </tr>
                                             ))}
