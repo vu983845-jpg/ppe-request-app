@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, Fragment } from 'react'
-import { approveRequestByHSE, rejectRequestByHSE, addPpeStock, getInventoryAnalytics, getYearlyChartData, deletePpeRequest, deletePpeMaster, updatePpeMasterPrice } from '@/app/actions/hse'
+import { approveRequestByHSE, rejectRequestByHSE, addPpeStock, getInventoryAnalytics, getYearlyChartData, deletePpeRequest, updatePpeMasterInfo } from '@/app/actions/hse'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -242,23 +242,26 @@ export function InventoryTable({ inventory, purchases }: { inventory: any[], pur
 
     const [isEditMenuOpen, setIsEditMenuOpen] = useState(false)
     const [editPrice, setEditPrice] = useState<number>(0)
+    const [editQty, setEditQty] = useState<number>(0)
     const [isUpdating, setIsUpdating] = useState(false)
 
     function openEditMenu(ppe: any) {
         setSelectedPpeId(ppe.id)
         setEditPrice(ppe.unit_price)
+        setEditQty(ppe.stock_quantity)
         setIsEditMenuOpen(true)
     }
 
-    async function handleEditPrice() {
-        if (!selectedPpeId || editPrice < 0) return
+    async function handleEditPpe() {
+        if (!selectedPpeId || editPrice < 0 || editQty < 0) return
+        if (!window.confirm("Cảnh báo: Việc điều chỉnh số lượng và đơn giá thủ công có thể ảnh hưởng đến sai lệch hồ sơ tồn kho cuối tháng. Hãy chắc chắn trước khi thực hiện.")) return
         setIsUpdating(true)
         try {
-            const res = await updatePpeMasterPrice(selectedPpeId, editPrice)
+            const res = await updatePpeMasterInfo(selectedPpeId, editPrice, editQty)
             if (res?.error) {
                 toast.error(res.error)
             } else {
-                toast.success(t.hse.inventoryTable.updatePriceSuccess || "Price updated successfully")
+                toast.success(t.hse.inventoryTable.updatePriceSuccess || "Stock updated successfully")
                 setIsEditMenuOpen(false)
                 router.refresh()
             }
@@ -266,21 +269,6 @@ export function InventoryTable({ inventory, purchases }: { inventory: any[], pur
             toast.error(err.message || 'Error occurred')
         } finally {
             setIsUpdating(false)
-        }
-    }
-
-    async function handleDeleteStock(ppeId: string) {
-        if (!window.confirm("Are you sure you want to delete this specific PPE item? Data linked to this item might be affected.")) return
-        try {
-            const res = await deletePpeMaster(ppeId)
-            if (res?.error) {
-                toast.error(res.error)
-            } else {
-                toast.success(t.hse.inventoryTable.deleteSuccess || "Item deleted successfully")
-                router.refresh()
-            }
-        } catch (err: any) {
-            toast.error(err.message || 'Error occurred')
         }
     }
 
@@ -332,10 +320,15 @@ export function InventoryTable({ inventory, purchases }: { inventory: any[], pur
         <div className="space-y-4">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 rounded-lg">
                 <div className="space-y-1">
-                    <h3 className="font-medium text-sm">Add Stock (Nhập Kho)</h3>
+                    <h3 className="font-medium text-sm">Add / Edit Stock (Nhập / Sửa Kho)</h3>
                     <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                        To add stock, click the "+ Add Stock" button next to any item in the table below.
+                        To manage stock, click the actions next to any item below.
                     </p>
+                    <div className="mt-2 text-sm font-semibold text-blue-600 dark:text-blue-400">
+                        Tổng giá trị tồn kho: ${(
+                            inventory.reduce((acc, item) => acc + (item.unit_price * item.stock_quantity), 0)
+                        ).toLocaleString()}
+                    </div>
                 </div>
                 <Button onClick={handleExport} variant="outline" size="sm" className="w-full sm:w-auto">
                     {t.admin?.exportBtn || "Export to Excel"}
@@ -375,9 +368,6 @@ export function InventoryTable({ inventory, purchases }: { inventory: any[], pur
                                         <div className="flex justify-end gap-2 items-center">
                                             <Button size="icon" variant="ghost" onClick={() => openEditMenu(item)} title={t.common.edit || "Edit"}>
                                                 <Pencil className="w-4 h-4 text-blue-500" />
-                                            </Button>
-                                            <Button size="icon" variant="ghost" onClick={() => handleDeleteStock(item.id)} title={t.common.delete || "Delete"}>
-                                                <Trash2 className="w-4 h-4 text-red-500" />
                                             </Button>
                                             <Button size="sm" variant="secondary" onClick={() => openAddMenu(item)}>
                                                 {t.hse.inventoryTable.addStockBtn || "+ Add Stock"}
@@ -498,9 +488,12 @@ export function InventoryTable({ inventory, purchases }: { inventory: any[], pur
             <Dialog open={isEditMenuOpen} onOpenChange={setIsEditMenuOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>{t.common.edit || "Edit"}</DialogTitle>
+                        <DialogTitle>{t.common.edit || "Edit Stock & Price"}</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
+                        <div className="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded text-sm text-amber-800 dark:text-amber-300">
+                            <strong>Cảnh báo:</strong> Việc điều chỉnh số lượng và đơn giá thủ công có thể ảnh hưởng đến sai lệch hồ sơ tồn kho cuối tháng. Hãy chắc chắn trước khi thực hiện.
+                        </div>
                         <div className="space-y-2">
                             <Label>{t.hse.inventoryTable.price || "Price"}</Label>
                             <Input
@@ -510,14 +503,23 @@ export function InventoryTable({ inventory, purchases }: { inventory: any[], pur
                                 onChange={(e) => setEditPrice(Number(e.target.value))}
                             />
                         </div>
+                        <div className="space-y-2">
+                            <Label>{t.hse.inventoryTable.currStock || "Stock Quantity"}</Label>
+                            <Input
+                                type="number"
+                                min="0"
+                                value={editQty === 0 ? 0 : (editQty || '')}
+                                onChange={(e) => setEditQty(Number(e.target.value))}
+                            />
+                        </div>
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setIsEditMenuOpen(false)} disabled={isUpdating}>
                             {t.common.cancel || "Cancel"}
                         </Button>
                         <Button
-                            onClick={handleEditPrice}
-                            disabled={isUpdating || editPrice < 0}
+                            onClick={handleEditPpe}
+                            disabled={isUpdating || editPrice < 0 || editQty < 0}
                         >
                             {isUpdating ? (t.common.loading || "Loading...") : (t.common.save || "Save")}
                         </Button>

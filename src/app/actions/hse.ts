@@ -447,7 +447,7 @@ export async function deletePpeMaster(ppeId: string) {
   return { success: true }
 }
 
-export async function updatePpeMasterPrice(ppeId: string, unitPrice: number) {
+export async function updatePpeMasterInfo(ppeId: string, unitPrice: number, stockQty: number) {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
@@ -458,7 +458,7 @@ export async function updatePpeMasterPrice(ppeId: string, unitPrice: number) {
 
   const { error } = await supabase
     .from('ppe_master')
-    .update({ unit_price: unitPrice })
+    .update({ unit_price: unitPrice, stock_quantity: stockQty })
     .eq('id', ppeId)
 
   if (error) return { error: error.message }

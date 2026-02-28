@@ -16,6 +16,7 @@ import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
 import { useLanguage } from '@/lib/i18n/context'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export function RequestsTable({ requests }: { requests: any[] }) {
     const { t } = useLanguage()
@@ -25,6 +26,9 @@ export function RequestsTable({ requests }: { requests: any[] }) {
         requestId: null,
     })
     const [rejectNote, setRejectNote] = useState('')
+
+    const pendingRequests = requests.filter(r => r.status === 'PENDING_DEPT')
+    const historyRequests = requests.filter(r => r.status !== 'PENDING_DEPT')
 
     async function onApprove(id: string) {
         setLoadingId(id)
@@ -42,50 +46,50 @@ export function RequestsTable({ requests }: { requests: any[] }) {
         if (res?.error) {
             toast.error(res.error)
         } else {
-            toast.success(t.common.save) // We can keep a generic success here or reuse
+            toast.success(t.common.save)
             setRejectDialog({ open: false, requestId: null })
             setRejectNote('')
         }
     }
 
-    return (
-        <>
-            <div className="rounded-md border bg-white dark:bg-zinc-950">
-                <Table className="whitespace-nowrap">
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>{t.deptHead.table.date}</TableHead>
-                            <TableHead>{t.deptHead.table.requester}</TableHead>
-                            <TableHead>{t.deptHead.table.item}</TableHead>
-                            <TableHead>{t.deptHead.table.qty}</TableHead>
-                            <TableHead>{t.deptHead.table.status}</TableHead>
-                            <TableHead className="text-right">{t.deptHead.table.actions}</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {requests.map((req) => (
-                            <TableRow key={req.id}>
-                                <TableCell>{new Date(req.created_at).toLocaleDateString()}</TableCell>
-                                <TableCell className="font-medium">
-                                    {req.requester_name}
-                                    {req.note && <div className="text-sm text-zinc-500">Note: {req.note}</div>}
-                                </TableCell>
-                                <TableCell>
-                                    {req.ppe_master.name}
-                                    <div className="text-sm text-zinc-500">{req.ppe_master.unit}</div>
-                                </TableCell>
-                                <TableCell>{req.quantity}</TableCell>
-                                <TableCell>
-                                    <Badge variant={req.status === 'PENDING_DEPT' ? 'default' : 'secondary'}>
-                                        {req.status === 'PENDING_DEPT' ? 'Chờ BP duyệt' :
-                                            req.status === 'PENDING_HSE' ? 'Chờ HSE duyệt' :
-                                                req.status === 'APPROVED_ISSUED' ? 'Đã cấp phát' :
-                                                    req.status === 'REJECTED_BY_DEPT' ? 'BP từ chối' :
-                                                        req.status === 'REJECTED_BY_HSE' ? 'HSE từ chối' : req.status}
-                                    </Badge>
-                                </TableCell>
+    const renderTable = (data: any[], isHistory: boolean) => (
+        <div className="rounded-md border bg-white dark:bg-zinc-950">
+            <Table className="whitespace-nowrap">
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>{t.deptHead.table.date}</TableHead>
+                        <TableHead>{t.deptHead.table.requester}</TableHead>
+                        <TableHead>{t.deptHead.table.item}</TableHead>
+                        <TableHead>{t.deptHead.table.qty}</TableHead>
+                        <TableHead>{t.deptHead.table.status}</TableHead>
+                        {!isHistory && <TableHead className="text-right">{t.deptHead.table.actions}</TableHead>}
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {data.map((req) => (
+                        <TableRow key={req.id}>
+                            <TableCell>{new Date(req.created_at).toLocaleDateString()}</TableCell>
+                            <TableCell className="font-medium">
+                                {req.requester_name}
+                                {req.note && <div className="text-sm text-zinc-500">Note: {req.note}</div>}
+                            </TableCell>
+                            <TableCell>
+                                {req.ppe_master?.name}
+                                <div className="text-sm text-zinc-500">{req.ppe_master?.unit}</div>
+                            </TableCell>
+                            <TableCell>{req.quantity}</TableCell>
+                            <TableCell>
+                                <Badge variant={req.status === 'PENDING_DEPT' ? 'default' : 'secondary'}>
+                                    {req.status === 'PENDING_DEPT' ? 'Chờ BP duyệt' :
+                                        req.status === 'PENDING_HSE' ? 'Chờ HSE duyệt' :
+                                            req.status === 'APPROVED_ISSUED' ? 'Đã cấp phát' :
+                                                req.status === 'REJECTED_BY_DEPT' ? 'BP từ chối' :
+                                                    req.status === 'REJECTED_BY_HSE' ? 'HSE từ chối' : req.status}
+                                </Badge>
+                            </TableCell>
+                            {!isHistory && (
                                 <TableCell className="text-right">
-                                    {req.status === 'PENDING_DEPT' && (
+                                    {(req.status === 'PENDING_DEPT') && (
                                         <div className="flex justify-end gap-2">
                                             <Button
                                                 size="sm"
@@ -105,18 +109,36 @@ export function RequestsTable({ requests }: { requests: any[] }) {
                                         </div>
                                     )}
                                 </TableCell>
-                            </TableRow>
-                        ))}
-                        {requests.length === 0 && (
-                            <TableRow>
-                                <TableCell colSpan={6} className="text-center py-6 text-zinc-500">
-                                    {t.deptHead.noRequests}
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
+                            )}
+                        </TableRow>
+                    ))}
+                    {data.length === 0 && (
+                        <TableRow>
+                            <TableCell colSpan={isHistory ? 5 : 6} className="text-center py-6 text-zinc-500">
+                                {isHistory ? t.hse.historyTable?.noHistory || "Không có dữ liệu lịch sử." : t.deptHead.noRequests}
+                            </TableCell>
+                        </TableRow>
+                    )}
+                </TableBody>
+            </Table>
+        </div>
+    )
+
+    return (
+        <>
+            <Tabs defaultValue="pending" className="space-y-4">
+                <TabsList>
+                    <TabsTrigger value="pending">{t.deptHead.tabs?.approvals || "Pending Approvals"}</TabsTrigger>
+                    <TabsTrigger value="history">{t.deptHead.tabs?.history || "Issuance History"}</TabsTrigger>
+                </TabsList>
+                <TabsContent value="pending" className="m-0">
+                    {renderTable(pendingRequests, false)}
+                </TabsContent>
+                <TabsContent value="history" className="m-0 space-y-4">
+                    <h3 className="font-medium text-lg mt-4">{t.deptHead.historyTitle || "Lịch Sử Cấp Phát Của Bộ Phận"}</h3>
+                    {renderTable(historyRequests, true)}
+                </TabsContent>
+            </Tabs>
 
             <Dialog open={rejectDialog.open} onOpenChange={(open) => !open && setRejectDialog({ open: false, requestId: null })}>
                 <DialogContent>

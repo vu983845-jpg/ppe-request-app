@@ -139,6 +139,11 @@ export const dictionaries = {
                 status: "Status",
                 actions: "Actions"
             },
+            tabs: {
+                approvals: "Pending Approvals",
+                history: "Issuance History"
+            },
+            historyTitle: "Department Issuance History",
             rejectDialogTitle: "Reject Request",
             rejectDialogPlaceholder: "Provide a reason for rejection (required)...",
             rejectConfirmBtn: "Confirm Reject",
@@ -377,6 +382,11 @@ export const dictionaries = {
                 status: "Trạng thái",
                 actions: "Thao tác"
             },
+            tabs: {
+                approvals: "Chờ Phê Duyệt",
+                history: "Lịch Sử Cấp Phát"
+            },
+            historyTitle: "Lịch Sử Cấp Phát Của Bộ Phận",
             rejectDialogTitle: "Từ Chối Yêu Cầu",
             rejectDialogPlaceholder: "Nhập lý do từ chối để báo cho nhân viên (Bắt buộc)...",
             rejectConfirmBtn: "Xác Nhận Từ Chối",
