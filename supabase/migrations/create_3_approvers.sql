@@ -10,15 +10,17 @@ DECLARE
   ]';
   user_rec JSON;
   new_user_id UUID;
+  existing_app_user UUID;
 BEGIN
   CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
   FOR user_rec IN SELECT * FROM json_array_elements(users_data)
   LOOP
-    -- Kiểm tra xem user đã tồn tại chưa
+    -- 1. Kiểm tra xem user đã tồn tại trong auth.users chưa
+    new_user_id := NULL;
     SELECT id INTO new_user_id FROM auth.users WHERE email = user_rec->>'email';
     
-    -- Nếu chưa tồn tại, tiến hành tạo mới
+    -- Nếu chưa tồn tại, tiến hành tạo mới trên auth.users
     IF new_user_id IS NULL THEN
       new_user_id := gen_random_uuid();
       
@@ -37,12 +39,19 @@ BEGIN
       );
     END IF;
 
-    -- Lưu/Cập nhật thông tin vào bảng app_users
+    -- 2. Kiểm tra và Lưu/Cập nhật thông tin vào bảng app_users
     IF new_user_id IS NOT NULL THEN
-      INSERT INTO public.app_users (auth_user_id, name, role)
-      VALUES (new_user_id, user_rec->>'name', 'DEPT_HEAD')
-      ON CONFLICT (auth_user_id) DO UPDATE 
-      SET role = 'DEPT_HEAD';
+      existing_app_user := NULL;
+      SELECT id INTO existing_app_user FROM public.app_users WHERE auth_user_id = new_user_id;
+
+      IF existing_app_user IS NULL THEN
+        -- Insert nếu chưa có mapping
+        INSERT INTO public.app_users (auth_user_id, role)
+        VALUES (new_user_id, 'DEPT_HEAD');
+      ELSE
+        -- Update nếu đã có mapping
+        UPDATE public.app_users SET role = 'DEPT_HEAD' WHERE id = existing_app_user;
+      END IF;
     END IF;
 
   END LOOP;

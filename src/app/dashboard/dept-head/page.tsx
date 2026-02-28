@@ -26,7 +26,7 @@ export default async function DeptHeadDashboard() {
         .single()
 
     if (appUser?.role !== 'DEPT_HEAD') {
-        return <div className="p-8">Unauthorized. Only Department Heads can access this page.</div>
+        return <div className="p-8">Unauthorized. Only Department Heads can access this page. Debug Data: {JSON.stringify(appUser || 'null')}</div>
     }
 
     // Fetch Requests
