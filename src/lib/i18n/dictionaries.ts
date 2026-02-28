@@ -19,7 +19,14 @@ export const dictionaries = {
             subtitle: "A centralized portal to request, approve, and manage Personal Protective Equipment inventory.",
             requestBtn: "Request PPE",
             trackBtn: "Track Request",
-            loginBtn: "System Login"
+            loginBtn: "System Login",
+            timeline: {
+                title: "How It Works",
+                step1: { title: "Submit Request", desc: "Fill out the form" },
+                step2: { title: "Dept Approval", desc: "Manager reviews" },
+                step3: { title: "HSE Review", desc: "Stock check & approval" },
+                step4: { title: "Receive Item", desc: "Collect your PPE" }
+            }
         },
         login: {
             title: "Staff Login",
@@ -69,7 +76,11 @@ export const dictionaries = {
             incidentDescPlaceholder: "Explain the event that caused it to be lost or broken...",
             incidentDate: "Date of Event",
             acceptCompensation: "I confirm the above information is accurate and accept responsibility for compensation or payroll deduction for the replacement cost.",
-            mustAcceptCompensation: "You must accept responsibility to proceed with a replacement request."
+            mustAcceptCompensation: "You must accept responsibility to proceed with a replacement request.",
+            lostBrokenAlert: {
+                title: "Important Notice",
+                desc: "For Lost/Broken reports, please provide accurate details. Per company policy, replacement costs may be subject to payroll deduction after review."
+            }
         },
         tracking: {
             title: "Request Tracking",
@@ -241,7 +252,14 @@ export const dictionaries = {
             subtitle: "Cổng thông tin điện tử hỗ trợ yêu cầu, phê duyệt và quản trị tồn kho Thiết bị Bảo hộ Cá nhân (PPE).",
             requestBtn: "Tạo Yêu Cầu Cấp Phát",
             trackBtn: "Tra Cứu Tình Trạng",
-            loginBtn: "Đăng Nhập Hệ Thống"
+            loginBtn: "Đăng Nhập Hệ Thống",
+            timeline: {
+                title: "Quy Trình 4 Bước",
+                step1: { title: "Gửi Yêu Cầu", desc: "Điền đầy đủ form" },
+                step2: { title: "Trưởng BP Duyệt", desc: "Quản lý xem xét" },
+                step3: { title: "HSE Duyệt", desc: "Kiểm kho & cấp phát" },
+                step4: { title: "Nhận Thiết Bị", desc: "Ký nhận trên hệ thống" }
+            }
         },
         login: {
             title: "Đăng Nhập Hệ Thống",
@@ -291,7 +309,11 @@ export const dictionaries = {
             incidentDescPlaceholder: "Trình bày sự việc dẫn đến làm mất hoặc hỏng thiết bị...",
             incidentDate: "Thời điểm xảy ra sự việc",
             acceptCompensation: "Tôi xác nhận thông tin trên là chính xác và chấp nhận trách nhiệm bồi thường/trừ lương đối với chi phí cấp lại trang thiết bị này.",
-            mustAcceptCompensation: "Bạn buộc phải đánh dấu đồng ý bồi thường để tiếp tục yêu cầu cấp lại."
+            mustAcceptCompensation: "Bạn buộc phải đánh dấu đồng ý bồi thường để tiếp tục yêu cầu cấp lại.",
+            lostBrokenAlert: {
+                title: "Lưu ý quan trọng",
+                desc: "Đối với Báo Cáo Mất/Hỏng, bạn vui lòng khai báo trung thực. Mọi chi phí cấp lại có thể được xem xét khấu trừ vào lương theo quy định hiện hành của công ty."
+            }
         },
         tracking: {
             title: "Hệ Thống Tra Cứu Yêu Cầu",

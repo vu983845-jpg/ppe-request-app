@@ -31,6 +31,8 @@ import {
 } from '@/components/ui/select'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { AlertTriangle } from 'lucide-react'
 
 const formSchema = z.object({
     requestType: z.enum(['NORMAL', 'LOST_BROKEN']),
@@ -294,6 +296,18 @@ export function RequestForm({
                         </FormItem>
                     )}
                 />
+
+                {currentRequestType === 'LOST_BROKEN' && (
+                    <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                        <Alert variant="destructive" className="bg-orange-50 text-orange-900 border-orange-200 dark:bg-orange-950/40 dark:text-orange-200 dark:border-orange-900">
+                            <AlertTriangle className="h-4 w-4" />
+                            <AlertTitle>{t.requestForm.lostBrokenAlert?.title || "Important Notice"}</AlertTitle>
+                            <AlertDescription>
+                                {t.requestForm.lostBrokenAlert?.desc || "For Lost/Broken reports, please provide accurate details. Per company policy, replacement costs may be subject to payroll deduction after review."}
+                            </AlertDescription>
+                        </Alert>
+                    </div>
+                )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
