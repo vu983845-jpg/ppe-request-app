@@ -12,7 +12,9 @@ export const dictionaries = {
             date: "Date",
             signOut: "Sign Out",
             required: "Required",
-            optional: "Optional"
+            optional: "Optional",
+            delete: "Delete",
+            edit: "Edit"
         },
         index: {
             title: "PPE Management System",
@@ -75,11 +77,11 @@ export const dictionaries = {
             incidentDesc: "Event Description",
             incidentDescPlaceholder: "Explain the event that caused it to be lost or broken...",
             incidentDate: "Date of Event",
-            acceptCompensation: "I confirm the above information is accurate and accept responsibility for compensation or payroll deduction for the replacement cost.",
+            acceptCompensation: "I confirm the above information is accurate and accept responsibility for compensation for the replacement cost.",
             mustAcceptCompensation: "You must accept responsibility to proceed with a replacement request.",
             lostBrokenAlert: {
                 title: "Important Notice",
-                desc: "For Lost/Broken reports, please provide accurate details. Per company policy, replacement costs may be subject to payroll deduction after review."
+                desc: "For Lost/Broken reports, please provide accurate details. Per company policy, replacement costs may be subject to compensation after review."
             }
         },
         tracking: {
@@ -172,7 +174,9 @@ export const dictionaries = {
                 addStockPrice: "Unit Price (Total recalculates automatically)",
                 addStockNote: "Remark / Note (Quality, Delivery, Supplier, ...)",
                 addStockConfirm: "Confirm Purchase",
-                addStockSuccess: "Stock added successfully!"
+                addStockSuccess: "Stock added successfully!",
+                deleteSuccess: "Item deleted successfully",
+                updatePriceSuccess: "Price updated successfully"
             },
             tabs: {
                 approvals: "Approvals",
@@ -195,7 +199,8 @@ export const dictionaries = {
             },
             issueBtn: "Issue",
             rejectDialogTitle: "Reject HSE Request",
-            noRequests: "No requests pending HSE approval."
+            noRequests: "No requests pending HSE approval.",
+            deleteRequestSuccess: "Request deleted successfully."
         },
         admin: {
             title: "System Admin Dashboard",
@@ -245,7 +250,9 @@ export const dictionaries = {
             date: "Ngày",
             signOut: "Đăng Xuất",
             required: "Bắt buộc",
-            optional: "Tùy chọn"
+            optional: "Tùy chọn",
+            delete: "Xóa",
+            edit: "Sửa"
         },
         index: {
             title: "Hệ Thống Quản Lý BHLĐ Intersnack",
@@ -308,11 +315,11 @@ export const dictionaries = {
             incidentDesc: "Mô tả sự việc",
             incidentDescPlaceholder: "Trình bày sự việc dẫn đến làm mất hoặc hỏng thiết bị...",
             incidentDate: "Thời điểm xảy ra sự việc",
-            acceptCompensation: "Tôi xác nhận thông tin trên là chính xác và chấp nhận trách nhiệm bồi thường/trừ lương đối với chi phí cấp lại trang thiết bị này.",
+            acceptCompensation: "Tôi xác nhận thông tin trên là chính xác và chấp nhận trách nhiệm bồi thường đối với chi phí cấp lại trang thiết bị này.",
             mustAcceptCompensation: "Bạn buộc phải đánh dấu đồng ý bồi thường để tiếp tục yêu cầu cấp lại.",
             lostBrokenAlert: {
                 title: "Lưu ý quan trọng",
-                desc: "Đối với Báo Cáo Mất/Hỏng, bạn vui lòng khai báo trung thực. Mọi chi phí cấp lại có thể được xem xét khấu trừ vào lương theo quy định hiện hành của công ty."
+                desc: "Đối với Báo Cáo Mất/Hỏng, xin vui lòng trình bày trung thực. Bạn có thể phải bồi thường chi phí cấp lại thiết bị theo đúng quy định hiện hành sau khi được xem xét."
             }
         },
         tracking: {
@@ -405,7 +412,9 @@ export const dictionaries = {
                 addStockPrice: "Đơn giá nhập",
                 addStockNote: "Ghi chú / Remark (Chất lượng, Giao hàng, NCC,...)",
                 addStockConfirm: "Xác Nhận Nhập",
-                addStockSuccess: "Nhập kho thành công!"
+                addStockSuccess: "Nhập kho thành công!",
+                deleteSuccess: "Xóa vật phẩm thành công",
+                updatePriceSuccess: "Cập nhật đơn giá thành công"
             },
             tabs: {
                 approvals: "Phê Duyệt",
@@ -428,7 +437,8 @@ export const dictionaries = {
             },
             issueBtn: "Cấp Phát",
             rejectDialogTitle: "HSE Từ Chối Cấp Phát",
-            noRequests: "Không có yêu cầu nào đang chờ HSE."
+            noRequests: "Không có yêu cầu nào đang chờ HSE.",
+            deleteRequestSuccess: "Đã xóa yêu cầu thành công."
         },
         admin: {
             title: "Bảng Điều Khiển Quản Trị Hệ Thống",

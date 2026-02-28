@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, Fragment } from 'react'
-import { approveRequestByHSE, rejectRequestByHSE, addPpeStock, getInventoryAnalytics, getYearlyChartData } from '@/app/actions/hse'
+import { approveRequestByHSE, rejectRequestByHSE, addPpeStock, getInventoryAnalytics, getYearlyChartData, deletePpeRequest, deletePpeMaster, updatePpeMasterPrice } from '@/app/actions/hse'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -22,7 +22,7 @@ import { useLanguage } from '@/lib/i18n/context'
 import { useRouter } from 'next/navigation'
 import * as xlsx from 'xlsx'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts'
-import { ChevronDown, ChevronRight, User, Hash, Building2, Calendar } from 'lucide-react'
+import { ChevronDown, ChevronRight, User, Hash, Building2, Calendar, Trash2, Pencil } from 'lucide-react'
 
 export function HseRequestsTable({ requests }: { requests: any[] }) {
     const { t } = useLanguage()
@@ -62,6 +62,24 @@ export function HseRequestsTable({ requests }: { requests: any[] }) {
                 toast.success(t.common.save)
                 setRejectDialog({ open: false, requestId: null })
                 setRejectNote('')
+                router.refresh()
+            }
+        } catch (err: any) {
+            toast.error(err.message || 'Unknown error occurred')
+        } finally {
+            setLoadingId(null)
+        }
+    }
+
+    async function onDelete(id: string) {
+        if (!window.confirm("Are you sure you want to delete this request? This action cannot be undone.")) return
+        setLoadingId(id)
+        try {
+            const res = await deletePpeRequest(id)
+            if (res?.error) {
+                toast.error(res.error)
+            } else {
+                toast.success(t.hse.deleteRequestSuccess || "Request deleted successfully.")
                 router.refresh()
             }
         } catch (err: any) {
@@ -129,6 +147,16 @@ export function HseRequestsTable({ requests }: { requests: any[] }) {
                                         {(req.status === 'PENDING_HSE' || req.status === 'PENDING_DEPT') && (
                                             <div className="flex justify-end gap-2">
                                                 <Button
+                                                    size="icon"
+                                                    variant="ghost"
+                                                    className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/50"
+                                                    disabled={loadingId === req.id}
+                                                    onClick={() => onDelete(req.id)}
+                                                    title={t.common.delete || "Delete"}
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </Button>
+                                                <Button
                                                     size="sm"
                                                     variant="destructive"
                                                     disabled={loadingId === req.id}
@@ -145,6 +173,20 @@ export function HseRequestsTable({ requests }: { requests: any[] }) {
                                                 </Button>
                                             </div>
                                         )}
+                                        {req.status !== 'PENDING_HSE' && req.status !== 'PENDING_DEPT' && (
+                                            <div className="flex justify-end gap-2">
+                                                <Button
+                                                    size="icon"
+                                                    variant="ghost"
+                                                    className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/50"
+                                                    disabled={loadingId === req.id}
+                                                    onClick={() => onDelete(req.id)}
+                                                    title={t.common.delete || "Delete"}
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </Button>
+                                            </div>
+                                        )}
                                     </TableCell>
                                 </TableRow>
                             )
@@ -158,7 +200,7 @@ export function HseRequestsTable({ requests }: { requests: any[] }) {
                         )}
                     </TableBody>
                 </Table>
-            </div>
+            </div >
 
             <Dialog open={rejectDialog.open} onOpenChange={(open) => !open && setRejectDialog({ open: false, requestId: null })}>
                 <DialogContent>
@@ -197,6 +239,50 @@ export function InventoryTable({ inventory, purchases }: { inventory: any[], pur
     const [addPrice, setAddPrice] = useState<number>(0)
     const [addNote, setAddNote] = useState('')
     const [isAdding, setIsAdding] = useState(false)
+
+    const [isEditMenuOpen, setIsEditMenuOpen] = useState(false)
+    const [editPrice, setEditPrice] = useState<number>(0)
+    const [isUpdating, setIsUpdating] = useState(false)
+
+    function openEditMenu(ppe: any) {
+        setSelectedPpeId(ppe.id)
+        setEditPrice(ppe.unit_price)
+        setIsEditMenuOpen(true)
+    }
+
+    async function handleEditPrice() {
+        if (!selectedPpeId || editPrice < 0) return
+        setIsUpdating(true)
+        try {
+            const res = await updatePpeMasterPrice(selectedPpeId, editPrice)
+            if (res?.error) {
+                toast.error(res.error)
+            } else {
+                toast.success(t.hse.inventoryTable.updatePriceSuccess || "Price updated successfully")
+                setIsEditMenuOpen(false)
+                router.refresh()
+            }
+        } catch (err: any) {
+            toast.error(err.message || 'Error occurred')
+        } finally {
+            setIsUpdating(false)
+        }
+    }
+
+    async function handleDeleteStock(ppeId: string) {
+        if (!window.confirm("Are you sure you want to delete this specific PPE item? Data linked to this item might be affected.")) return
+        try {
+            const res = await deletePpeMaster(ppeId)
+            if (res?.error) {
+                toast.error(res.error)
+            } else {
+                toast.success(t.hse.inventoryTable.deleteSuccess || "Item deleted successfully")
+                router.refresh()
+            }
+        } catch (err: any) {
+            toast.error(err.message || 'Error occurred')
+        }
+    }
 
     function openAddMenu(ppe: any) {
         setSelectedPpeId(ppe.id)
@@ -286,9 +372,17 @@ export function InventoryTable({ inventory, purchases }: { inventory: any[], pur
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="text-right">
-                                        <Button size="sm" variant="secondary" onClick={() => openAddMenu(item)}>
-                                            {t.hse.inventoryTable.addStockBtn || "+ Add Stock"}
-                                        </Button>
+                                        <div className="flex justify-end gap-2 items-center">
+                                            <Button size="icon" variant="ghost" onClick={() => openEditMenu(item)} title={t.common.edit || "Edit"}>
+                                                <Pencil className="w-4 h-4 text-blue-500" />
+                                            </Button>
+                                            <Button size="icon" variant="ghost" onClick={() => handleDeleteStock(item.id)} title={t.common.delete || "Delete"}>
+                                                <Trash2 className="w-4 h-4 text-red-500" />
+                                            </Button>
+                                            <Button size="sm" variant="secondary" onClick={() => openAddMenu(item)}>
+                                                {t.hse.inventoryTable.addStockBtn || "+ Add Stock"}
+                                            </Button>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             )
@@ -396,6 +490,36 @@ export function InventoryTable({ inventory, purchases }: { inventory: any[], pur
                             disabled={isAdding || addQty <= 0 || addPrice < 0}
                         >
                             {isAdding ? t.common.loading : (t.hse.inventoryTable.addStockConfirm || "Confirm Purchase")}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={isEditMenuOpen} onOpenChange={setIsEditMenuOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>{t.common.edit || "Edit"}</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <Label>{t.hse.inventoryTable.price || "Price"}</Label>
+                            <Input
+                                type="number"
+                                min="0"
+                                value={editPrice || ''}
+                                onChange={(e) => setEditPrice(Number(e.target.value))}
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsEditMenuOpen(false)} disabled={isUpdating}>
+                            {t.common.cancel || "Cancel"}
+                        </Button>
+                        <Button
+                            onClick={handleEditPrice}
+                            disabled={isUpdating || editPrice < 0}
+                        >
+                            {isUpdating ? (t.common.loading || "Loading...") : (t.common.save || "Save")}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

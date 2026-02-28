@@ -394,3 +394,76 @@ export async function getYearlyChartData(year: number) {
 
   return chartData
 }
+
+export async function deletePpeRequest(requestId: string) {
+  const supabase = await createClient()
+
+  // Ensure role
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Unauthorized' }
+
+  const { data: userData } = await supabase.from('app_users').select('role').eq('auth_user_id', user.id).single()
+  if (!userData || !['ADMIN', 'HSE'].includes(userData.role)) return { error: 'Unauthorized' }
+
+  // 1. Delete associated logs first
+  await supabase.from('ppe_issue_log').delete().eq('request_id', requestId)
+
+  // 2. Delete the request
+  const { error } = await supabase.from('ppe_requests').delete().eq('id', requestId)
+
+  if (error) return { error: error.message }
+
+  revalidatePath('/dashboard/hse')
+  revalidatePath('/admin')
+  return { success: true }
+}
+
+export async function deletePpeMaster(ppeId: string) {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Unauthorized' }
+
+  const { data: userData } = await supabase.from('app_users').select('role').eq('auth_user_id', user.id).single()
+  if (!userData || !['ADMIN', 'HSE'].includes(userData.role)) return { error: 'Unauthorized' }
+
+  // Due to foreign keys, the exact delete might fail if items are linked to requests.
+  // We can do a soft delete or just attempt a hard delete. 
+  // Often it's safer to mark as inactive. For now, try hard delete, if it fails, try to mark as inactive.
+  const { error } = await supabase.from('ppe_master').delete().eq('id', ppeId)
+
+  if (error) {
+    if (error.code === '23503') { // foreign key violation
+      // Fallback: Soft delete by making active = false
+      const { error: softError } = await supabase.from('ppe_master').update({ active: false }).eq('id', ppeId)
+      if (softError) return { error: softError.message }
+    } else {
+      return { error: error.message }
+    }
+  }
+
+  revalidatePath('/dashboard/hse')
+  revalidatePath('/admin')
+  return { success: true }
+}
+
+export async function updatePpeMasterPrice(ppeId: string, unitPrice: number) {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Unauthorized' }
+
+  const { data: userData } = await supabase.from('app_users').select('role').eq('auth_user_id', user.id).single()
+  if (!userData || !['ADMIN', 'HSE'].includes(userData.role)) return { error: 'Unauthorized' }
+
+  const { error } = await supabase
+    .from('ppe_master')
+    .update({ unit_price: unitPrice })
+    .eq('id', ppeId)
+
+  if (error) return { error: error.message }
+
+  revalidatePath('/dashboard/hse')
+  revalidatePath('/admin')
+  return { success: true }
+}
