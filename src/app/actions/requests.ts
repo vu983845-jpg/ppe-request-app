@@ -57,8 +57,7 @@ export async function submitPpeRequest(formData: z.infer<typeof PPE_REQUEST_SCHE
             status: 'PENDING_DEPT',
             request_type: formData.requestType,
             incident_description: formData.incidentDescription || null,
-            incident_date: formData.incidentDate || null,
-            employee_accepts_compensation: formData.employeeAcceptsCompensation
+            incident_date: formData.incidentDate || null
         }))
 
         const { error: insertError } = await supabase
