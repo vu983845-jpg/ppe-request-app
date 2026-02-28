@@ -297,7 +297,7 @@ export async function getInventoryAnalytics(year: number, month?: number) {
 
   // Note: RLS allows us to fetch all, but we only really need aggregations
   const { data: allPurchases } = await supabase.from('ppe_purchases').select('ppe_id, quantity, purchased_at')
-  const { data: allIssues } = await supabase.from('ppe_issue_log').select('ppe_id, issued_quantity, issued_at')
+  const { data: allIssues } = await supabase.from('ppe_issue_log').select('ppe_id, issued_quantity, issued_at, ppe_requests(requester_name, requester_emp_code, departments(name))')
 
   const analytics = items.map(item => {
     // Purchases
@@ -309,6 +309,14 @@ export async function getInventoryAnalytics(year: number, month?: number) {
     const itemIssues = (allIssues || []).filter(i => i.ppe_id === item.id)
     const inPeriodIssues = itemIssues.filter(i => i.issued_at >= startDate && i.issued_at < endDate)
     const totalOutPeriod = inPeriodIssues.reduce((acc, i) => acc + Number(i.issued_quantity), 0)
+
+    const issueDetails = inPeriodIssues.map(i => ({
+      date: i.issued_at,
+      qty: i.issued_quantity,
+      requester: (i.ppe_requests as any)?.requester_name || 'Unknown',
+      empCode: (i.ppe_requests as any)?.requester_emp_code || '',
+      department: (i.ppe_requests as any)?.departments?.name || 'Unknown'
+    })).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
     // Calculate Opening Balance
     // Current Stock = Opening Balance + Total In (from start of time) - Total Out (from start of time)
@@ -332,6 +340,7 @@ export async function getInventoryAnalytics(year: number, month?: number) {
       in: totalInPeriod,
       out: totalOutPeriod,
       closingBalance,
+      issueDetails,
       currentRealStock: Number(item.stock_quantity) // for debugging/reference
     }
   })
