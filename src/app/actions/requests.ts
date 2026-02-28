@@ -138,10 +138,10 @@ export async function searchRequestsByEmpCode(empCode: string) {
             *, 
             ppe_master(name, unit), 
             departments(name),
-            dept_approver:app_users!dept_approved_by(name),
-            hse_approver:app_users!hse_approved_by(name),
-            pm_approver:app_users!plant_manager_approved_by(name),
-            hr_approver:app_users!hr_approved_by(name)
+            dept_approver:app_users!fk_dept_approver(name),
+            hse_approver:app_users!fk_hse_approver(name),
+            pm_approver:app_users!fk_pm_approver(name),
+            hr_approver:app_users!fk_hr_approver(name)
         `)
         .eq('requester_emp_code', empCode)
         .order('created_at', { ascending: false })
