@@ -11,7 +11,10 @@ export async function sendTeamsNotification({
     requestType: 'NORMAL' | 'LOST_BROKEN';
     incidentDescription?: string;
 }) {
-    const webhookUrl = process.env.TEAMS_WEBHOOK_URL;
+    const webhookUrl = requestType === 'LOST_BROKEN'
+        ? (process.env.TEAMS_WEBHOOK_URL_LOST_BROKEN || process.env.TEAMS_WEBHOOK_URL)
+        : process.env.TEAMS_WEBHOOK_URL;
+
     if (!webhookUrl) return;
 
     const title = requestType === 'NORMAL'
