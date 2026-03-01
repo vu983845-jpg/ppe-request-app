@@ -77,7 +77,7 @@ export async function sendTeamsNotification({
                         {
                             "type": "Action.OpenUrl",
                             "title": "Open Approval Dashboard",
-                            "url": process.env.APP_BASE_URL || "https://sparse-sunspot-dun.vercel.app/login"
+                            "url": process.env.APP_BASE_URL || "https://ppe-request-app.vercel.app/login"
                         }
                     ]
                 }
