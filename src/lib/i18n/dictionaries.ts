@@ -24,10 +24,17 @@ export const dictionaries = {
             loginBtn: "System Login",
             timeline: {
                 title: "How It Works",
-                step1: { title: "Submit Request", desc: "Fill out the form" },
-                step2: { title: "Dept Approval", desc: "Manager reviews" },
+                step1: { title: "Submit Request", desc: "Choose Normal or Lost/Broken" },
+                step2: { title: "Dept Approval", desc: "Manager reviews request" },
                 step3: { title: "HSE Review", desc: "Stock check & approval" },
-                step4: { title: "Receive Item", desc: "Collect your PPE" }
+                step4: { title: "Plant Mgr & HR", desc: "(Lost/Broken items only)" },
+                step5: { title: "Receive Item", desc: "Collect & confirm receipt" }
+            },
+            contact: {
+                title: "Need Support?",
+                desc: "Having trouble? Contact us:",
+                email: "Email",
+                phone: "Zalo"
             }
         },
         login: {
@@ -268,11 +275,18 @@ export const dictionaries = {
             trackBtn: "Tra Cứu Tình Trạng",
             loginBtn: "Đăng Nhập Hệ Thống",
             timeline: {
-                title: "Quy Trình 4 Bước",
-                step1: { title: "Gửi Yêu Cầu", desc: "Điền đầy đủ form" },
-                step2: { title: "Trưởng BP Duyệt", desc: "Quản lý xem xét" },
-                step3: { title: "HSE Duyệt", desc: "Kiểm kho & cấp phát" },
-                step4: { title: "Nhận Thiết Bị", desc: "Ký nhận trên hệ thống" }
+                title: "Quy Trình Xử Lý",
+                step1: { title: "Tạo Đơn Cấp Phát", desc: "Chọn Mới hoặc Cấp Lại" },
+                step2: { title: "Trưởng BP Duyệt", desc: "Quản lý xem xét yêu cầu" },
+                step3: { title: "HSE Duyệt", desc: "Kiểm tra tồn kho & cấp phát" },
+                step4: { title: "Ban Giám Đốc & HR", desc: "(Chỉ dành cho Đơn Mất/Hỏng)" },
+                step5: { title: "Nhận Thiết Bị", desc: "Ký nhận trên hệ thống" }
+            },
+            contact: {
+                title: "Cần Hỗ Trợ?",
+                desc: "Gặp khó khăn trong quá trình sử dụng? Vui lòng liên hệ:",
+                email: "Email",
+                phone: "Zalo"
             }
         },
         login: {
