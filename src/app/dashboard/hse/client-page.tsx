@@ -22,7 +22,7 @@ import { useLanguage } from '@/lib/i18n/context'
 import { useRouter } from 'next/navigation'
 import * as xlsx from 'xlsx'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts'
-import { ChevronDown, ChevronRight, User, Hash, Building2, Calendar, Trash2, Pencil } from 'lucide-react'
+import { ChevronDown, ChevronRight, User, Hash, Building2, Calendar, Trash2, Pencil, Tag } from 'lucide-react'
 
 export function HseRequestsTable({ requests }: { requests: any[] }) {
     const { t } = useLanguage()
@@ -855,6 +855,7 @@ export function AnalyticsTable({ triggerRefetch }: { triggerRefetch?: number }) 
                                                                             <TableHead className="h-10"><div className="flex items-center gap-1.5"><User className="w-3.5 h-3.5" /> Người nhận</div></TableHead>
                                                                             <TableHead className="h-10"><div className="flex items-center gap-1.5"><Hash className="w-3.5 h-3.5" /> Mã NV</div></TableHead>
                                                                             <TableHead className="h-10"><div className="flex items-center gap-1.5"><Building2 className="w-3.5 h-3.5" /> Dept</div></TableHead>
+                                                                            <TableHead className="h-10"><div className="flex items-center gap-1.5"><Tag className="w-3.5 h-3.5" /> Lý do</div></TableHead>
                                                                             <TableHead className="text-right h-10 text-orange-600 dark:text-orange-400">SL Xuất</TableHead>
                                                                         </TableRow>
                                                                     </TableHeader>
@@ -872,6 +873,17 @@ export function AnalyticsTable({ triggerRefetch }: { triggerRefetch?: number }) 
                                                                                 </TableCell>
                                                                                 <TableCell className="text-zinc-600 dark:text-zinc-400">
                                                                                     {detail.department}
+                                                                                </TableCell>
+                                                                                <TableCell>
+                                                                                    {detail.reason === 'NEW' ? (
+                                                                                        <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20 text-[10px] px-1.5">
+                                                                                            Cấp Mới
+                                                                                        </Badge>
+                                                                                    ) : (
+                                                                                        <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-500/10 dark:text-orange-400 dark:border-orange-500/20 text-[10px] px-1.5">
+                                                                                            Cấp Hỏng/Mất
+                                                                                        </Badge>
+                                                                                    )}
                                                                                 </TableCell>
                                                                                 <TableCell className="text-right font-medium text-orange-600 dark:text-orange-400">
                                                                                     {detail.qty} {item.unit}
@@ -904,6 +916,7 @@ export function AnalyticsTable({ triggerRefetch }: { triggerRefetch?: number }) 
                                                                     <TableHead className="h-10"><div className="flex items-center gap-1.5"><User className="w-3.5 h-3.5" /> Người nhận</div></TableHead>
                                                                     <TableHead className="h-10"><div className="flex items-center gap-1.5"><Hash className="w-3.5 h-3.5" /> Mã NV</div></TableHead>
                                                                     <TableHead className="h-10"><div className="flex items-center gap-1.5"><Building2 className="w-3.5 h-3.5" /> Dept</div></TableHead>
+                                                                    <TableHead className="h-10"><div className="flex items-center gap-1.5"><Tag className="w-3.5 h-3.5" /> Lý do</div></TableHead>
                                                                     <TableHead className="text-right h-10 text-orange-600 dark:text-orange-400">SL Xuất</TableHead>
                                                                 </TableRow>
                                                             </TableHeader>
@@ -921,6 +934,17 @@ export function AnalyticsTable({ triggerRefetch }: { triggerRefetch?: number }) 
                                                                         </TableCell>
                                                                         <TableCell className="text-zinc-600 dark:text-zinc-400">
                                                                             {detail.department}
+                                                                        </TableCell>
+                                                                        <TableCell>
+                                                                            {detail.reason === 'NEW' ? (
+                                                                                <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20 text-[10px] px-1.5">
+                                                                                    Cấp Mới
+                                                                                </Badge>
+                                                                            ) : (
+                                                                                <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-500/10 dark:text-orange-400 dark:border-orange-500/20 text-[10px] px-1.5">
+                                                                                    Cấp Hỏng/Mất
+                                                                                </Badge>
+                                                                            )}
                                                                         </TableCell>
                                                                         <TableCell className="text-right font-medium text-orange-600 dark:text-orange-400">
                                                                             {detail.qty} {items[0].unit}
