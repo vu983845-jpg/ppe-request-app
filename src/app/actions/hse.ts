@@ -112,16 +112,16 @@ export async function approveRequestByHSE(requestId: string) {
   }
 
   // 4. Send Emails
-  
 
-  
+
+
 
   // To Dept Head
-  
+
 
   // To Requester
   if (req.requester_email) {
-    
+
   }
 
   revalidatePath('/dashboard/hse')
@@ -164,12 +164,12 @@ export async function rejectRequestByHSE(requestId: string, note: string) {
   if (error) return { error: error.message }
 
   // Mail
-  
 
-  
+
+
 
   if (req.requester_email) {
-    
+
   }
 
   revalidatePath('/dashboard/hse')
@@ -259,7 +259,7 @@ export async function getInventoryAnalytics(year: number, month?: number) {
     : new Date(year + 1, 0, 1).toISOString()
 
   // Fetch all items
-  const { data: items } = await supabase.from('ppe_master').select('id, name, unit, stock_quantity')
+  const { data: items } = await supabase.from('ppe_master').select('id, name, unit, stock_quantity, size')
   if (!items) return []
 
   // Note: RLS allows us to fetch all, but we only really need aggregations
@@ -303,6 +303,7 @@ export async function getInventoryAnalytics(year: number, month?: number) {
       id: item.id,
       name: item.name,
       unit: item.unit,
+      size: item.size,
       openingBalance,
       in: totalInPeriod,
       out: totalOutPeriod,
