@@ -251,6 +251,23 @@ export function InventoryTable({ inventory, purchases }: { inventory: any[], pur
     const { t } = useLanguage()
     const router = useRouter()
 
+    const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({})
+
+    const groupedInventory = React.useMemo(() => {
+        const groups: Record<string, any[]> = {}
+        inventory.forEach(item => {
+            if (!groups[item.name]) {
+                groups[item.name] = []
+            }
+            groups[item.name].push(item)
+        })
+        return groups
+    }, [inventory])
+
+    const toggleGroup = (name: string) => {
+        setExpandedGroups(prev => ({ ...prev, [name]: !prev[name] }))
+    }
+
     // Add Stock States
     const [isAddMenuOpen, setIsAddMenuOpen] = useState(false)
     const [selectedPpeId, setSelectedPpeId] = useState<string | null>(null)
@@ -367,33 +384,85 @@ export function InventoryTable({ inventory, purchases }: { inventory: any[], pur
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {inventory.map((item) => {
-                            const isLow = item.stock_quantity <= item.minimum_stock
+                        {Object.entries(groupedInventory).map(([name, items]) => {
+                            const isExpanded = expandedGroups[name]
+                            const totalStock = items.reduce((acc, it) => acc + Number(it.stock_quantity), 0)
+                            const isLow = items.some(it => it.stock_quantity <= it.minimum_stock)
+                            const hasMultipleSizes = items.length > 1 || items[0].size !== null
+
                             return (
-                                <TableRow key={item.id}>
-                                    <TableCell className="font-medium">{item.name}</TableCell>
-                                    <TableCell>
-                                        <Badge variant="outline">{item.category}</Badge>
-                                    </TableCell>
-                                    <TableCell className="text-zinc-500">{item.unit}</TableCell>
-                                    <TableCell className="text-right">${item.unit_price}</TableCell>
-                                    <TableCell className="text-right text-zinc-500">{item.minimum_stock}</TableCell>
-                                    <TableCell className="text-right">
-                                        <Badge variant={isLow ? "destructive" : "secondary"}>
-                                            {item.stock_quantity}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        <div className="flex justify-end gap-2 items-center">
-                                            <Button size="icon" variant="ghost" onClick={() => openEditMenu(item)} title={t.common.edit || "Edit"}>
-                                                <Pencil className="w-4 h-4 text-blue-500" />
-                                            </Button>
-                                            <Button size="sm" variant="secondary" onClick={() => openAddMenu(item)}>
-                                                {t.hse.inventoryTable.addStockBtn || "+ Add Stock"}
-                                            </Button>
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
+                                <Fragment key={name}>
+                                    <TableRow
+                                        className={hasMultipleSizes ? "cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-900/50" : ""}
+                                        onClick={() => hasMultipleSizes && toggleGroup(name)}
+                                    >
+                                        <TableCell className="font-medium flex items-center gap-2">
+                                            {hasMultipleSizes && (
+                                                <div className="p-0.5 rounded-md hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-500">
+                                                    {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                                                </div>
+                                            )}
+                                            {!hasMultipleSizes && <div className="w-5" />}
+                                            {name}
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge variant="outline">{items[0].category}</Badge>
+                                        </TableCell>
+                                        <TableCell className="text-zinc-500">{items[0].unit}</TableCell>
+                                        <TableCell className="text-right">
+                                            {hasMultipleSizes ? '-' : `$${items[0].unit_price}`}
+                                        </TableCell>
+                                        <TableCell className="text-right text-zinc-500">
+                                            {hasMultipleSizes ? '-' : items[0].minimum_stock}
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            <Badge variant={isLow ? "destructive" : "secondary"}>
+                                                {totalStock}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            {!hasMultipleSizes && (
+                                                <div className="flex justify-end gap-2 items-center">
+                                                    <Button size="icon" variant="ghost" onClick={(e) => { e.stopPropagation(); openEditMenu(items[0]) }} title={t.common.edit || "Edit"}>
+                                                        <Pencil className="w-4 h-4 text-blue-500" />
+                                                    </Button>
+                                                    <Button size="sm" variant="secondary" onClick={(e) => { e.stopPropagation(); openAddMenu(items[0]) }}>
+                                                        {t.hse.inventoryTable.addStockBtn || "+ Add Stock"}
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </TableCell>
+                                    </TableRow>
+                                    {isExpanded && hasMultipleSizes && items.map((item) => {
+                                        const isItemLow = item.stock_quantity <= item.minimum_stock
+                                        return (
+                                            <TableRow key={item.id} className="bg-zinc-50/50 dark:bg-zinc-900/40">
+                                                <TableCell className="pl-12 text-sm text-zinc-500">
+                                                    Size: {item.size || 'N/A'}
+                                                </TableCell>
+                                                <TableCell></TableCell>
+                                                <TableCell></TableCell>
+                                                <TableCell className="text-right">${item.unit_price}</TableCell>
+                                                <TableCell className="text-right text-zinc-500">{item.minimum_stock}</TableCell>
+                                                <TableCell className="text-right">
+                                                    <Badge variant={isItemLow ? "destructive" : "outline"}>
+                                                        {item.stock_quantity}
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <div className="flex justify-end gap-2 items-center">
+                                                        <Button size="icon" variant="ghost" onClick={(e) => { e.stopPropagation(); openEditMenu(item); }} title={t.common.edit || "Edit"}>
+                                                            <Pencil className="w-4 h-4 text-blue-500" />
+                                                        </Button>
+                                                        <Button size="sm" variant="secondary" onClick={(e) => { e.stopPropagation(); openAddMenu(item); }}>
+                                                            {t.hse.inventoryTable.addStockBtn || "+ Add Stock"}
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        )
+                                    })}
+                                </Fragment>
                             )
                         })}
                         {inventory.length === 0 && (
