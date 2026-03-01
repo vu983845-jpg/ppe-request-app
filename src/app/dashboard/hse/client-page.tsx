@@ -666,9 +666,11 @@ export function AnalyticsTable({ triggerRefetch }: { triggerRefetch?: number }) 
     }, [year, month, triggerRefetch])
 
     function handleExport() {
+        // 1. Summary Sheet
         const exportData = data.map(item => {
             return {
                 [t.hse.historyTable.item]: item.name,
+                "Size": item.size || 'N/A',
                 [t.hse.historyTable.unit]: item.unit,
                 [t.hse.historyTable.openBal]: item.openingBalance,
                 [t.hse.historyTable.in]: item.in,
@@ -677,9 +679,39 @@ export function AnalyticsTable({ triggerRefetch }: { triggerRefetch?: number }) 
             }
         })
 
-        const ws = xlsx.utils.json_to_sheet(exportData)
+        const wsSummary = xlsx.utils.json_to_sheet(exportData)
         const wb = xlsx.utils.book_new()
-        xlsx.utils.book_append_sheet(wb, ws, 'Analytics')
+        xlsx.utils.book_append_sheet(wb, wsSummary, 'Tong Hop (Summary)')
+
+        // 2. Details Sheet (Issue History)
+        const issueExportData: any[] = []
+        data.forEach(item => {
+            if (item.issueDetails && item.issueDetails.length > 0) {
+                item.issueDetails.forEach((detail: any) => {
+                    issueExportData.push({
+                        "Ngày (Date)": new Date(detail.date).toLocaleDateString(),
+                        "Vật phẩm (Item)": item.name,
+                        "Size": item.size || 'N/A',
+                        "Người nhận (Requester)": detail.requester,
+                        "Mã NV (Emp Code)": detail.empCode || '-',
+                        "Phòng ban (Dept)": detail.department,
+                        "Lý do (Reason)": detail.request_type === 'NORMAL' ? 'Cấp Mới' : 'Cấp Hỏng/Mất',
+                        "SL Xuất (Out Qty)": detail.qty,
+                        "Đơn vị (Unit)": item.unit
+                    })
+                })
+            }
+        })
+
+        if (issueExportData.length > 0) {
+            const wsDetails = xlsx.utils.json_to_sheet(issueExportData)
+            xlsx.utils.book_append_sheet(wb, wsDetails, 'Lich Su Cap Phat (Details)')
+        } else {
+            // Add an empty sheet with headers if no data
+            const wsDetails = xlsx.utils.json_to_sheet([{ "Thông báo": "Không có dữ liệu cấp phát trong khoảng thời gian này." }])
+            xlsx.utils.book_append_sheet(wb, wsDetails, 'Lich Su Cap Phat (Details)')
+        }
+
         xlsx.writeFile(wb, `inventory_analytics_${year}_${month}.xlsx`)
     }
 
