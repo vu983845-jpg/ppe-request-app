@@ -790,7 +790,7 @@ export function AnalyticsTable({ triggerRefetch }: { triggerRefetch?: number }) 
                             return (
                                 <Fragment key={name}>
                                     <TableRow
-                                        className={hasMultipleSizes ? "cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-900/50" : (totalIssueDetails > 0 ? "cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-900/50" : "")}
+                                        className={(hasMultipleSizes || totalIssueDetails > 0) ? "cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-900/50" : ""}
                                         onClick={() => {
                                             if (hasMultipleSizes) {
                                                 toggleGroup(name)
@@ -802,7 +802,7 @@ export function AnalyticsTable({ triggerRefetch }: { triggerRefetch?: number }) 
                                         <TableCell>
                                             {(hasMultipleSizes || totalIssueDetails > 0) && (
                                                 <div className="p-0.5 rounded-md hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-500 w-fit">
-                                                    {(isGroupExpanded || expandedItems.includes(items[0].id))
+                                                    {(hasMultipleSizes ? isGroupExpanded : expandedItems.includes(items[0].id))
                                                         ? <ChevronDown className="h-4 w-4" />
                                                         : <ChevronRight className="h-4 w-4" />
                                                     }
