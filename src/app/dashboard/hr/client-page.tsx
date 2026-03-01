@@ -96,9 +96,9 @@ export function RequestsTable({ requests }: { requests: any[] }) {
                                 </TableCell>
                                 <TableCell>
                                     <div className="text-[11px] text-zinc-500 font-medium leading-tight space-y-1">
-                                        {req.dept_approver?.name && <div>BP: {req.dept_approver.name}</div>}
-                                        {req.hse_approver?.name && <div>HSE: {req.hse_approver.name}</div>}
-                                        {req.pm_approver?.name && <div>GĐ: {req.pm_approver.name}</div>}
+                                        {req.dept_approver?.role && <div>BP: {req.dept_approver.role}</div>}
+                                        {req.hse_approver?.role && <div>HSE: {req.hse_approver.role}</div>}
+                                        {req.pm_approver?.role && <div>GĐ: {req.pm_approver.role}</div>}
                                     </div>
                                 </TableCell>
                                 <TableCell className="text-right">

@@ -37,10 +37,10 @@ export default async function PlantManagerDashboard() {
             *, 
             ppe_master(name, unit), 
             departments(name),
-            dept_approver:app_users!fk_dept_approver(name),
-            hse_approver:app_users!fk_hse_approver(name),
-            pm_approver:app_users!fk_pm_approver(name),
-            hr_approver:app_users!fk_hr_approver(name)
+            dept_approver:app_users!fk_dept_approver(role),
+            hse_approver:app_users!fk_hse_approver(role),
+            pm_approver:app_users!fk_pm_approver(role),
+            hr_approver:app_users!fk_hr_approver(role)
         `)
         .eq('status', 'PENDING_PLANT_MANAGER')
         .order('created_at', { ascending: false })
