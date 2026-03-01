@@ -12,12 +12,23 @@ export async function sendTeamsNotification({
     incidentDescription?: string;
 }) {
     const webhookUrls: string[] = [];
-    if (process.env.TEAMS_WEBHOOK_URL) webhookUrls.push(process.env.TEAMS_WEBHOOK_URL);
-    if (requestType === 'LOST_BROKEN' && process.env.TEAMS_WEBHOOK_URL_LOST_BROKEN) {
-        webhookUrls.push(process.env.TEAMS_WEBHOOK_URL_LOST_BROKEN);
+    // Normal requests go to the standard Webhook URL
+    if (requestType === 'NORMAL' && process.env.TEAMS_WEBHOOK_URL) {
+        webhookUrls.push(process.env.TEAMS_WEBHOOK_URL);
+    }
+    // Lost/Broken requests go to the specific Lost_Broken URL (or fallback to standard if not provided)
+    if (requestType === 'LOST_BROKEN') {
+        if (process.env.TEAMS_WEBHOOK_URL_LOST_BROKEN) {
+            webhookUrls.push(process.env.TEAMS_WEBHOOK_URL_LOST_BROKEN);
+        } else if (process.env.TEAMS_WEBHOOK_URL) {
+            webhookUrls.push(process.env.TEAMS_WEBHOOK_URL);
+        }
     }
 
-    if (webhookUrls.length === 0) return;
+    if (webhookUrls.length === 0) {
+        console.log("No webhook URLs configured for", requestType);
+        return;
+    }
 
     const title = "🔔 **MỌI NGƯỜI CHÚ Ý:** " + (requestType === 'NORMAL'
         ? "🆕 New PPE Request Created"
@@ -66,7 +77,7 @@ export async function sendTeamsNotification({
                         {
                             "type": "Action.OpenUrl",
                             "title": "Open Approval Dashboard",
-                            "url": process.env.APP_BASE_URL || "http://localhost:3000"
+                            "url": process.env.APP_BASE_URL || "https://sparse-sunspot-dun.vercel.app/login"
                         }
                     ]
                 }
