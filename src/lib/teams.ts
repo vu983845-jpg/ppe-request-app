@@ -12,17 +12,13 @@ export async function sendTeamsNotification({
     incidentDescription?: string;
 }) {
     const webhookUrls: string[] = [];
-    // Normal requests go to the standard Webhook URL
-    if (requestType === 'NORMAL' && process.env.TEAMS_WEBHOOK_URL) {
+
+    // As requested: Route ALL notifications (Normal & Lost/Broken) to the Lost/Broken Teams channel.
+    if (process.env.TEAMS_WEBHOOK_URL_LOST_BROKEN) {
+        webhookUrls.push(process.env.TEAMS_WEBHOOK_URL_LOST_BROKEN);
+    } else if (process.env.TEAMS_WEBHOOK_URL) {
+        // Fallback just in case they only defined the basic one
         webhookUrls.push(process.env.TEAMS_WEBHOOK_URL);
-    }
-    // Lost/Broken requests go to the specific Lost_Broken URL (or fallback to standard if not provided)
-    if (requestType === 'LOST_BROKEN') {
-        if (process.env.TEAMS_WEBHOOK_URL_LOST_BROKEN) {
-            webhookUrls.push(process.env.TEAMS_WEBHOOK_URL_LOST_BROKEN);
-        } else if (process.env.TEAMS_WEBHOOK_URL) {
-            webhookUrls.push(process.env.TEAMS_WEBHOOK_URL);
-        }
     }
 
     if (webhookUrls.length === 0) {
