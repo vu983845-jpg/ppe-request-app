@@ -19,9 +19,9 @@ export async function sendTeamsNotification({
 
     if (webhookUrls.length === 0) return;
 
-    const title = requestType === 'NORMAL'
+    const title = "🔔 **MỌI NGƯỜI CHÚ Ý:** " + (requestType === 'NORMAL'
         ? "🆕 New PPE Request Created"
-        : "⚠️ New Lost/Broken PPE Report";
+        : "⚠️ New Lost/Broken PPE Report");
 
     const color = requestType === 'NORMAL' ? "107C10" : "D83B01"; // Green vs Red
 

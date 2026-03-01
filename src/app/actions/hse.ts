@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { sendEmail, generateStatusEmailHtml } from '@/lib/email'
+
 import { revalidatePath } from 'next/cache'
 
 export async function approveRequestByHSE(requestId: string) {
@@ -112,32 +112,16 @@ export async function approveRequestByHSE(requestId: string) {
   }
 
   // 4. Send Emails
-  const baseUrl = process.env.APP_BASE_URL || 'http://localhost:3000'
+  
 
-  const emailHtml = generateStatusEmailHtml({
-    requestName: req.requester_name,
-    status: req.request_type === 'LOST_BROKEN' ? 'HSE VERIFIED (Pending PM)' : 'APPROVED & ISSUED',
-    department: req.departments.name,
-    ppeName: ppe.name,
-    quantity: req.quantity,
-    unit: ppe.unit,
-    ctaLink: baseUrl
-  })
+  
 
   // To Dept Head
-  await sendEmail({
-    to: req.departments.dept_head_email,
-    subject: `[PPE Request] ISSUED for ${req.requester_name}`,
-    html: emailHtml
-  })
+  
 
   // To Requester
   if (req.requester_email) {
-    await sendEmail({
-      to: req.requester_email,
-      subject: `[PPE Request] Your PPE has been ISSUED`,
-      html: emailHtml
-    })
+    
   }
 
   revalidatePath('/dashboard/hse')
@@ -180,29 +164,12 @@ export async function rejectRequestByHSE(requestId: string, note: string) {
   if (error) return { error: error.message }
 
   // Mail
-  const emailHtml = generateStatusEmailHtml({
-    requestName: req.requester_name,
-    status: 'REJECTED by HSE',
-    department: req.departments.name,
-    ppeName: req.ppe_master.name,
-    quantity: req.quantity,
-    unit: req.ppe_master.unit,
-    note,
-    ctaLink: 'javascript:void(0)'
-  })
+  
 
-  await sendEmail({
-    to: req.departments.dept_head_email,
-    subject: `[PPE Request] HSE Rejected`,
-    html: emailHtml
-  })
+  
 
   if (req.requester_email) {
-    await sendEmail({
-      to: req.requester_email,
-      subject: `[PPE Request] HSE Rejected`,
-      html: emailHtml
-    })
+    
   }
 
   revalidatePath('/dashboard/hse')

@@ -49,10 +49,11 @@ const formSchema = z.object({
         quantity: z.number().positive().min(1, 'At least 1 item is required'),
     })).min(1, 'You must request at least one item.'),
     note: z.string().optional(),
-    attachmentUrl: z.string().optional(),
+
     captchaAnswer: z.string().min(1, 'Required'),
     incidentDescription: z.string().optional(),
     incidentDate: z.string().optional(),
+    lastReceiptDate: z.string().optional(),
     employeeAcceptsCompensation: z.boolean(),
 }).superRefine((data, ctx) => {
     if (data.requestType === 'LOST_BROKEN') {
@@ -68,6 +69,13 @@ const formSchema = z.object({
                 code: z.ZodIssueCode.custom,
                 message: 'Required',
                 path: ['incidentDate']
+            });
+        }
+        if (!data.lastReceiptDate) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Required',
+                path: ['lastReceiptDate']
             });
         }
         if (!data.employeeAcceptsCompensation) {
@@ -104,7 +112,7 @@ export function RequestForm({
             location: '',
             items: [{ itemName: '', size: '', quantity: 1 }],
             note: '',
-            attachmentUrl: '',
+            lastReceiptDate: '',
             captchaAnswer: '',
             incidentDescription: '',
             incidentDate: '',
@@ -137,7 +145,7 @@ export function RequestForm({
 
     const currentRequestType = form.watch('requestType')
 
-    const [file, setFile] = useState<File | null>(null)
+
 
     async function handleInitialSubmit(values: z.infer<typeof formSchema>) {
         const expectedAnswer = mathCaptcha.num1 + mathCaptcha.num2
@@ -156,26 +164,7 @@ export function RequestForm({
         if (!confirmedValues) return
 
         setIsSubmitting(true)
-        let attachmentUrl = ''
         const values = confirmedValues
-
-        if (file) {
-            const supabase = createClient()
-            const ext = file.name.split('.').pop()
-            const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`
-            const { data, error } = await supabase.storage
-                .from('ppe_attachments')
-                .upload(fileName, file)
-
-            if (error) {
-                toast.error('Failed to upload attachment: ' + error.message)
-            } else if (data) {
-                // Since the bucket is public, we can construct the base public URL easily:
-                const { data: publicUrlData } = supabase.storage.from('ppe_attachments').getPublicUrl(data.path)
-                attachmentUrl = publicUrlData.publicUrl
-            }
-        }
-
         const itemsPayload = values.items.map((item: any) => {
             const ppe = ppes.find(p => p.name === item.itemName && (!item.size || p.size === item.size))
             return {
@@ -183,7 +172,7 @@ export function RequestForm({
                 quantity: item.quantity
             }
         })
-        const payload = { ...values, items: itemsPayload, attachmentUrl }
+        const payload = { ...values, items: itemsPayload }
         const result = await submitPpeRequest(payload)
 
         if (result?.error) {
@@ -574,7 +563,7 @@ export function RequestForm({
                         control={form.control}
                         name="note"
                         render={({ field }) => (
-                            <FormItem>
+                            <FormItem className="col-span-1 md:col-span-2">
                                 <FormLabel>{t.requestForm.reason}</FormLabel>
                                 <FormControl>
                                     <Textarea placeholder={t.requestForm.reasonPlaceholder} {...field} />
@@ -583,14 +572,6 @@ export function RequestForm({
                             </FormItem>
                         )}
                     />
-
-                    <FormItem>
-                        <FormLabel>{t.requestForm.attachment}</FormLabel>
-                        <FormControl>
-                            <Input type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} />
-                        </FormControl>
-                        <p className="text-xs text-zinc-500">{t.requestForm.attachmentDesc}</p>
-                    </FormItem>
                 </div>
 
                 <div className="bg-zinc-50 dark:bg-zinc-900/40 p-4 border border-zinc-200 dark:border-zinc-800 rounded-lg max-w-sm">

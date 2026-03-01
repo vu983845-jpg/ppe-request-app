@@ -152,7 +152,17 @@ export default function TrackingPage() {
                                                     {new Date(req.created_at).toLocaleDateString()}
                                                 </td>
                                                 <td className="px-6 py-4">{req.departments?.name}</td>
-                                                <td className="px-6 py-4 max-w-[200px] truncate">{req.ppe_master?.name} {req.ppe_master?.size ? `- Size ${req.ppe_master.size}` : ''}</td>
+                                                <td className="px-6 py-4 max-w-[200px] truncate">
+                                                    <div>{req.ppe_master?.name} {req.ppe_master?.size ? `- Size ${req.ppe_master.size}` : ''}</div>
+                                                    {req.request_type === 'LOST_BROKEN' ? (
+                                                        <div className="mt-1 flex flex-col gap-1">
+                                                            <span className="inline-flex items-center rounded-md border px-1.5 py-0.5 text-[10px] font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-red-500 text-white hover:bg-red-500/80 w-fit uppercase">Mất/Hỏng</span>
+                                                            {req.last_receipt_date && <div className="text-[11px] text-zinc-500">Nhận gần nhất: {new Date(req.last_receipt_date).toLocaleDateString()}</div>}
+                                                        </div>
+                                                    ) : (
+                                                        <span className="inline-flex items-center rounded-md border px-1.5 py-0.5 text-[10px] font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-blue-100 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/50 dark:text-blue-300 w-fit uppercase mt-1">Cấp Mới</span>
+                                                    )}
+                                                </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     {req.quantity} <span className="text-xs text-zinc-500">{req.ppe_master?.unit}</span>
                                                 </td>
@@ -215,7 +225,17 @@ export default function TrackingPage() {
                                                         {new Date(req.created_at).toLocaleDateString()}
                                                     </td>
                                                     <td className="px-6 py-4">{req.departments?.name}</td>
-                                                    <td className="px-6 py-4 max-w-[200px] truncate">{req.ppe_master?.name} {req.ppe_master?.size ? `- Size ${req.ppe_master.size}` : ''}</td>
+                                                    <td className="px-6 py-4 max-w-[200px] truncate">
+                                                        <div>{req.ppe_master?.name} {req.ppe_master?.size ? `- Size ${req.ppe_master.size}` : ''}</div>
+                                                        {req.request_type === 'LOST_BROKEN' ? (
+                                                            <div className="mt-1 flex flex-col gap-1">
+                                                                <span className="inline-flex items-center rounded-md border px-1.5 py-0.5 text-[10px] font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-red-500 text-white hover:bg-red-500/80 w-fit uppercase">Mất/Hỏng</span>
+                                                                {req.last_receipt_date && <div className="text-[11px] text-zinc-500">Nhận gần nhất: {new Date(req.last_receipt_date).toLocaleDateString()}</div>}
+                                                            </div>
+                                                        ) : (
+                                                            <span className="inline-flex items-center rounded-md border px-1.5 py-0.5 text-[10px] font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-blue-100 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/50 dark:text-blue-300 w-fit uppercase mt-1">Cấp Mới</span>
+                                                        )}
+                                                    </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         {req.quantity} <span className="text-xs text-zinc-500">{req.ppe_master?.unit}</span>
                                                     </td>

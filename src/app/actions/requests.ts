@@ -1,7 +1,6 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { sendEmail, generateStatusEmailHtml } from '@/lib/email'
 import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
 import { sendTeamsNotification } from '@/lib/teams'
@@ -21,6 +20,7 @@ const PPE_REQUEST_SCHEMA = z.object({
     requestType: z.enum(['NORMAL', 'LOST_BROKEN']),
     incidentDescription: z.string().optional(),
     incidentDate: z.string().optional(),
+    lastReceiptDate: z.string().optional(),
     employeeAcceptsCompensation: z.boolean().default(false),
 })
 
@@ -58,6 +58,7 @@ export async function submitPpeRequest(formData: z.infer<typeof PPE_REQUEST_SCHE
             request_type: formData.requestType,
             incident_description: formData.incidentDescription || null,
             incident_date: formData.incidentDate || null,
+            last_receipt_date: formData.lastReceiptDate || null,
             employee_accepts_compensation: formData.employeeAcceptsCompensation
         }))
 
@@ -70,38 +71,7 @@ export async function submitPpeRequest(formData: z.infer<typeof PPE_REQUEST_SCHE
             return { error: insertError.message }
         }
 
-        // 3. Send email to Department Head
-        const baseUrl = process.env.APP_BASE_URL || 'http://localhost:3000'
 
-        let itemsHtml = '<ul>'
-        for (const item of formData.items) {
-            const ppeDetails = ppeList?.find(p => p.id === item.ppeId)
-            itemsHtml += `<li><strong>${ppeDetails?.name || 'Unknown Item'}</strong>: ${item.quantity} ${ppeDetails?.unit || ''}</li>`
-        }
-        itemsHtml += '</ul>'
-
-        const notifyHtml = `
-            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-                <h2 style="color: #333;">PPE Request Update</h2>
-                <p>A new multi-item PPE Request requires your approval.</p>
-                
-                <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
-                    <p><strong>Requester:</strong> ${formData.requesterName}</p>
-                    <p><strong>Department:</strong> ${dept.name}</p>
-                    <p><strong>Items Requested:</strong></p>
-                    ${itemsHtml}
-                    ${formData.note ? `<p><strong>Note:</strong> ${formData.note}</p>` : ''}
-                </div>
-
-                <a href="${baseUrl}/login" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: #fff; text-decoration: none; border-radius: 5px;">Review Requests</a>
-            </div>
-        `
-
-        await sendEmail({
-            to: dept.dept_head_email,
-            subject: `[PPE Request] Action Required for ${formData.requesterName}`,
-            html: notifyHtml
-        })
 
         // 4. Send Teams Notification
         let teamsItemsText = '';
