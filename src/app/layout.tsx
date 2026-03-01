@@ -35,10 +35,10 @@ export default async function RootLayout({
             </main>
             <footer className="border-t bg-white dark:bg-zinc-950/50 py-4">
               <div className="container mx-auto px-4 flex flex-col items-center justify-between gap-2 md:h-12 md:flex-row">
-                <p className="text-zinc-500 mb-2 md:mb-0 text-center text-sm">
+                <p className="text-zinc-400 dark:text-zinc-600 mb-2 md:mb-0 text-center text-xs opacity-70">
                   &copy; {new Date().getFullYear()} Intersnack Vietnam. All rights reserved.
                 </p>
-                <p className="text-zinc-500 dark:text-zinc-400 font-medium tracking-wide text-sm whitespace-nowrap">
+                <p className="text-zinc-400 dark:text-zinc-600 font-medium tracking-wide text-xs opacity-70 whitespace-nowrap">
                   Designed & Built by V.H
                 </p>
                 <div className="ml-0 md:ml-auto">

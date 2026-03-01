@@ -194,21 +194,32 @@ export default async function Home() {
       </div>
 
       {/* Support Contact */}
-      <div className="mt-16 w-full max-w-3xl text-center py-8 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm animate-in zoom-in-95 duration-700 delay-300 mb-12">
-        <h2 className="text-xl font-bold text-zinc-800 dark:text-zinc-200 mb-2">
-          {t.index.contact?.title || "Cần Hỗ Trợ?"}
-        </h2>
-        <p className="text-zinc-500 dark:text-zinc-400 mb-6 text-sm">
-          {t.index.contact?.desc || "Liên hệ với chúng tôi qua:"}
-        </p>
-
-        <ContactButtons
-          email="vu.huynh@intersnack.com.vn"
-          phone="0945 646 999"
-          emailLabel={t.index.contact?.email || "Email Support"}
-          phoneLabel={t.index.contact?.phone || "Zalo / Hotline"}
-          revealText={t.index.contact?.reveal || "Show Info"}
-        />
+      <div className="mt-16 mb-12 flex justify-center animate-in zoom-in-95 duration-700 delay-300">
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline" className="rounded-full shadow-sm hover:shadow-md transition-all gap-2 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 px-6">
+              <MessageCircle className="w-5 h-5" />
+              <span>{t.index.contact?.title || "Cần Hỗ Trợ?"}</span>
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-md text-center">
+            <DialogHeader>
+              <DialogTitle className="text-center">{t.index.contact?.title || "Cần Hỗ Trợ?"}</DialogTitle>
+              <DialogDescription className="text-center pt-2 pb-4">
+                {t.index.contact?.desc || "Liên hệ với chúng tôi qua:"}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex justify-center pb-4">
+              <ContactButtons
+                email="vu.huynh@intersnack.com.vn"
+                phone="0945 646 999"
+                emailLabel={t.index.contact?.email || "Email Support"}
+                phoneLabel={t.index.contact?.phone || "Zalo / Hotline"}
+                revealText={t.index.contact?.reveal || "Show Info"}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
     </div>
