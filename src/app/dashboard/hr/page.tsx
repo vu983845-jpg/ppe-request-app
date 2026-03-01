@@ -35,7 +35,7 @@ export default async function HRDashboard() {
         .from('ppe_requests')
         .select(`
             *, 
-            ppe_master(name, unit, unit_price), 
+            ppe_master(name, unit, unit_price, size), 
             departments(name),
             dept_approver:app_users!fk_dept_approver(email),
             hse_approver:app_users!fk_hse_approver(email),

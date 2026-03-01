@@ -152,7 +152,7 @@ export default function TrackingPage() {
                                                     {new Date(req.created_at).toLocaleDateString()}
                                                 </td>
                                                 <td className="px-6 py-4">{req.departments?.name}</td>
-                                                <td className="px-6 py-4 max-w-[200px] truncate">{req.ppe_master?.name}</td>
+                                                <td className="px-6 py-4 max-w-[200px] truncate">{req.ppe_master?.name} {req.ppe_master?.size ? `- Size ${req.ppe_master.size}` : ''}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     {req.quantity} <span className="text-xs text-zinc-500">{req.ppe_master?.unit}</span>
                                                 </td>
@@ -215,7 +215,7 @@ export default function TrackingPage() {
                                                         {new Date(req.created_at).toLocaleDateString()}
                                                     </td>
                                                     <td className="px-6 py-4">{req.departments?.name}</td>
-                                                    <td className="px-6 py-4 max-w-[200px] truncate">{req.ppe_master?.name}</td>
+                                                    <td className="px-6 py-4 max-w-[200px] truncate">{req.ppe_master?.name} {req.ppe_master?.size ? `- Size ${req.ppe_master.size}` : ''}</td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         {req.quantity} <span className="text-xs text-zinc-500">{req.ppe_master?.unit}</span>
                                                     </td>

@@ -155,7 +155,7 @@ export async function rejectRequestByHSE(requestId: string, note: string) {
 
   const { data: req, error: selError } = await supabase
     .from('ppe_requests')
-    .select('*, ppe_master(name, unit), departments(name, dept_head_email)')
+    .select('*, ppe_master(name, unit, size), departments(name, dept_head_email)')
     .eq('id', requestId)
     .single()
 

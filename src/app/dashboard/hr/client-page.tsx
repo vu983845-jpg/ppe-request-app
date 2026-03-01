@@ -80,7 +80,7 @@ export function RequestsTable({ requests }: { requests: any[] }) {
                                     <div className="text-sm text-zinc-500">{req.departments?.name}</div>
                                 </TableCell>
                                 <TableCell>
-                                    {req.ppe_master.name}
+                                    {req.ppe_master.name} {req.ppe_master.size ? `- Size ${req.ppe_master.size}` : ''}
                                     <div className="text-sm text-zinc-500">Unit cost: ${(req.ppe_master.unit_price || 0).toFixed(2)}</div>
                                 </TableCell>
                                 <TableCell>{req.quantity}</TableCell>

@@ -22,7 +22,7 @@ export async function approveRequestByDept(requestId: string) {
   // Fetch request to ensure it belongs to this dept (if specifically assigned) and get details for email
   let query = supabase
     .from('ppe_requests')
-    .select('*, ppe_master(name, unit), departments(name)')
+    .select('*, ppe_master(name, unit, size), departments(name)')
     .eq('id', requestId)
 
   if (approver.department_id) {
@@ -103,7 +103,7 @@ export async function rejectRequestByDept(requestId: string, note: string) {
 
   let query = supabase
     .from('ppe_requests')
-    .select('*, ppe_master(name, unit), departments(name)')
+    .select('*, ppe_master(name, unit, size), departments(name)')
     .eq('id', requestId)
 
   if (approver.department_id) {

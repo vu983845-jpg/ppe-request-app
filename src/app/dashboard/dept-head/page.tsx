@@ -43,7 +43,7 @@ export default async function DeptHeadDashboard() {
         .from('ppe_requests')
         .select(`
             *, 
-            ppe_master(name, unit), 
+            ppe_master(name, unit, size), 
             departments(name),
             dept_approver:app_users!fk_dept_approver(email),
             hse_approver:app_users!fk_hse_approver(email),

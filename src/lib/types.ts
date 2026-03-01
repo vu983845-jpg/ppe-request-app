@@ -38,6 +38,7 @@ export interface PPEMaster {
     stock_quantity: number
     minimum_stock: number
     active: boolean
+    size?: string | null
 }
 
 export interface PperRequest {

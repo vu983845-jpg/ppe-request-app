@@ -122,7 +122,7 @@ export function HseRequestsTable({ requests }: { requests: any[] }) {
                                         {req.note && <div className="text-xs text-zinc-500 truncate max-w-[150px]" title={req.note}>{req.note}</div>}
                                     </TableCell>
                                     <TableCell>
-                                        {req.ppe_master?.name}
+                                        {req.ppe_master?.name} {req.ppe_master?.size ? `- Size ${req.ppe_master.size}` : ''}
                                         <div className="text-xs text-zinc-500">{req.ppe_master?.unit}</div>
                                     </TableCell>
                                     <TableCell>{req.quantity}</TableCell>

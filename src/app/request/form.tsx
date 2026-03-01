@@ -25,7 +25,9 @@ import { createClient } from '@/lib/supabase/client'
 import {
     Select,
     SelectContent,
+    SelectGroup,
     SelectItem,
+    SelectLabel,
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
@@ -225,7 +227,7 @@ export function RequestForm({
                                 const ppe = ppes.find(p => p.id === item.ppeId)
                                 return (
                                     <li key={idx} className="flex justify-between items-center bg-white dark:bg-zinc-950 p-3 rounded border border-zinc-100 dark:border-zinc-800">
-                                        <span>{ppe?.name}</span>
+                                        <span>{ppe?.name} {ppe?.size ? `- Size ${ppe.size}` : ''}</span>
                                         <span className="font-medium bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded">
                                             {item.quantity} {ppe?.unit}
                                         </span>
@@ -420,11 +422,31 @@ export function RequestForm({
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    {ppes.map((ppe) => (
-                                                        <SelectItem key={ppe.id} value={ppe.id}>
-                                                            {ppe.name} ({ppe.unit})
-                                                        </SelectItem>
-                                                    ))}
+                                                    {Object.entries(
+                                                        ppes.reduce((acc, ppe) => {
+                                                            if (!acc[ppe.name]) acc[ppe.name] = []
+                                                            acc[ppe.name].push(ppe)
+                                                            return acc
+                                                        }, {} as Record<string, typeof ppes>)
+                                                    ).map(([name, variants]) => {
+                                                        if (variants.length === 1 && !variants[0].size) {
+                                                            return (
+                                                                <SelectItem key={variants[0].id} value={variants[0].id}>
+                                                                    {variants[0].name} ({variants[0].unit})
+                                                                </SelectItem>
+                                                            )
+                                                        }
+                                                        return (
+                                                            <SelectGroup key={name}>
+                                                                <SelectLabel>{name}</SelectLabel>
+                                                                {variants.map((v) => (
+                                                                    <SelectItem key={v.id} value={v.id}>
+                                                                        {name} - Size {v.size} ({v.unit})
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectGroup>
+                                                        )
+                                                    })}
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage />

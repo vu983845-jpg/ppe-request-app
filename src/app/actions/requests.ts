@@ -136,7 +136,7 @@ export async function searchRequestsByEmpCode(empCode: string) {
         .from('ppe_requests')
         .select(`
             *, 
-            ppe_master(name, unit), 
+            ppe_master(name, unit, size), 
             departments(name),
             dept_approver:app_users!fk_dept_approver(role),
             hse_approver:app_users!fk_hse_approver(role),
@@ -158,7 +158,7 @@ export async function searchRequestsByEmpCode(empCode: string) {
     if (requestIds.length > 0) {
         const { data: issueLog, error: logError } = await supabase
             .from('ppe_issue_log')
-            .select('*, ppe_requests!inner(ppe_master(name, unit))')
+            .select('*, ppe_requests!inner(ppe_master(name, unit, size))')
             .in('request_id', requestIds)
             .order('issued_at', { ascending: false })
 

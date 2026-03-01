@@ -78,7 +78,7 @@ export function RequestsTable({ requests }: { requests: any[] }) {
                                 {req.departments?.name || '-'}
                             </TableCell>
                             <TableCell>
-                                {req.ppe_master?.name}
+                                {req.ppe_master?.name} {req.ppe_master?.size ? `- Size ${req.ppe_master.size}` : ''}
                                 <div className="text-sm text-zinc-500">{req.ppe_master?.unit}</div>
                             </TableCell>
                             <TableCell>{req.quantity}</TableCell>
