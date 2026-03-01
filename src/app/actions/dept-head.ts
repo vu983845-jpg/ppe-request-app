@@ -19,13 +19,17 @@ export async function approveRequestByDept(requestId: string) {
 
   if (!approver) return { error: 'Approver profile not found' }
 
-  // Fetch request to ensure it belongs to this dept and get details for email
-  const { data: request } = await supabase
+  // Fetch request to ensure it belongs to this dept (if specifically assigned) and get details for email
+  let query = supabase
     .from('ppe_requests')
     .select('*, ppe_master(name, unit), departments(name)')
     .eq('id', requestId)
-    .eq('requester_department_id', approver.department_id)
-    .single()
+
+  if (approver.department_id) {
+    query = query.eq('requester_department_id', approver.department_id)
+  }
+
+  const { data: request } = await query.single()
 
   if (!request) return { error: 'Request not found or unauthorized' }
 
@@ -97,12 +101,16 @@ export async function rejectRequestByDept(requestId: string, note: string) {
 
   if (!approver) return { error: 'Approver profile not found' }
 
-  const { data: request } = await supabase
+  let query = supabase
     .from('ppe_requests')
     .select('*, ppe_master(name, unit), departments(name)')
     .eq('id', requestId)
-    .eq('requester_department_id', approver.department_id)
-    .single()
+
+  if (approver.department_id) {
+    query = query.eq('requester_department_id', approver.department_id)
+  }
+
+  const { data: request } = await query.single()
 
   if (!request) return { error: 'Request not found or unauthorized' }
 
