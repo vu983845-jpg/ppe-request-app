@@ -627,6 +627,22 @@ export function AnalyticsTable({ triggerRefetch }: { triggerRefetch?: number }) 
     const [chartData, setChartData] = useState<any[]>([])
     const [loading, setLoading] = useState(false)
     const [expandedItems, setExpandedItems] = useState<string[]>([])
+    const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({})
+
+    const groupedData = React.useMemo(() => {
+        const groups: Record<string, any[]> = {}
+        data.forEach(item => {
+            if (!groups[item.name]) {
+                groups[item.name] = []
+            }
+            groups[item.name].push(item)
+        })
+        return groups
+    }, [data])
+
+    const toggleGroup = (name: string) => {
+        setExpandedGroups(prev => ({ ...prev, [name]: !prev[name] }))
+    }
 
     const toggleExpand = (id: string) => {
         setExpandedItems(prev =>
@@ -760,70 +776,167 @@ export function AnalyticsTable({ triggerRefetch }: { triggerRefetch?: number }) 
                                 </TableCell>
                             </TableRow>
                         )}
-                        {!loading && data.map((item) => (
-                            <Fragment key={item.id}>
-                                <TableRow key={item.id} className={item.issueDetails?.length > 0 ? "cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-900/50" : ""} onClick={() => item.issueDetails?.length > 0 && toggleExpand(item.id)}>
-                                    <TableCell>
-                                        {item.issueDetails?.length > 0 && (
-                                            expandedItems.includes(item.id)
-                                                ? <ChevronDown className="h-4 w-4 text-zinc-500" />
-                                                : <ChevronRight className="h-4 w-4 text-zinc-500" />
-                                        )}
-                                    </TableCell>
-                                    <TableCell className="font-medium text-zinc-900 dark:text-zinc-100">{item.name}</TableCell>
-                                    <TableCell className="text-zinc-500">{item.unit}</TableCell>
-                                    <TableCell className="text-right font-medium">{item.openingBalance}</TableCell>
-                                    <TableCell className="text-right text-blue-600 dark:text-blue-400 font-medium">+{item.in}</TableCell>
-                                    <TableCell className="text-right text-orange-600 dark:text-orange-400 font-medium">-{item.out}</TableCell>
-                                    <TableCell className="text-right font-bold text-zinc-900 dark:text-zinc-100">{item.closingBalance}</TableCell>
-                                </TableRow>
-                                {expandedItems.includes(item.id) && item.issueDetails && item.issueDetails.length > 0 && (
-                                    <TableRow key={`${item.id}-details`} className="bg-zinc-50/50 dark:bg-zinc-900/20">
-                                        <TableCell colSpan={7} className="p-0 border-b-0">
-                                            <div className="py-4 pl-14 pr-4 bg-zinc-50/50 dark:bg-zinc-900/20 border-l-4 border-l-orange-400">
-                                                <h4 className="text-sm font-semibold mb-3 text-zinc-700 dark:text-zinc-300 flex items-center gap-2">
-                                                    Lịch sử cấp phát (Issue Details)
-                                                </h4>
-                                                <div className="rounded-md border bg-white dark:bg-zinc-950 overflow-hidden shadow-sm">
-                                                    <Table className="text-sm">
-                                                        <TableHeader className="bg-zinc-100 dark:bg-zinc-900/80">
-                                                            <TableRow>
-                                                                <TableHead className="h-10"><div className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> Ngày (Date)</div></TableHead>
-                                                                <TableHead className="h-10"><div className="flex items-center gap-1.5"><User className="w-3.5 h-3.5" /> Người nhận (Requester)</div></TableHead>
-                                                                <TableHead className="h-10"><div className="flex items-center gap-1.5"><Hash className="w-3.5 h-3.5" /> Mã NV (Emp Code)</div></TableHead>
-                                                                <TableHead className="h-10"><div className="flex items-center gap-1.5"><Building2 className="w-3.5 h-3.5" /> Phòng ban (Dept)</div></TableHead>
-                                                                <TableHead className="text-right h-10 text-orange-600 dark:text-orange-400">SL Xuất</TableHead>
-                                                            </TableRow>
-                                                        </TableHeader>
-                                                        <TableBody>
-                                                            {item.issueDetails.map((detail: any, idx: number) => (
-                                                                <TableRow key={idx} className="hover:bg-zinc-50 dark:hover:bg-zinc-900/50 border-b-zinc-100 dark:border-b-zinc-800">
-                                                                    <TableCell className="text-zinc-600 dark:text-zinc-400">
-                                                                        {new Date(detail.date).toLocaleDateString()}
-                                                                    </TableCell>
-                                                                    <TableCell className="font-medium text-zinc-900 dark:text-zinc-100">
-                                                                        {detail.requester}
-                                                                    </TableCell>
-                                                                    <TableCell className="font-mono text-zinc-500 text-xs">
-                                                                        {detail.empCode || '-'}
-                                                                    </TableCell>
-                                                                    <TableCell className="text-zinc-600 dark:text-zinc-400">
-                                                                        {detail.department}
-                                                                    </TableCell>
-                                                                    <TableCell className="text-right font-medium text-orange-600 dark:text-orange-400">
-                                                                        {detail.qty} {item.unit}
-                                                                    </TableCell>
-                                                                </TableRow>
-                                                            ))}
-                                                        </TableBody>
-                                                    </Table>
+                        {!loading && Object.entries(groupedData).map(([name, items]) => {
+                            const isGroupExpanded = expandedGroups[name]
+                            const hasMultipleSizes = items.length > 1 || items[0].size !== null
+
+                            // Parent row aggregates
+                            const tOpen = items.reduce((acc, it) => acc + Number(it.openingBalance), 0)
+                            const tIn = items.reduce((acc, it) => acc + Number(it.in), 0)
+                            const tOut = items.reduce((acc, it) => acc + Number(it.out), 0)
+                            const tClose = items.reduce((acc, it) => acc + Number(it.closingBalance), 0)
+                            const totalIssueDetails = items.reduce((acc, it) => acc + (it.issueDetails?.length || 0), 0)
+
+                            return (
+                                <Fragment key={name}>
+                                    <TableRow
+                                        className={hasMultipleSizes ? "cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-900/50" : (totalIssueDetails > 0 ? "cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-900/50" : "")}
+                                        onClick={() => {
+                                            if (hasMultipleSizes) {
+                                                toggleGroup(name)
+                                            } else if (totalIssueDetails > 0) {
+                                                toggleExpand(items[0].id)
+                                            }
+                                        }}
+                                    >
+                                        <TableCell>
+                                            {(hasMultipleSizes || totalIssueDetails > 0) && (
+                                                <div className="p-0.5 rounded-md hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-500 w-fit">
+                                                    {(isGroupExpanded || expandedItems.includes(items[0].id))
+                                                        ? <ChevronDown className="h-4 w-4" />
+                                                        : <ChevronRight className="h-4 w-4" />
+                                                    }
                                                 </div>
-                                            </div>
+                                            )}
                                         </TableCell>
+                                        <TableCell className="font-medium text-zinc-900 dark:text-zinc-100">{name}</TableCell>
+                                        <TableCell className="text-zinc-500">{items[0].unit}</TableCell>
+                                        <TableCell className="text-right font-medium">{tOpen}</TableCell>
+                                        <TableCell className="text-right text-blue-600 dark:text-blue-400 font-medium">+{tIn}</TableCell>
+                                        <TableCell className="text-right text-orange-600 dark:text-orange-400 font-medium">-{tOut}</TableCell>
+                                        <TableCell className="text-right font-bold text-zinc-900 dark:text-zinc-100">{tClose}</TableCell>
                                     </TableRow>
-                                )}
-                            </Fragment>
-                        ))}
+
+                                    {/* SIZES EXPANDED VIEW */}
+                                    {isGroupExpanded && hasMultipleSizes && items.map((item) => (
+                                        <Fragment key={item.id}>
+                                            <TableRow
+                                                className={`bg-zinc-50/50 dark:bg-zinc-900/40 ${item.issueDetails?.length > 0 ? "cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800" : ""}`}
+                                                onClick={() => item.issueDetails?.length > 0 && toggleExpand(item.id)}
+                                            >
+                                                <TableCell className="pl-6">
+                                                    {item.issueDetails?.length > 0 && (
+                                                        <div className="p-0.5 w-fit rounded-md text-zinc-400">
+                                                            {expandedItems.includes(item.id) ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                                                        </div>
+                                                    )}
+                                                </TableCell>
+                                                <TableCell className="pl-12 text-sm text-zinc-500">Size: {item.size || 'N/A'}</TableCell>
+                                                <TableCell></TableCell>
+                                                <TableCell className="text-right">{item.openingBalance}</TableCell>
+                                                <TableCell className="text-right text-blue-600 dark:text-blue-400 font-medium">+{item.in}</TableCell>
+                                                <TableCell className="text-right text-orange-600 dark:text-orange-400 font-medium">-{item.out}</TableCell>
+                                                <TableCell className="text-right font-bold text-zinc-700 dark:text-zinc-300">{item.closingBalance}</TableCell>
+                                            </TableRow>
+
+                                            {/* ISSUE DETAILS EXPANED VIEW (CHILD OF SIZE ROW) */}
+                                            {expandedItems.includes(item.id) && item.issueDetails && item.issueDetails.length > 0 && (
+                                                <TableRow key={`${item.id}-details`} className="bg-zinc-50/80 dark:bg-zinc-900/20">
+                                                    <TableCell colSpan={7} className="p-0 border-b-0">
+                                                        <div className="py-4 pl-24 pr-4 bg-zinc-50/50 dark:bg-zinc-900/20 border-l-4 border-l-orange-400">
+                                                            <h4 className="text-sm font-semibold mb-3 text-zinc-700 dark:text-zinc-300 flex items-center gap-2">
+                                                                Lịch sử cấp phát (Issue Details)
+                                                            </h4>
+                                                            <div className="rounded-md border bg-white dark:bg-zinc-950 overflow-hidden shadow-sm">
+                                                                <Table className="text-sm">
+                                                                    <TableHeader className="bg-zinc-100 dark:bg-zinc-900/80">
+                                                                        <TableRow>
+                                                                            <TableHead className="h-10"><div className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> Ngày (Date)</div></TableHead>
+                                                                            <TableHead className="h-10"><div className="flex items-center gap-1.5"><User className="w-3.5 h-3.5" /> Người nhận</div></TableHead>
+                                                                            <TableHead className="h-10"><div className="flex items-center gap-1.5"><Hash className="w-3.5 h-3.5" /> Mã NV</div></TableHead>
+                                                                            <TableHead className="h-10"><div className="flex items-center gap-1.5"><Building2 className="w-3.5 h-3.5" /> Dept</div></TableHead>
+                                                                            <TableHead className="text-right h-10 text-orange-600 dark:text-orange-400">SL Xuất</TableHead>
+                                                                        </TableRow>
+                                                                    </TableHeader>
+                                                                    <TableBody>
+                                                                        {item.issueDetails.map((detail: any, idx: number) => (
+                                                                            <TableRow key={idx} className="hover:bg-zinc-50 dark:hover:bg-zinc-900/50 border-b-zinc-100 dark:border-b-zinc-800">
+                                                                                <TableCell className="text-zinc-600 dark:text-zinc-400">
+                                                                                    {new Date(detail.date).toLocaleDateString()}
+                                                                                </TableCell>
+                                                                                <TableCell className="font-medium text-zinc-900 dark:text-zinc-100">
+                                                                                    {detail.requester}
+                                                                                </TableCell>
+                                                                                <TableCell className="font-mono text-zinc-500 text-xs">
+                                                                                    {detail.empCode || '-'}
+                                                                                </TableCell>
+                                                                                <TableCell className="text-zinc-600 dark:text-zinc-400">
+                                                                                    {detail.department}
+                                                                                </TableCell>
+                                                                                <TableCell className="text-right font-medium text-orange-600 dark:text-orange-400">
+                                                                                    {detail.qty} {item.unit}
+                                                                                </TableCell>
+                                                                            </TableRow>
+                                                                        ))}
+                                                                    </TableBody>
+                                                                </Table>
+                                                            </div>
+                                                        </div>
+                                                    </TableCell>
+                                                </TableRow>
+                                            )}
+                                        </Fragment>
+                                    ))}
+
+                                    {/* ISSUE DETAILS EXPANED VIEW (DIRECT CHILD OF PARENT, NO SIZES) */}
+                                    {expandedItems.includes(items[0].id) && !hasMultipleSizes && items[0].issueDetails && items[0].issueDetails.length > 0 && (
+                                        <TableRow key={`${items[0].id}-details`} className="bg-zinc-50/50 dark:bg-zinc-900/20">
+                                            <TableCell colSpan={7} className="p-0 border-b-0">
+                                                <div className="py-4 pl-14 pr-4 bg-zinc-50/50 dark:bg-zinc-900/20 border-l-4 border-l-orange-400">
+                                                    <h4 className="text-sm font-semibold mb-3 text-zinc-700 dark:text-zinc-300 flex items-center gap-2">
+                                                        Lịch sử cấp phát (Issue Details)
+                                                    </h4>
+                                                    <div className="rounded-md border bg-white dark:bg-zinc-950 overflow-hidden shadow-sm">
+                                                        <Table className="text-sm">
+                                                            <TableHeader className="bg-zinc-100 dark:bg-zinc-900/80">
+                                                                <TableRow>
+                                                                    <TableHead className="h-10"><div className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> Ngày (Date)</div></TableHead>
+                                                                    <TableHead className="h-10"><div className="flex items-center gap-1.5"><User className="w-3.5 h-3.5" /> Người nhận</div></TableHead>
+                                                                    <TableHead className="h-10"><div className="flex items-center gap-1.5"><Hash className="w-3.5 h-3.5" /> Mã NV</div></TableHead>
+                                                                    <TableHead className="h-10"><div className="flex items-center gap-1.5"><Building2 className="w-3.5 h-3.5" /> Dept</div></TableHead>
+                                                                    <TableHead className="text-right h-10 text-orange-600 dark:text-orange-400">SL Xuất</TableHead>
+                                                                </TableRow>
+                                                            </TableHeader>
+                                                            <TableBody>
+                                                                {items[0].issueDetails.map((detail: any, idx: number) => (
+                                                                    <TableRow key={idx} className="hover:bg-zinc-50 dark:hover:bg-zinc-900/50 border-b-zinc-100 dark:border-b-zinc-800">
+                                                                        <TableCell className="text-zinc-600 dark:text-zinc-400">
+                                                                            {new Date(detail.date).toLocaleDateString()}
+                                                                        </TableCell>
+                                                                        <TableCell className="font-medium text-zinc-900 dark:text-zinc-100">
+                                                                            {detail.requester}
+                                                                        </TableCell>
+                                                                        <TableCell className="font-mono text-zinc-500 text-xs">
+                                                                            {detail.empCode || '-'}
+                                                                        </TableCell>
+                                                                        <TableCell className="text-zinc-600 dark:text-zinc-400">
+                                                                            {detail.department}
+                                                                        </TableCell>
+                                                                        <TableCell className="text-right font-medium text-orange-600 dark:text-orange-400">
+                                                                            {detail.qty} {items[0].unit}
+                                                                        </TableCell>
+                                                                    </TableRow>
+                                                                ))}
+                                                            </TableBody>
+                                                        </Table>
+                                                    </div>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </Fragment>
+                            )
+                        })}
                         {!loading && data.length === 0 && (
                             <TableRow>
                                 <TableCell colSpan={7} className="text-center py-8 text-zinc-500">
