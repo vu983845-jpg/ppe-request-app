@@ -95,10 +95,10 @@ export function RequestsTable({ requests }: { requests: any[] }) {
                                                                     req.status === 'REJECTED_BY_HSE' ? 'HSE từ chối' : req.status}
                                     </Badge>
                                     <div className="text-[11px] text-zinc-500 font-medium mt-1 leading-tight">
-                                        {req.dept_approver?.role && <div>BP: {req.dept_approver.role}</div>}
-                                        {req.hse_approver?.role && <div>HSE: {req.hse_approver.role}</div>}
-                                        {req.pm_approver?.role && <div>GĐ: {req.pm_approver.role}</div>}
-                                        {req.hr_approver?.role && <div>HR: {req.hr_approver.role}</div>}
+                                        {req.dept_approver?.email && <div>BP: {req.dept_approver.email}</div>}
+                                        {req.hse_approver?.email && <div>HSE: {req.hse_approver.email}</div>}
+                                        {req.pm_approver?.email && <div>GĐ: {req.pm_approver.email}</div>}
+                                        {req.hr_approver?.email && <div>HR: {req.hr_approver.email}</div>}
                                     </div>
                                 </div>
                             </TableCell>

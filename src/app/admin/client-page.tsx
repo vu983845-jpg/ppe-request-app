@@ -42,10 +42,10 @@ export function AdminDashboardClient({
             'Unit Price': r.ppe_master?.unit_price,
             'Total Cost': r.quantity * (r.ppe_master?.unit_price || 0),
             'Status': r.status,
-            'Dept Approver': r.dept_approver?.role || '',
-            'HSE Approver': r.hse_approver?.role || '',
-            'PM Approver': r.pm_approver?.role || '',
-            'HR Approver': r.hr_approver?.role || '',
+            'Dept Approver': r.dept_approver?.email || '',
+            'HSE Approver': r.hse_approver?.email || '',
+            'PM Approver': r.pm_approver?.email || '',
+            'HR Approver': r.hr_approver?.email || '',
         }))
 
         const ws = xlsx.utils.json_to_sheet(exportData)

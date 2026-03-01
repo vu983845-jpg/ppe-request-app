@@ -46,11 +46,11 @@ BEGIN
 
       IF existing_app_user IS NULL THEN
         -- Insert nếu chưa có mapping
-        INSERT INTO public.app_users (auth_user_id, role)
-        VALUES (new_user_id, 'DEPT_HEAD');
+        INSERT INTO public.app_users (auth_user_id, role, email)
+        VALUES (new_user_id, 'DEPT_HEAD', user_rec->>'email');
       ELSE
         -- Update nếu đã có mapping
-        UPDATE public.app_users SET role = 'DEPT_HEAD' WHERE id = existing_app_user;
+        UPDATE public.app_users SET role = 'DEPT_HEAD', email = user_rec->>'email' WHERE id = existing_app_user;
       END IF;
     END IF;
 
