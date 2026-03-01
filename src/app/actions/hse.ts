@@ -264,7 +264,7 @@ export async function getInventoryAnalytics(year: number, month?: number) {
 
   // Note: RLS allows us to fetch all, but we only really need aggregations
   const { data: allPurchases } = await supabase.from('ppe_purchases').select('ppe_id, quantity, purchased_at')
-  const { data: allIssues } = await supabase.from('ppe_issue_log').select('ppe_id, issued_quantity, issued_at, ppe_requests(reason, requester_name, requester_emp_code, departments(name))')
+  const { data: allIssues } = await supabase.from('ppe_issue_log').select('ppe_id, issued_quantity, issued_at, ppe_requests(request_type, requester_name, requester_emp_code, departments(name))')
 
   const analytics = items.map(item => {
     // Purchases
@@ -280,7 +280,7 @@ export async function getInventoryAnalytics(year: number, month?: number) {
     const issueDetails = inPeriodIssues.map(i => ({
       date: i.issued_at,
       qty: i.issued_quantity,
-      reason: (i.ppe_requests as any)?.reason || 'NEW',
+      request_type: (i.ppe_requests as any)?.request_type || 'NORMAL',
       requester: (i.ppe_requests as any)?.requester_name || 'Unknown',
       empCode: (i.ppe_requests as any)?.requester_emp_code || '',
       department: (i.ppe_requests as any)?.departments?.name || 'Unknown'

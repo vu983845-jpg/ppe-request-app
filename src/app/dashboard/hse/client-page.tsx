@@ -875,7 +875,7 @@ export function AnalyticsTable({ triggerRefetch }: { triggerRefetch?: number }) 
                                                                                     {detail.department}
                                                                                 </TableCell>
                                                                                 <TableCell>
-                                                                                    {detail.reason === 'NEW' ? (
+                                                                                    {detail.request_type === 'NORMAL' ? (
                                                                                         <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20 text-[10px] px-1.5">
                                                                                             Cấp Mới
                                                                                         </Badge>
@@ -936,7 +936,7 @@ export function AnalyticsTable({ triggerRefetch }: { triggerRefetch?: number }) 
                                                                             {detail.department}
                                                                         </TableCell>
                                                                         <TableCell>
-                                                                            {detail.reason === 'NEW' ? (
+                                                                            {detail.request_type === 'NORMAL' ? (
                                                                                 <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20 text-[10px] px-1.5">
                                                                                     Cấp Mới
                                                                                 </Badge>
