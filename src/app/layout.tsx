@@ -6,7 +6,7 @@ import { getLocale } from './actions/locale'
 import { LanguageProvider } from '@/lib/i18n/context'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import Link from 'next/link'
-import Image from 'next/image'
+import { GlobalHeader } from '@/components/global-header'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -28,23 +28,7 @@ export default async function RootLayout({
         <LanguageProvider initialLocale={initialLocale}>
           <div className="flex flex-col min-h-screen">
             {/* Global Header */}
-            <header className="border-b bg-white dark:bg-zinc-950/50 sticky top-0 z-50">
-              <div className="container mx-auto px-4 h-16 flex items-center">
-                <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                  <div className="bg-white rounded-md px-2 py-1 shadow-sm">
-                    <div className="relative w-28 h-8">
-                      <Image
-                        src="/intersnack-logo.jpg"
-                        alt="Intersnack Logo"
-                        fill
-                        className="object-contain object-center"
-                        priority
-                      />
-                    </div>
-                  </div>
-                </Link>
-              </div>
-            </header>
+            <GlobalHeader />
 
             <main className="flex-1">
               {children}
