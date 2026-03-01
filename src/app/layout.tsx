@@ -34,7 +34,7 @@ export default async function RootLayout({
                   <div className="bg-white rounded-md px-2 py-1 shadow-sm">
                     <div className="relative w-28 h-8">
                       <Image
-                        src="/logo.png"
+                        src="/intersnack-logo.jpg"
                         alt="Intersnack Logo"
                         fill
                         className="object-contain object-center"
