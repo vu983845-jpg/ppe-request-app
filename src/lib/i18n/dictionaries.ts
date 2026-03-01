@@ -77,6 +77,7 @@ export const dictionaries = {
             incidentDesc: "Event Description",
             incidentDescPlaceholder: "Explain the event that caused it to be lost or broken...",
             incidentDate: "Date of Event",
+            lastReceiptDate: "Last PPE Receipt Date",
             acceptCompensation: "I confirm the above information is accurate and accept responsibility for compensation for the replacement cost.",
             mustAcceptCompensation: "You must accept responsibility to proceed with a replacement request.",
             lostBrokenAlert: {
@@ -321,6 +322,7 @@ export const dictionaries = {
             incidentDesc: "Mô tả sự việc",
             incidentDescPlaceholder: "Trình bày sự việc dẫn đến làm mất hoặc hỏng thiết bị...",
             incidentDate: "Thời điểm xảy ra sự việc",
+            lastReceiptDate: "Ngày nhận PPE gần nhất",
             acceptCompensation: "Tôi xác nhận thông tin trên là chính xác và chấp nhận trách nhiệm bồi thường đối với chi phí cấp lại trang thiết bị này.",
             mustAcceptCompensation: "Bạn buộc phải đánh dấu đồng ý bồi thường để tiếp tục yêu cầu cấp lại.",
             lostBrokenAlert: {
