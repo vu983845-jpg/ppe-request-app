@@ -24,11 +24,32 @@ export const dictionaries = {
             loginBtn: "System Login",
             timeline: {
                 title: "How It Works",
-                step1: { title: "Submit Request", desc: "Choose Normal or Lost/Broken" },
-                step2: { title: "Dept Approval", desc: "Manager reviews request" },
-                step3: { title: "HSE Review", desc: "Stock check & approval" },
-                step4: { title: "Plant Mgr & HR", desc: "(Lost/Broken items only)" },
-                step5: { title: "Receive Item", desc: "Collect & confirm receipt" }
+                clickForDetails: "Click each step to read detailed instructions",
+                step1: {
+                    title: "Submit Request",
+                    desc: "Choose Normal or Lost/Broken",
+                    fullDetail: "Employees must fill out all required fields. If requesting a replacement for a Lost or Broken item, you must provide the incident date, a detailed reason, and accept that you may be held responsible for compensation based on company policy."
+                },
+                step2: {
+                    title: "Dept Approval",
+                    desc: "Manager reviews request",
+                    fullDetail: "The Department Head (Line Manager) will review your request. They check if the item is truly necessary for your role and if your reason is valid. If rejected, you will be notified."
+                },
+                step3: {
+                    title: "HSE Review",
+                    desc: "Stock check & approval",
+                    fullDetail: "The HSE Department reviews approved requests. They will check the warehouse inventory. If stock is available, they will approve and deduct the item from the stock balance. You will then be notified to collect it."
+                },
+                step4: {
+                    title: "Plant Mgr & HR",
+                    desc: "(Lost/Broken items only)",
+                    fullDetail: "ONLY FOR LOST/BROKEN ITEMS: After HSE approval, the Plant Manager must review the incident report. If approved, HR will then finalize the request by processing any necessary payroll deductions before the item can be issued."
+                },
+                step5: {
+                    title: "Receive Item",
+                    desc: "Collect & confirm receipt",
+                    fullDetail: "Once your request status is 'READY_FOR_PICKUP', you can collect the item from the HSE office. After receiving the physical item, you MUST log in to the Tracking page using your Employee Code and click the 'Confirm Receipt' button to close the request."
+                }
             },
             contact: {
                 title: "Need Support?",
@@ -276,11 +297,32 @@ export const dictionaries = {
             loginBtn: "Đăng Nhập Hệ Thống",
             timeline: {
                 title: "Quy Trình Xử Lý",
-                step1: { title: "Tạo Đơn Cấp Phát", desc: "Chọn Mới hoặc Cấp Lại" },
-                step2: { title: "Trưởng BP Duyệt", desc: "Quản lý xem xét yêu cầu" },
-                step3: { title: "HSE Duyệt", desc: "Kiểm tra tồn kho & cấp phát" },
-                step4: { title: "Ban Giám Đốc & HR", desc: "(Chỉ dành cho Đơn Mất/Hỏng)" },
-                step5: { title: "Nhận Thiết Bị", desc: "Ký nhận trên hệ thống" }
+                clickForDetails: "Bấm vào từng bước để xem hướng dẫn chi tiết",
+                step1: {
+                    title: "Tạo Đơn Cấp Phát",
+                    desc: "Chọn Mới hoặc Cấp Lại",
+                    fullDetail: "Nhân viên điền đầy đủ thông tin vào Form. Đối với trường hợp Mất/Hỏng, bắt buộc phải chọn tab tương ứng, ghi rõ thời gian, lý do làm mất, và đồng ý chịu trách nhiệm đền bù theo quy định công ty nếu có."
+                },
+                step2: {
+                    title: "Trưởng BP Duyệt",
+                    desc: "Quản lý xem xét yêu cầu",
+                    fullDetail: "Quản lý trực tiếp (Department Head) sẽ xem xét đơn của bạn xem có thực sự cần thiết và hợp lý không. Nếu đơn bị từ chối, quy trình sẽ kết thúc tại đây."
+                },
+                step3: {
+                    title: "HSE Duyệt",
+                    desc: "Kiểm tra tồn kho & cấp phát",
+                    fullDetail: "Bộ phận An Toàn (HSE) sẽ tiếp nhận các đơn đã được Quản lý duyệt. Họ kiểm tra số lượng tồn kho, phê duyệt xuất kho và trừ tồn kho tự động. Sau đó bạn sẽ nhận được thông báo lên lấy đồ."
+                },
+                step4: {
+                    title: "Ban Giám Đốc & HR",
+                    desc: "(Chỉ dành cho Đơn Mất/Hỏng)",
+                    fullDetail: "CHỈ ÁP DỤNG DO MẤT/HỎNG: Sau khi HSE xét duyệt, Giám Đốc Nhà Máy (Plant Manager) sẽ xem xét lý do sự cố. Nếu thông qua, Hành Chính Nhân Sự (HR) sẽ chốt bước cuối cùng để xử lý khấu trừ lương trước khi bạn được nhận đồ mới."
+                },
+                step5: {
+                    title: "Nhận Thiết Bị",
+                    desc: "Ký nhận trên hệ thống",
+                    fullDetail: "Khi trạng thái đơn là 'Chờ Bạn Xác Nhận', bạn lên kho HSE nhận đồ bảo hộ. Vô cùng quan trọng: Sau khi cầm đồ trên tay, bạn PHẢI vào trang Tra Cứu, nhập Mã Nhân Viên và bấm 'Xác nhận đã nhận' để khép lại quy trình cấp phát."
+                }
             },
             contact: {
                 title: "Cần Hỗ Trợ?",

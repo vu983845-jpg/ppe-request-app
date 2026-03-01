@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { FileText, UserCheck, ShieldCheck, Box, Users, Mail, MessageCircle } from 'lucide-react'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { getLocale } from './actions/locale'
 import { dictionaries } from '@/lib/i18n/dictionaries'
 
@@ -47,64 +48,144 @@ export default async function Home() {
         </h2>
 
         {/* Horizontal on md+, Vertical on mobile */}
+        <p className="text-zinc-500 dark:text-zinc-400 text-center text-sm mb-6 -mt-6">
+          {t.index.timeline?.clickForDetails || "Bấm vào từng bước để xem chi tiết"}
+        </p>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 relative">
 
           {/* Step 1 */}
-          <div className="relative flex flex-col items-center text-center p-4 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm transition-all hover:shadow-md">
-            <div className="flex items-center justify-center w-12 h-12 rounded-full border-4 border-white dark:border-zinc-950 bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400 shrink-0 mb-3 z-10">
-              <FileText className="w-5 h-5" />
-            </div>
-            <h3 className="font-bold text-zinc-800 dark:text-zinc-100 text-sm mb-1">1. {t.index.timeline?.step1?.title}</h3>
-            <div className="text-zinc-500 text-xs">{t.index.timeline?.step1?.desc}</div>
-
-            {/* Connecting Line (Right) - Hidden on mobile */}
-            <div className="hidden md:block absolute top-[2.2rem] right-0 translate-x-1/2 w-[calc(100%-1rem)] h-0.5 bg-zinc-200 dark:bg-zinc-800 -z-10" />
-          </div>
+          <Dialog>
+            <DialogTrigger asChild>
+              <button className="relative flex flex-col items-center text-center p-4 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm transition-all hover:shadow-md hover:ring-2 hover:ring-blue-500/50 cursor-pointer focus:outline-none w-full">
+                <div className="flex items-center justify-center w-12 h-12 rounded-full border-4 border-white dark:border-zinc-950 bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400 shrink-0 mb-3 z-10">
+                  <FileText className="w-5 h-5" />
+                </div>
+                <h3 className="font-bold text-zinc-800 dark:text-zinc-100 text-sm mb-1 w-full text-center">1. {t.index.timeline?.step1?.title}</h3>
+                <div className="text-zinc-500 text-xs w-full text-center">{t.index.timeline?.step1?.desc}</div>
+                <div className="hidden md:block absolute top-[2.2rem] right-0 translate-x-1/2 w-[calc(100%-1rem)] h-0.5 bg-zinc-200 dark:bg-zinc-800 -z-10" />
+              </button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400">
+                    <FileText className="w-5 h-5" />
+                  </div>
+                  1. {t.index.timeline?.step1?.title}
+                </DialogTitle>
+                <DialogDescription className="pt-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-300">
+                  {t.index.timeline?.step1?.fullDetail}
+                </DialogDescription>
+              </DialogHeader>
+            </DialogContent>
+          </Dialog>
 
           {/* Step 2 */}
-          <div className="relative flex flex-col items-center text-center p-4 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm transition-all hover:shadow-md">
-            <div className="flex items-center justify-center w-12 h-12 rounded-full border-4 border-white dark:border-zinc-950 bg-amber-100 text-amber-600 dark:bg-amber-900/50 dark:text-amber-500 shrink-0 mb-3 z-10">
-              <UserCheck className="w-5 h-5" />
-            </div>
-            <h3 className="font-bold text-zinc-800 dark:text-zinc-100 text-sm mb-1">2. {t.index.timeline?.step2?.title}</h3>
-            <div className="text-zinc-500 text-xs">{t.index.timeline?.step2?.desc}</div>
-
-            {/* Connecting Line (Right) - Hidden on mobile */}
-            <div className="hidden md:block absolute top-[2.2rem] right-0 translate-x-1/2 w-[calc(100%-1rem)] h-0.5 bg-zinc-200 dark:bg-zinc-800 -z-10" />
-          </div>
+          <Dialog>
+            <DialogTrigger asChild>
+              <button className="relative flex flex-col items-center text-center p-4 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm transition-all hover:shadow-md hover:ring-2 hover:ring-amber-500/50 cursor-pointer focus:outline-none w-full">
+                <div className="flex items-center justify-center w-12 h-12 rounded-full border-4 border-white dark:border-zinc-950 bg-amber-100 text-amber-600 dark:bg-amber-900/50 dark:text-amber-500 shrink-0 mb-3 z-10">
+                  <UserCheck className="w-5 h-5" />
+                </div>
+                <h3 className="font-bold text-zinc-800 dark:text-zinc-100 text-sm mb-1 w-full text-center">2. {t.index.timeline?.step2?.title}</h3>
+                <div className="text-zinc-500 text-xs w-full text-center">{t.index.timeline?.step2?.desc}</div>
+                <div className="hidden md:block absolute top-[2.2rem] right-0 translate-x-1/2 w-[calc(100%-1rem)] h-0.5 bg-zinc-200 dark:bg-zinc-800 -z-10" />
+              </button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-amber-100 text-amber-600 dark:bg-amber-900/50 dark:text-amber-500">
+                    <UserCheck className="w-5 h-5" />
+                  </div>
+                  2. {t.index.timeline?.step2?.title}
+                </DialogTitle>
+                <DialogDescription className="pt-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-300">
+                  {t.index.timeline?.step2?.fullDetail}
+                </DialogDescription>
+              </DialogHeader>
+            </DialogContent>
+          </Dialog>
 
           {/* Step 3 */}
-          <div className="relative flex flex-col items-center text-center p-4 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm transition-all hover:shadow-md">
-            <div className="flex items-center justify-center w-12 h-12 rounded-full border-4 border-white dark:border-zinc-950 bg-purple-100 text-purple-600 dark:bg-purple-900/50 dark:text-purple-400 shrink-0 mb-3 z-10">
-              <ShieldCheck className="w-5 h-5" />
-            </div>
-            <h3 className="font-bold text-zinc-800 dark:text-zinc-100 text-sm mb-1">3. {t.index.timeline?.step3?.title}</h3>
-            <div className="text-zinc-500 text-xs">{t.index.timeline?.step3?.desc}</div>
-
-            {/* Connecting Line (Right) - Hidden on mobile */}
-            <div className="hidden md:block absolute top-[2.2rem] right-0 translate-x-1/2 w-[calc(100%-1rem)] h-0.5 bg-zinc-200 dark:bg-zinc-800 -z-10" />
-          </div>
+          <Dialog>
+            <DialogTrigger asChild>
+              <button className="relative flex flex-col items-center text-center p-4 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm transition-all hover:shadow-md hover:ring-2 hover:ring-purple-500/50 cursor-pointer focus:outline-none w-full">
+                <div className="flex items-center justify-center w-12 h-12 rounded-full border-4 border-white dark:border-zinc-950 bg-purple-100 text-purple-600 dark:bg-purple-900/50 dark:text-purple-400 shrink-0 mb-3 z-10">
+                  <ShieldCheck className="w-5 h-5" />
+                </div>
+                <h3 className="font-bold text-zinc-800 dark:text-zinc-100 text-sm mb-1 w-full text-center">3. {t.index.timeline?.step3?.title}</h3>
+                <div className="text-zinc-500 text-xs w-full text-center">{t.index.timeline?.step3?.desc}</div>
+                <div className="hidden md:block absolute top-[2.2rem] right-0 translate-x-1/2 w-[calc(100%-1rem)] h-0.5 bg-zinc-200 dark:bg-zinc-800 -z-10" />
+              </button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-purple-100 text-purple-600 dark:bg-purple-900/50 dark:text-purple-400">
+                    <ShieldCheck className="w-5 h-5" />
+                  </div>
+                  3. {t.index.timeline?.step3?.title}
+                </DialogTitle>
+                <DialogDescription className="pt-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-300">
+                  {t.index.timeline?.step3?.fullDetail}
+                </DialogDescription>
+              </DialogHeader>
+            </DialogContent>
+          </Dialog>
 
           {/* Step 4 */}
-          <div className="relative flex flex-col items-center text-center p-4 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm transition-all hover:shadow-md">
-            <div className="flex items-center justify-center w-12 h-12 rounded-full border-4 border-white dark:border-zinc-950 bg-rose-100 text-rose-600 dark:bg-rose-900/50 dark:text-rose-500 shrink-0 mb-3 z-10">
-              <Users className="w-5 h-5" />
-            </div>
-            <h3 className="font-bold text-zinc-800 dark:text-zinc-100 text-sm mb-1">4. {t.index.timeline?.step4?.title}</h3>
-            <div className="text-zinc-500 text-xs">{t.index.timeline?.step4?.desc}</div>
-
-            {/* Connecting Line (Right) - Hidden on mobile */}
-            <div className="hidden md:block absolute top-[2.2rem] right-0 translate-x-1/2 w-[calc(100%-1rem)] h-0.5 bg-zinc-200 dark:bg-zinc-800 -z-10" />
-          </div>
+          <Dialog>
+            <DialogTrigger asChild>
+              <button className="relative flex flex-col items-center text-center p-4 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm transition-all hover:shadow-md hover:ring-2 hover:ring-rose-500/50 cursor-pointer focus:outline-none w-full">
+                <div className="flex items-center justify-center w-12 h-12 rounded-full border-4 border-white dark:border-zinc-950 bg-rose-100 text-rose-600 dark:bg-rose-900/50 dark:text-rose-500 shrink-0 mb-3 z-10">
+                  <Users className="w-5 h-5" />
+                </div>
+                <h3 className="font-bold text-zinc-800 dark:text-zinc-100 text-sm mb-1 w-full text-center">4. {t.index.timeline?.step4?.title}</h3>
+                <div className="text-zinc-500 text-xs w-full text-center">{t.index.timeline?.step4?.desc}</div>
+                <div className="hidden md:block absolute top-[2.2rem] right-0 translate-x-1/2 w-[calc(100%-1rem)] h-0.5 bg-zinc-200 dark:bg-zinc-800 -z-10" />
+              </button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-rose-100 text-rose-600 dark:bg-rose-900/50 dark:text-rose-500">
+                    <Users className="w-5 h-5" />
+                  </div>
+                  4. {t.index.timeline?.step4?.title}
+                </DialogTitle>
+                <DialogDescription className="pt-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-300">
+                  {t.index.timeline?.step4?.fullDetail}
+                </DialogDescription>
+              </DialogHeader>
+            </DialogContent>
+          </Dialog>
 
           {/* Step 5 */}
-          <div className="relative flex flex-col items-center text-center p-4 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm transition-all hover:shadow-md">
-            <div className="flex items-center justify-center w-12 h-12 rounded-full border-4 border-white dark:border-zinc-950 bg-green-100 text-green-600 dark:bg-green-900/50 dark:text-green-500 shrink-0 mb-3 z-10">
-              <Box className="w-5 h-5" />
-            </div>
-            <h3 className="font-bold text-zinc-800 dark:text-zinc-100 text-sm mb-1">5. {t.index.timeline?.step5?.title}</h3>
-            <div className="text-zinc-500 text-xs">{t.index.timeline?.step5?.desc}</div>
-          </div>
+          <Dialog>
+            <DialogTrigger asChild>
+              <button className="relative flex flex-col items-center text-center p-4 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm transition-all hover:shadow-md hover:ring-2 hover:ring-green-500/50 cursor-pointer focus:outline-none w-full">
+                <div className="flex items-center justify-center w-12 h-12 rounded-full border-4 border-white dark:border-zinc-950 bg-green-100 text-green-600 dark:bg-green-900/50 dark:text-green-500 shrink-0 mb-3 z-10">
+                  <Box className="w-5 h-5" />
+                </div>
+                <h3 className="font-bold text-zinc-800 dark:text-zinc-100 text-sm mb-1 w-full text-center">5. {t.index.timeline?.step5?.title}</h3>
+                <div className="text-zinc-500 text-xs w-full text-center">{t.index.timeline?.step5?.desc}</div>
+              </button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-green-100 text-green-600 dark:bg-green-900/50 dark:text-green-500">
+                    <Box className="w-5 h-5" />
+                  </div>
+                  5. {t.index.timeline?.step5?.title}
+                </DialogTitle>
+                <DialogDescription className="pt-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-300">
+                  {t.index.timeline?.step5?.fullDetail}
+                </DialogDescription>
+              </DialogHeader>
+            </DialogContent>
+          </Dialog>
 
         </div>
       </div>
