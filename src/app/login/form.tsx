@@ -27,8 +27,10 @@ export function LoginForm() {
 
     return (
         <Card className="w-full max-w-sm mx-auto mt-12">
-            <CardHeader className="flex flex-col items-center">
-                <img src="/intersnack-logo.png" alt="Intersnack Logo" className="h-12 object-contain mb-4" />
+            <CardHeader className="flex flex-col items-center pb-2">
+                <div className="bg-white p-2 md:p-3 rounded-2xl shadow-sm border border-zinc-200 dark:border-zinc-800 mb-6 mt-2">
+                    <img src="/intersnack-logo.png" alt="Intersnack Logo" className="h-10 md:h-12 object-contain" />
+                </div>
                 <CardTitle className="text-2xl">{t.login.title}</CardTitle>
                 <CardDescription>{t.login.subtitle}</CardDescription>
             </CardHeader>
