@@ -37,10 +37,10 @@ export default async function HseDashboard() {
             *, 
             ppe_master(*), 
             departments(*),
-            dept_approver:app_users!fk_dept_approver(role),
-            hse_approver:app_users!fk_hse_approver(role),
-            pm_approver:app_users!fk_pm_approver(role),
-            hr_approver:app_users!fk_hr_approver(role)
+            dept_approver:app_users!fk_dept_approver(email),
+            hse_approver:app_users!fk_hse_approver(email),
+            pm_approver:app_users!fk_pm_approver(email),
+            hr_approver:app_users!fk_hr_approver(email)
         `)
         .order('created_at', { ascending: false })
         .limit(100)
@@ -69,6 +69,9 @@ export default async function HseDashboard() {
             <div className="max-w-7xl mx-auto space-y-6">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
+                        <div className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-1">
+                            👋 Xin chào, {user.email}
+                        </div>
                         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{t.hse.title}</h1>
                         <p className="text-sm sm:text-base text-zinc-500">
                             {t.hse.subtitle}

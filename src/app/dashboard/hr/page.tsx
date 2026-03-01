@@ -37,10 +37,10 @@ export default async function HRDashboard() {
             *, 
             ppe_master(name, unit, unit_price), 
             departments(name),
-            dept_approver:app_users!fk_dept_approver(role),
-            hse_approver:app_users!fk_hse_approver(role),
-            pm_approver:app_users!fk_pm_approver(role),
-            hr_approver:app_users!fk_hr_approver(role)
+            dept_approver:app_users!fk_dept_approver(email),
+            hse_approver:app_users!fk_hse_approver(email),
+            pm_approver:app_users!fk_pm_approver(email),
+            hr_approver:app_users!fk_hr_approver(email)
         `)
         .eq('status', 'PENDING_HR')
         .order('created_at', { ascending: false })
