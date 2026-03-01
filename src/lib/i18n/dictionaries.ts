@@ -55,7 +55,8 @@ export const dictionaries = {
                 title: "Need Support?",
                 desc: "Having trouble? Contact us:",
                 email: "Email",
-                phone: "Zalo"
+                phone: "Zalo",
+                reveal: "Show Info"
             }
         },
         login: {
@@ -328,7 +329,8 @@ export const dictionaries = {
                 title: "Cần Hỗ Trợ?",
                 desc: "Gặp khó khăn trong quá trình sử dụng? Vui lòng liên hệ:",
                 email: "Email",
-                phone: "Zalo"
+                phone: "Zalo",
+                reveal: "Bấm để xem"
             }
         },
         login: {

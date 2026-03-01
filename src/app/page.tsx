@@ -4,6 +4,7 @@ import { FileText, UserCheck, ShieldCheck, Box, Users, Mail, MessageCircle } fro
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { getLocale } from './actions/locale'
 import { dictionaries } from '@/lib/i18n/dictionaries'
+import { ContactButtons } from '@/components/contact-buttons'
 
 export default async function Home() {
   const locale = await getLocale()
@@ -201,35 +202,13 @@ export default async function Home() {
           {t.index.contact?.desc || "Liên hệ với chúng tôi qua:"}
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a
-            href="mailto:vu.huynh@intersnack.com.vn"
-            className="flex items-center gap-3 px-6 py-3 rounded-full bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 transition-colors border border-zinc-200 dark:border-zinc-700 w-full sm:w-auto"
-          >
-            <div className="p-2 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-full">
-              <Mail className="w-5 h-5" />
-            </div>
-            <div className="text-left">
-              <div className="text-xs text-zinc-500 dark:text-zinc-400 leading-tight">Email Support</div>
-              <div className="font-medium text-sm">vu.huynh@intersnack.com.vn</div>
-            </div>
-          </a>
-
-          <a
-            href="https://zalo.me/0945646999"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-3 px-6 py-3 rounded-full bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 transition-colors border border-zinc-200 dark:border-zinc-700 w-full sm:w-auto"
-          >
-            <div className="p-2 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-full">
-              <MessageCircle className="w-5 h-5" />
-            </div>
-            <div className="text-left">
-              <div className="text-xs text-zinc-500 dark:text-zinc-400 leading-tight">Zalo / Hotline</div>
-              <div className="font-medium text-sm">0945 646 999</div>
-            </div>
-          </a>
-        </div>
+        <ContactButtons
+          email="vu.huynh@intersnack.com.vn"
+          phone="0945 646 999"
+          emailLabel={t.index.contact?.email || "Email Support"}
+          phoneLabel={t.index.contact?.phone || "Zalo / Hotline"}
+          revealText={t.index.contact?.reveal || "Show Info"}
+        />
       </div>
 
     </div>
