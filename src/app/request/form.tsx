@@ -521,6 +521,19 @@ export function RequestForm({
                                     </FormItem>
                                 )}
                             />
+                            <FormField
+                                control={form.control}
+                                name="lastReceiptDate"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-red-800 dark:text-red-200">{t.requestForm.lastReceiptDate || "Ngày nhận PPE gần nhất"} *</FormLabel>
+                                        <FormControl>
+                                            <Input type="date" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                         </div>
                         <FormField
                             control={form.control}
