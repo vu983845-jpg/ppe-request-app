@@ -41,9 +41,6 @@ export default async function RootLayout({
                 <p className="text-zinc-400 dark:text-zinc-600 font-medium tracking-wide text-xs opacity-70 whitespace-nowrap">
                   Designed & Built by V.H
                 </p>
-                <div className="ml-0 md:ml-auto">
-                  <LanguageSwitcher />
-                </div>
               </div>
             </footer>
           </div>
