@@ -416,7 +416,7 @@ export async function deletePpeMaster(ppeId: string) {
   return { success: true }
 }
 
-export async function updatePpeMasterInfo(ppeId: string, unitPrice: number, stockQty: number) {
+export async function updatePpeMasterInfo(ppeId: string, unitPrice: number, stockQty: number, nameEn?: string, lifeSpanMonths?: number) {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
@@ -425,9 +425,13 @@ export async function updatePpeMasterInfo(ppeId: string, unitPrice: number, stoc
   const { data: userData } = await supabase.from('app_users').select('role').eq('auth_user_id', user.id).single()
   if (!userData || !['ADMIN', 'HSE'].includes(userData.role)) return { error: 'Unauthorized' }
 
+  const updatePayload: any = { unit_price: unitPrice, stock_quantity: stockQty }
+  if (nameEn !== undefined) updatePayload.name_en = nameEn
+  if (lifeSpanMonths !== undefined) updatePayload.life_span_months = lifeSpanMonths
+
   const { error } = await supabase
     .from('ppe_master')
-    .update({ unit_price: unitPrice, stock_quantity: stockQty })
+    .update(updatePayload)
     .eq('id', ppeId)
 
   if (error) return { error: error.message }

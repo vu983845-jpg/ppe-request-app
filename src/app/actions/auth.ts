@@ -26,11 +26,19 @@ export async function loginAction(formData: FormData) {
     // Get user role logic to redirect
     const { data: { user } } = await supabase.auth.getUser()
     if (user) {
-        const { data: appUser } = await supabase
+        const { data: appUser, error: auError } = await supabase
             .from('app_users')
             .select('role')
             .eq('auth_user_id', user.id)
             .single()
+
+        if (auError) {
+            console.error("Role Fetch Error:", auError)
+            return { error: `Role Fetch Error: ${auError.message}` }
+        }
+
+        console.log("Logged in user UUID:", user.id)
+        console.log("Found appUser record:", appUser)
 
         if (appUser?.role === 'ADMIN') {
             redirect('/admin')
@@ -38,8 +46,12 @@ export async function loginAction(formData: FormData) {
             redirect('/dashboard/hse')
         } else if (appUser?.role === 'DEPT_HEAD') {
             redirect('/dashboard/dept-head')
+        } else if (appUser?.role === 'PLANT_MANAGER') {
+            redirect('/dashboard/plant-manager')
+        } else if (appUser?.role === 'HR') {
+            redirect('/dashboard/hr')
         } else {
-            redirect('/')
+            return { error: `No valid role found. Mapped role is: "${appUser?.role}". Expected "PLANT_MANAGER".` }
         }
     }
 

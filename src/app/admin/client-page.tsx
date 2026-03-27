@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import * as xlsx from 'xlsx'
 import { Badge } from '@/components/ui/badge'
 import { useLanguage } from '@/lib/i18n/context'
+import { getPpeName } from '@/lib/utils'
 
 export function AdminDashboardClient({
     budget,
@@ -15,7 +16,7 @@ export function AdminDashboardClient({
     requests: any[]
     ppeStats: any[]
 }) {
-    const { t } = useLanguage()
+    const { t, locale } = useLanguage()
 
     const currentMonthRequests = requests.filter(r => {
         const d = new Date(r.created_at)
@@ -34,12 +35,15 @@ export function AdminDashboardClient({
 
     function handleExport() {
         const exportData = requests.map(r => ({
+            'ID': r.id,
             'Date': new Date(r.created_at).toLocaleDateString(),
-            'Requester': r.requester_name,
+            'Requester Name': r.requester_name,
+            'Employee Code': r.requester_emp_code,
             'Department': r.departments?.name,
-            'Item': r.ppe_master?.name,
-            'Qty': r.quantity,
-            'Unit Price': r.ppe_master?.unit_price,
+            'Item': getPpeName(r.ppe_master, locale),
+            'Size': r.ppe_master?.size || 'N/A',
+            'Unit': r.ppe_master?.unit,
+            'Quantity': r.quantity,
             'Total Cost': r.quantity * (r.ppe_master?.unit_price || 0),
             'Status': r.status,
             'Dept Approver': r.dept_approver?.email || '',

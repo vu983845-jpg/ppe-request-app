@@ -14,7 +14,18 @@ export const dictionaries = {
             required: "Required",
             optional: "Optional",
             delete: "Delete",
-            edit: "Edit"
+            edit: "Edit",
+            noData: "No data available."
+        },
+        dashboard: {
+            analytics: {
+                totalRequests: "Total Requests (Month)",
+                pendingApprovals: "Pending Approvals",
+                totalCost: "Total Cost (VND)",
+                lostBroken: "Lost / Broken (Month)",
+                requestsByDept: "Requests by Department",
+                requestsByCategory: "Item Distribution Ratio"
+            }
         },
         index: {
             title: "PPE Management System",
@@ -288,7 +299,18 @@ export const dictionaries = {
             required: "Bắt buộc",
             optional: "Tùy chọn",
             delete: "Xóa",
-            edit: "Sửa"
+            edit: "Sửa",
+            noData: "Không có dữ liệu."
+        },
+        dashboard: {
+            analytics: {
+                totalRequests: "Tổng Yêu Cầu (Tháng)",
+                pendingApprovals: "Chờ Phê Duyệt",
+                totalCost: "Tổng Chi Phí (VNĐ)",
+                lostBroken: "Cấp Hỏng/Mất (Tháng)",
+                requestsByDept: "Yêu Cầu Theo Phòng Ban",
+                requestsByCategory: "Phân Bổ Tỷ Lệ Vật Phẩm"
+            }
         },
         index: {
             title: "Hệ Thống Quản Lý BHLĐ Intersnack",

@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { HseRequestsTable, InventoryTable, AnalyticsTable, BudgetCostsTable } from './client-page'
+import { RequestsTable, InventoryTable, AnalyticsTable, BudgetCostsTable } from './client-page'
 import { logoutAction } from '@/app/actions/auth'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -95,7 +95,7 @@ export default async function HseDashboard() {
                     <TabsContent value="approvals">
                         <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6">
                             <h2 className="text-xl font-semibold mb-4">{t.hse.pendingTitle}</h2>
-                            <HseRequestsTable requests={requests || []} />
+                            <RequestsTable requests={requests || []} />
                         </div>
                     </TabsContent>
 

@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation'
 import { RequestsTable } from './client-page'
 import { logoutAction } from '@/app/actions/auth'
 import { Button } from '@/components/ui/button'
+import { getDashboardStats } from '@/app/actions/analytics'
+import { AnalyticsDashboard } from '@/components/analytics-dashboard'
 import { getLocale } from '@/app/actions/locale'
 import { dictionaries } from '@/lib/i18n/dictionaries'
 
@@ -37,6 +39,8 @@ export default async function DeptHeadDashboard() {
             </div>
         )
     }
+
+    const stats = await getDashboardStats('DEPT_HEAD', appUser.department_id)
 
     // Fetch Requests
     const { data: requests, error: reqError } = await supabase
@@ -73,6 +77,8 @@ export default async function DeptHeadDashboard() {
                         <Button variant="outline" type="submit" className="w-full sm:w-auto">{t.common.signOut}</Button>
                     </form>
                 </div>
+
+                <AnalyticsDashboard stats={stats} translations={t} />
 
                 <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6">
                     <h2 className="text-xl font-semibold mb-4">{t.deptHead.pendingTitle}</h2>

@@ -21,11 +21,12 @@ import { Textarea } from '@/components/ui/textarea'
 import { useLanguage } from '@/lib/i18n/context'
 import { useRouter } from 'next/navigation'
 import * as xlsx from 'xlsx'
+import { checkEarlyReplacement, getPpeName } from '@/lib/utils'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts'
 import { ChevronDown, ChevronRight, User, Hash, Building2, Calendar, Trash2, Pencil, Tag } from 'lucide-react'
 
-export function HseRequestsTable({ requests }: { requests: any[] }) {
-    const { t } = useLanguage()
+export function RequestsTable({ requests }: { requests: any[] }) {
+    const { t, locale } = useLanguage()
     const router = useRouter()
     const [loadingId, setLoadingId] = useState<string | null>(null)
     const [rejectDialog, setRejectDialog] = useState<{ open: boolean; requestId: string | null }>({
@@ -122,15 +123,23 @@ export function HseRequestsTable({ requests }: { requests: any[] }) {
                                         {req.note && <div className="text-xs text-zinc-500 truncate max-w-[150px]" title={req.note}>{req.note}</div>}
                                     </TableCell>
                                     <TableCell>
-                                        {req.ppe_master?.name} {req.ppe_master?.size ? `- Size ${req.ppe_master.size}` : ''}
-                                        <div className="text-xs text-zinc-500">{req.ppe_master?.unit}</div>
+                                        {getPpeName(req.ppe_master, locale)} {req.ppe_master?.size ? `- Size ${req.ppe_master.size}` : ''}
+                                        <div className="text-sm text-zinc-500">{req.ppe_master?.unit}</div>
                                         {req.request_type === 'LOST_BROKEN' ? (
                                             <div className="mt-1 flex flex-col gap-1">
                                                 <Badge variant="destructive" className="w-fit text-[10px] px-1.5 py-0 h-4 uppercase">Mất/Hỏng</Badge>
                                                 {req.last_receipt_date && <div className="text-[11px] text-zinc-500">Nhận gần nhất: {new Date(req.last_receipt_date).toLocaleDateString()}</div>}
                                             </div>
                                         ) : (
-                                            <Badge variant="secondary" className="w-fit text-[10px] px-1.5 py-0 h-4 mt-1 bg-blue-100 text-blue-700 hover:bg-blue-100 uppercase dark:bg-blue-900/50 dark:text-blue-300">Cấp Mới</Badge>
+                                            <div className="mt-1 flex flex-col gap-1">
+                                                <Badge variant="secondary" className="w-fit text-[10px] px-1.5 py-0 h-4 bg-blue-100 text-blue-700 hover:bg-blue-100 uppercase dark:bg-blue-900/50 dark:text-blue-300">Cấp Mới</Badge>
+                                                {req.last_receipt_date && <div className="text-[11px] text-zinc-500">Nhận gần nhất: {new Date(req.last_receipt_date).toLocaleDateString()}</div>}
+                                            </div>
+                                        )}
+                                        {checkEarlyReplacement(req) && (
+                                            <Badge variant="destructive" className="mt-1 w-fit text-[10px] px-1.5 py-0 h-4">
+                                                ⚠️ Cấp sớm so với chu kỳ ({req.ppe_master.life_span_months} tháng)
+                                            </Badge>
                                         )}
                                     </TableCell>
                                     <TableCell>{req.quantity}</TableCell>
@@ -248,8 +257,10 @@ export function HseRequestsTable({ requests }: { requests: any[] }) {
 }
 
 export function InventoryTable({ inventory, purchases }: { inventory: any[], purchases: any[] }) {
-    const { t } = useLanguage()
+    const { t, locale } = useLanguage()
     const router = useRouter()
+
+    const [searchTerm, setSearchTerm] = useState('')
 
     const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({})
 
@@ -279,12 +290,16 @@ export function InventoryTable({ inventory, purchases }: { inventory: any[], pur
     const [isEditMenuOpen, setIsEditMenuOpen] = useState(false)
     const [editPrice, setEditPrice] = useState<number>(0)
     const [editQty, setEditQty] = useState<number>(0)
+    const [editNameEn, setEditNameEn] = useState<string>('')
+    const [editLifeSpan, setEditLifeSpan] = useState<number>(0)
     const [isUpdating, setIsUpdating] = useState(false)
 
     function openEditMenu(ppe: any) {
         setSelectedPpeId(ppe.id)
         setEditPrice(ppe.unit_price)
         setEditQty(ppe.stock_quantity)
+        setEditNameEn(ppe.name_en || '')
+        setEditLifeSpan(ppe.life_span_months || 0)
         setIsEditMenuOpen(true)
     }
 
@@ -293,7 +308,7 @@ export function InventoryTable({ inventory, purchases }: { inventory: any[], pur
         if (!window.confirm("Cảnh báo: Việc điều chỉnh số lượng và đơn giá thủ công có thể ảnh hưởng đến sai lệch hồ sơ tồn kho cuối tháng. Hãy chắc chắn trước khi thực hiện.")) return
         setIsUpdating(true)
         try {
-            const res = await updatePpeMasterInfo(selectedPpeId, editPrice, editQty)
+            const res = await updatePpeMasterInfo(selectedPpeId, editPrice, editQty, editNameEn, editLifeSpan)
             if (res?.error) {
                 toast.error(res.error)
             } else {
@@ -498,8 +513,8 @@ export function InventoryTable({ inventory, purchases }: { inventory: any[], pur
                                     <div className="text-xs text-zinc-500">{new Date(p.purchased_at).toLocaleTimeString()}</div>
                                 </TableCell>
                                 <TableCell>
-                                    <div className="font-medium">{p.ppe_master?.name}</div>
-                                    <div className="text-xs text-zinc-500">{p.ppe_master?.unit}</div>
+                                    <div className="font-medium">{getPpeName(p.ppe_master, locale)}</div>
+                                    <div className="text-sm text-zinc-500">{p.ppe_master?.unit} {p.ppe_master?.size ? `- Size ${p.ppe_master.size}` : ''}</div>
                                 </TableCell>
                                 <TableCell className="font-medium text-green-600 dark:text-green-400">+{p.quantity}</TableCell>
                                 <TableCell>{Number(p.unit_price).toLocaleString()}</TableCell>
@@ -600,6 +615,26 @@ export function InventoryTable({ inventory, purchases }: { inventory: any[], pur
                                 onChange={(e) => setEditQty(Number(e.target.value))}
                             />
                         </div>
+                        <div className="space-y-2">
+                            <Label>English Name (Tên Tiếng Anh)</Label>
+                            <Input
+                                type="text"
+                                placeholder="e.g., Safety Shoes"
+                                value={editNameEn}
+                                onChange={(e) => setEditNameEn(e.target.value)}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Life Span (Chu kỳ cấp phát - Tháng)</Label>
+                            <Input
+                                type="number"
+                                min="0"
+                                placeholder="e.g., 6"
+                                value={editLifeSpan === 0 ? 0 : (editLifeSpan || '')}
+                                onChange={(e) => setEditLifeSpan(Number(e.target.value))}
+                            />
+                            <p className="text-xs text-zinc-500">Đặt là 0 nếu không có giới hạn chu kỳ.</p>
+                        </div>
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setIsEditMenuOpen(false)} disabled={isUpdating}>
@@ -619,7 +654,7 @@ export function InventoryTable({ inventory, purchases }: { inventory: any[], pur
 }
 
 export function AnalyticsTable({ triggerRefetch }: { triggerRefetch?: number }) {
-    const { t } = useLanguage()
+    const { t, locale } = useLanguage()
 
     const [year, setYear] = useState<number>(new Date().getFullYear())
     const [month, setMonth] = useState<string>("all") // "all" string for Entire Year, or "1"-"12"
@@ -841,7 +876,7 @@ export function AnalyticsTable({ triggerRefetch }: { triggerRefetch?: number }) 
                                                 </div>
                                             )}
                                         </TableCell>
-                                        <TableCell className="font-medium text-zinc-900 dark:text-zinc-100">{name}</TableCell>
+                                        <TableCell className="font-medium text-zinc-900 dark:text-zinc-100">{getPpeName({ name: name, name_en: items[0].name_en }, locale)}</TableCell>
                                         <TableCell className="text-zinc-500">{items[0].unit}</TableCell>
                                         <TableCell className="text-right font-medium">{tOpen}</TableCell>
                                         <TableCell className="text-right text-blue-600 dark:text-blue-400 font-medium">+{tIn}</TableCell>

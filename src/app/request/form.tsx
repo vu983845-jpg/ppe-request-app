@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 import { submitPpeRequest } from '@/app/actions/requests'
 import { Department, PPEMaster } from '@/lib/types'
 import { useLanguage } from '@/lib/i18n/context'
+import { getPpeName } from '@/lib/utils'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -95,7 +96,7 @@ export function RequestForm({
     departments: Department[]
     ppes: PPEMaster[]
 }) {
-    const { t } = useLanguage()
+    const { t, locale } = useLanguage()
     const router = useRouter()
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isConfirming, setIsConfirming] = useState(false)
@@ -224,7 +225,7 @@ export function RequestForm({
                                 const ppe = ppes.find(p => p.name === item.itemName && (!item.size || p.size === item.size))
                                 return (
                                     <li key={idx} className="flex justify-between items-center bg-white dark:bg-zinc-950 p-3 rounded border border-zinc-100 dark:border-zinc-800">
-                                        <span>{ppe?.name} {ppe?.size ? `- Size ${ppe.size}` : ''}</span>
+                                        <span>{getPpeName(ppe, locale)} {ppe?.size ? `- Size ${ppe.size}` : ''}</span>
                                         <span className="font-medium bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded">
                                             {item.quantity} {ppe?.unit}
                                         </span>
@@ -423,10 +424,20 @@ export function RequestForm({
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent>
-                                                        {Array.from(new Set(ppes.map(p => p.name))).map((name) => (
-                                                            <SelectItem key={name} value={name}>
-                                                                {name}
-                                                            </SelectItem>
+                                                        {Array.from(new Set(ppes.map(p => p.name))).map((groupName) => (
+                                                            <SelectGroup key={groupName}>
+                                                                <SelectLabel>{groupName}</SelectLabel>
+                                                                {(() => {
+                                                                    const groupItems = ppes.filter(p => p.name === groupName)
+                                                                    const unit = groupItems[0]?.unit || ''
+                                                                    const stock = groupItems.reduce((acc, curr) => acc + curr.stock_quantity, 0)
+                                                                    return (
+                                                                        <SelectItem key={groupName} value={groupName}>
+                                                                            {getPpeName(groupItems[0], locale)} <span className="text-zinc-400 text-xs ml-2">({unit}) - Kho: {stock}</span>
+                                                                        </SelectItem>
+                                                                    )
+                                                                })()}
+                                                            </SelectGroup>
                                                         ))}
                                                     </SelectContent>
                                                 </Select>
@@ -435,6 +446,7 @@ export function RequestForm({
                                         )}
                                     />
 
+                                    {/* Select Size if available */}
                                     {(() => {
                                         const currentName = form.watch(`items.${index}.itemName`);
                                         const variants = ppes.filter(p => p.name === currentName);

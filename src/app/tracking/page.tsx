@@ -7,6 +7,7 @@ import { searchRequestsByEmpCode, confirmReceipt } from '@/app/actions/requests'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
+import { checkEarlyReplacement } from '@/lib/utils'
 
 export default function TrackingPage() {
     const { t } = useLanguage()
@@ -160,7 +161,15 @@ export default function TrackingPage() {
                                                             {req.last_receipt_date && <div className="text-[11px] text-zinc-500">Nhận gần nhất: {new Date(req.last_receipt_date).toLocaleDateString()}</div>}
                                                         </div>
                                                     ) : (
-                                                        <span className="inline-flex items-center rounded-md border px-1.5 py-0.5 text-[10px] font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-blue-100 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/50 dark:text-blue-300 w-fit uppercase mt-1">Cấp Mới</span>
+                                                        <div className="mt-1 flex flex-col gap-1">
+                                                            <span className="inline-flex items-center rounded-md border px-1.5 py-0.5 text-[10px] font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-blue-100 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/50 dark:text-blue-300 w-fit uppercase mt-1">Cấp Mới</span>
+                                                            {req.last_receipt_date && <div className="text-[11px] text-zinc-500">Nhận gần nhất: {new Date(req.last_receipt_date).toLocaleDateString()}</div>}
+                                                        </div>
+                                                    )}
+                                                    {checkEarlyReplacement(req) && (
+                                                        <Badge variant="destructive" className="mt-1 w-fit text-[10px] px-1.5 py-0 h-4 rounded-md">
+                                                            ⚠️ Cấp sớm so với chu kỳ ({req.ppe_master.life_span_months} tháng)
+                                                        </Badge>
                                                     )}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
@@ -233,7 +242,15 @@ export default function TrackingPage() {
                                                                 {req.last_receipt_date && <div className="text-[11px] text-zinc-500">Nhận gần nhất: {new Date(req.last_receipt_date).toLocaleDateString()}</div>}
                                                             </div>
                                                         ) : (
-                                                            <span className="inline-flex items-center rounded-md border px-1.5 py-0.5 text-[10px] font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-blue-100 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/50 dark:text-blue-300 w-fit uppercase mt-1">Cấp Mới</span>
+                                                            <div className="mt-1 flex flex-col gap-1">
+                                                                <span className="inline-flex items-center rounded-md border px-1.5 py-0.5 text-[10px] font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-blue-100 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/50 dark:text-blue-300 w-fit uppercase mt-1">Cấp Mới</span>
+                                                                {req.last_receipt_date && <div className="text-[11px] text-zinc-500">Nhận gần nhất: {new Date(req.last_receipt_date).toLocaleDateString()}</div>}
+                                                            </div>
+                                                        )}
+                                                        {checkEarlyReplacement(req) && (
+                                                            <Badge variant="destructive" className="mt-1 w-fit text-[10px] px-1.5 py-0 h-4 rounded-md">
+                                                                ⚠️ Cấp sớm so với chu kỳ ({req.ppe_master.life_span_months} tháng)
+                                                            </Badge>
                                                         )}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">

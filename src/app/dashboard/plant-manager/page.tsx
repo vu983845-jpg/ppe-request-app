@@ -1,8 +1,10 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { RequestsTable } from './client-page'
-import { logoutAction } from '@/app/actions/auth'
 import { Button } from '@/components/ui/button'
+import { logoutAction } from '@/app/actions/auth'
+import { getDashboardStats } from '@/app/actions/analytics'
+import { AnalyticsDashboard } from '@/components/analytics-dashboard'
 import { getLocale } from '@/app/actions/locale'
 import { dictionaries } from '@/lib/i18n/dictionaries'
 
@@ -29,6 +31,8 @@ export default async function PlantManagerDashboard() {
     if (appUser?.role !== 'PLANT_MANAGER') {
         return <div className="p-8">Unauthorized. Only the Plant Manager can access this page.</div>
     }
+
+    const stats = await getDashboardStats('PLANT_MANAGER')
 
     // Fetch Requests for Plant Manager Review (Lost/Broken flow)
     const { data: requests, error: reqError } = await supabase
@@ -63,6 +67,8 @@ export default async function PlantManagerDashboard() {
                         <Button variant="outline" type="submit" className="w-full sm:w-auto">{_t.common.signOut}</Button>
                     </form>
                 </div>
+
+                <AnalyticsDashboard stats={stats} translations={_t} />
 
                 <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6">
                     <h2 className="text-xl font-semibold mb-4">{_t.plantManager.pendingTitle}</h2>
